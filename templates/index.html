@@ -135,7 +135,7 @@
                 <div class="icon">👥</div>
                 <h3>Conviventes</h3>
                 <p>Cadastre, edite e gerencie os conviventes do Lar Ditoso</p>
-                <a href="{{ url_for('conviventes') }}" class="btn btn-primary">Gerenciar Conviventes</a>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">Gerenciar Conviventes</a>
             </div>
 
             <!-- CARD 2: CHAMADA -->
@@ -143,7 +143,7 @@
                 <div class="icon">📋</div>
                 <h3>Chamada Diária</h3>
                 <p>Registre a presença, falta, ausência ou hospitalização dos conviventes</p>
-                <a href="{{ url_for('chamada') }}" class="btn btn-success">Fazer Chamada</a>
+                <a href="{{ url_for('index') }}" class="btn btn-success">Fazer Chamada</a>
             </div>
 
             <!-- CARD 3: RELATÓRIOS -->
@@ -152,10 +152,10 @@
                 <h3>Relatórios de Chamada</h3>
                 <p>Imprima o relatório mensal preenchido ou a folha em branco para auditoria</p>
                 <div class="btn-group">
-                    <a href="{{ url_for('relatorio_chamada') }}" class="btn btn-primary">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
                         Relatório Preenchido
                     </a>
-                    <a href="{{ url_for('relatorio_chamada_branco') }}" class="btn btn-warning">
+                    <a href="{{ url_for('index') }}" class="btn btn-warning">
                         Espelho em Branco
                     </a>
                 </div>
@@ -166,7 +166,7 @@
                 <div class="icon">🚪</div>
                 <h3>Sair do Sistema</h3>
                 <p>Encerre sua sessão com segurança</p>
-                <a href="{{ url_for('logout') }}" class="btn btn-danger">Sair</a>
+                <a href="{{ url_for('index') }}" class="btn btn-danger">Sair</a>
             </div>
         </div>
     </div>
