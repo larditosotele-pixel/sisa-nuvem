@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Convivente</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 30px auto; padding: 20px; }
+        h2 { color: #1a2533; border-bottom: 2px solid #f39c12; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        input[type="file"] { margin-top: 5px; }
+   .info { font-size: 12px; color: #666; margin-top: 5px; }
+   .preview { margin-top: 10px; max-width: 150px; border-radius: 5px; }
+   .foto-atual { max-width: 150px; border-radius: 5px; margin-top: 5px; }
+   .btn { background: #f39c12; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; font-size: 16px; width: 100%; }
+   .btn:hover { background: #e67e22; }
+   .btn-danger { background: #e74c3c; margin-top: 10px; }
+   .btn-danger:hover { background: #c0392b; }
+   .voltar { background: #95a5a6; text-decoration: none; display: inline-block; text-align: center; margin-top: 10px; }
+   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    </style>
+</head>
+<body>
+    <h2>Editar Convivente</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label>Foto Atual:</label>
+        {% if convivente.foto %}
+            <img src="/static/{{ convivente.foto }}" class="foto-atual">
+        {% else %}
+            <p>Sem foto cadastrada</p>
+        {% endif %}
+
+        <label>Trocar Foto:</label>
+        <input type="file" name="foto" id="foto" accept="image/*">
+        <div class="info">Deixe em branco para manter a foto atual</div>
+        <img id="preview" class="preview" style="display:none;">
+
+        <label>Nome do Convivente:</label>
+        <input type="text" name="nome" value="{{ convivente.nome }}" required>
+
+        <div class="grid">
+            <div>
+                <label>Número do Quarto:</label>
+                <input type="number" name="quarto" value="{{ convivente.quarto }}" required>
+            </div>
+            <div>
+                <label>Número do Leito:</label>
+                <input type="number" name="leito" value="{{ convivente.leito }}" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Salvar Alterações</button>
+    </form>
+
+    <a href="/excluir/{{ convivente.id }}" class="btn btn-danger" onclick="return confirm('Desocupar o Leito {{ convivente.leito }}? Isso vai apagar o registro do convivente.')">Desocupar Leito</a>
+
+    <a href="/" class="btn voltar">Voltar</a>
+
+    <script>
+        document.getElementById('foto').onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>
