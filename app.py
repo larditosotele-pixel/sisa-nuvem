@@ -162,8 +162,8 @@ def relatorio_chamada_branco():
     )
 
 # ========== CADASTRO DE CONVIVENTES COM FOTO ==========
-@app.route('/conviventes')
-def conviventes(): # MUDEI O NOME DA FUNÇÃO DE listar_conviventes PRA conviventes
+   @app.route('/conviventes', endpoint='listar_conviventes')
+   def conviventes(): # MUDEI O NOME DA FUNÇÃO DE listar_conviventes PRA conviventes
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM {TABELA_CONVIVENTE} ORDER BY CAST(quarto AS INTEGER), CAST(leito AS TEXT)")
