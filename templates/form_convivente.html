@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titulo }} - SISA</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+     .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        h1 { color: #1b5e20; }
+     .btn { background: #43a047; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px; border: none; cursor: pointer; }
+     .btn-voltar { background: #95a5a6; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+     .foto-atual { margin-top: 10px; }
+     .foto-atual img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 2px solid #ccc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('listar_conviventes') }}" class="btn btn-voltar">Voltar</a>
+        <h1>{{ titulo }}</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            <label>Nome Completo:</label>
+            <input type="text" name="nome" value="{{ convivente.nome if convivente else '' }}" required>
+
+            <label>Quarto:</label>
+            <input type="text" name="quarto" value="{{ convivente.quarto if convivente else '' }}" required>
+
+            <label>Leito:</label>
+            <input type="text" name="leito" value="{{ convivente.leito if convivente else '' }}" required>
+
+            <label>Foto:</label>
+            <input type="file" name="foto" accept="image/*">
+
+            {% if convivente and convivente.foto %}
+            <div class="foto-atual">
+                <p><strong>Foto atual:</strong></p>
+                <img src="{{ url_for('static', filename=convivente.foto) }}"
+                     onerror="this.src='{{ url_for('static', filename='sem-foto.jpg') }}'" alt="Foto atual">
+                <p style="font-size: 10px; color: #666;">Envie uma nova foto para substituir</p>
+            </div>
+            {% endif %}
+
+            <br><br>
+            <button type="submit" class="btn">Salvar</button>
+        </form>
+    </div>
+</body>
+</html>

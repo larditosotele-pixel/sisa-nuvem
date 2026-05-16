@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Conviventes - SISA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+      .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+      .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+      .btn { background: #43a047; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px; font-size: 14px; border: none; cursor: pointer; }
+      .btn-danger { background: #d32f2f; }
+      .btn-voltar { background: #95a5a6; }
+      .filtros { margin-bottom: 20px; display: flex; gap: 10px; }
+      .quarto-grupo { margin-bottom: 25px; border: 2px solid #1b5e20; border-radius: 8px; overflow: hidden; }
+      .quarto-titulo { background: #1b5e20; color: white; padding: 12px 15px; font-size: 18px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #e8f5e9; color: #1b5e20; }
+        tr:hover { background: #f5f5f5; }
+        tr:last-child td { border-bottom: none; }
+        img.foto { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+      .acoes { display: flex; gap: 10px; }
+      .vazio { background: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Gerenciar Conviventes</h1>
+            <div>
+                <a href="{{ url_for('cadastrar') }}" class="btn">+ Novo Convivente</a>
+                <a href="{{ url_for('index') }}" class="btn btn-voltar">Voltar</a>
+            </div>
+        </div>
+
+        <div class="filtros">
+            <a href="{{ url_for('listar', sort='quarto') }}" class="btn" style="background: #1976d2;">Ordem por Quarto</a>
+            <a href="{{ url_for('listar', sort='nome') }}" class="btn" style="background: #1976d2;">Ordem Alfabética</a>
+        </div>
+
+        {% if ordem == 'nome' %}
+            <!-- LISTA SIMPLES ALFABÉTICA -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nome</th>
+                        <th>Quarto</th>
+                        <th>Leito</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in conviventes %}
+                    <tr>
+                        <td>
+                            {% if c.foto %}
+                                <img class="foto" src="{{ url_for('static', filename='fotos_conviventes/' + c.foto) }}" alt="">
+                            {% else %}
+                                <img class="foto" src="{{ url_for('static', filename='fotos_conviventes/sem-foto.jpg') }}" alt="">
+                            {% endif %}
+                        </td>
+                        <td>{{ c.nome }}</td>
+                        <td>{{ c.quarto if c.quarto|int > 0 else 'Sem quarto' }}</td>
+                        <td>{{ c.leito if c.leito|int > 0 else 'Sem leito' }}</td>
+                        <td class="acoes">
+                            <a href="{{ url_for('editar', id=c.id) }}" class="btn">Editar</a>
+                            <a href="{{ url_for('excluir', id=c.id) }}" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja excluir {{ c.nome }}?')">Excluir</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <!-- AGRUPADO POR QUARTO -->
+            {% set quartos = conviventes|groupby('quarto') %}
+            {% for quarto, pessoas in quartos %}
+                <div class="quarto-grupo">
+                    <div class="quarto-titulo">
+                        QUARTO {{ quarto if quarto|int > 0 else 'SEM QUARTO DEFINIDO' }} - {{ pessoas|length }} convivente(s)
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">Foto</th>
+                                <th>Nome</th>
+                                <th style="width: 80px;">Leito</th>
+                                <th style="width: 180px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in pessoas|sort(attribute='leito') %}
+                            <tr>
+                                <td>
+                                    {% if c.foto %}
+                                        <img class="foto" src="{{ url_for('static', filename='fotos_conviventes/' + c.foto) }}" alt="">
+                                    {% else %}
+                                        <img class="foto" src="{{ url_for('static', filename='fotos_conviventes/sem-foto.jpg') }}" alt="">
+                                    {% endif %}
+                                </td>
+                                <td>{{ c.nome }}</td>
+                                <td>{{ c.leito if c.leito|int > 0 else '-' }}</td>
+                                <td class="acoes">
+                                    <a href="{{ url_for('editar', id=c.id) }}" class="btn">Editar</a>
+                                    <a href="{{ url_for('excluir', id=c.id) }}" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja excluir {{ c.nome }}?')">Excluir</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+            
+            {% if not conviventes %}
+                <div class="vazio">Nenhum convivente cadastrado ainda. Clique em "+ Novo Convivente" para começar.</div>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
