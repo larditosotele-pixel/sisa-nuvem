@@ -17,21 +17,21 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # ====================================================
 
-def get_db_connection():
+    def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     return conn
 
-def allowed_file(filename):
+    def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
-def index():
+    def index():
     return render_template('index.html')
 
 # ========== CAROMETRO ==========
 @app.route('/carometro')
-def carometro():
+    def carometro():
     ordem = request.args.get('sort', 'quarto')
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -44,7 +44,7 @@ def carometro():
     return render_template('carometro.html', conviventes=conviventes, ordem=ordem, orientacao='retrato')
 
 @app.route('/carometro-paisagem')
-def carometro_paisagem():
+    def carometro_paisagem():
     ordem = request.args.get('sort', 'quarto')
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -58,7 +58,7 @@ def carometro_paisagem():
 
 # ========== CHAMADA ==========
 @app.route('/chamada')
-def chamada():
+    def chamada():
     data_param = request.args.get('data')
     hoje = data_param if data_param else datetime.now().strftime('%Y-%m-%d')
 
@@ -74,7 +74,7 @@ def chamada():
     return render_template('chamada.html', conviventes=conviventes, hoje=hoje, chamadas_salvas=chamadas_salvas)
 
 @app.route('/salvar_chamada', methods=['POST'])
-def salvar_chamada():
+    def salvar_chamada():
     dados = request.get_json()
     data = dados.get('data')
     presencas = dados.get('presencas', {})
@@ -92,7 +92,7 @@ def salvar_chamada():
     return jsonify({'status': 'ok'})
 
 @app.route('/relatorio_chamada')
-def relatorio_chamada():
+    def relatorio_chamada():
     conn = get_db_connection()
     cursor = conn.cursor()
     hoje = datetime.now()
@@ -135,7 +135,7 @@ def relatorio_chamada():
                            hoje=hoje_formatado)
 
 @app.route('/relatorio_chamada_branco')
-def relatorio_chamada_branco():
+    def relatorio_chamada_branco():
     mes = datetime.now().month
     ano = datetime.now().year
     hoje = datetime.now().strftime('%d/%m/%Y')
@@ -162,8 +162,8 @@ def relatorio_chamada_branco():
     )
 
 # ========== CADASTRO DE CONVIVENTES COM FOTO ==========
-   @app.route('/conviventes', endpoint='listar_conviventes')
-   def conviventes(): # MUDEI O NOME DA FUNÇÃO DE listar_conviventes PRA conviventes
+@app.route('/conviventes', endpoint='listar_conviventes')
+    def conviventes(): # MUDEI O NOME DA FUNÇÃO DE listar_conviventes PRA conviventes
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM {TABELA_CONVIVENTE} ORDER BY CAST(quarto AS INTEGER), CAST(leito AS TEXT)")
@@ -172,7 +172,7 @@ def relatorio_chamada_branco():
     return render_template('conviventes.html', conviventes=conviventes)
 
 @app.route('/convivente/novo', methods=['GET', 'POST'])
-def novo_convivente():
+    def novo_convivente():
     if request.method == 'POST':
         nome = request.form['nome']
         quarto = request.form['quarto']
@@ -197,7 +197,7 @@ def novo_convivente():
     return render_template('form_convivente.html', convivente=None, titulo="Novo Convivente")
 
 @app.route('/convivente/editar/<int:id>', methods=['GET', 'POST'])
-def editar_convivente(id):
+    def editar_convivente(id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -231,7 +231,7 @@ def editar_convivente(id):
     return render_template('form_convivente.html', convivente=convivente, titulo="Editar Convivente")
 
 @app.route('/convivente/excluir/<int:id>')
-def excluir_convivente(id):
+    def excluir_convivente(id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(f"SELECT foto FROM {TABELA_CONVIVENTE} WHERE id=?", (id,))
@@ -247,7 +247,7 @@ def excluir_convivente(id):
 
 # ADICIONEI ESSA ROTA DE LOGOUT QUE FALTAVA
 @app.route('/logout')
-def logout():
+    def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
