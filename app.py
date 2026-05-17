@@ -15,23 +15,26 @@ COLUNA_DATA_CHAMADA = 'data_chamada'
 UPLOAD_FOLDER = 'static/fotos_conviventes'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# CRIA A PASTA SE NÃO EXISTIR - EVITA ERRO 500 NO RENDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # ====================================================
 
-    def get_db_connection():
+def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     return conn
 
-    def allowed_file(filename):
+def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
-    def index():
+def index():
     return render_template('index.html')
 
 # ========== CAROMETRO ==========
 @app.route('/carometro')
-    def carometro():
+def carometro():
     ordem = request.args.get('sort', 'quarto')
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -44,7 +47,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     return render_template('carometro.html', conviventes=conviventes, ordem=ordem, orientacao='retrato')
 
 @app.route('/carometro-paisagem')
-    def carometro_paisagem():
+def carometro_paisagem():
     ordem = request.args.get('sort', 'quarto')
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -58,7 +61,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # ========== CHAMADA ==========
 @app.route('/chamada')
-    def chamada():
+def chamada():
     data_param = request.args.get('data')
     hoje = data_param if data_param else datetime.now().strftime('%Y-%m-%d')
 
@@ -74,7 +77,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     return render_template('chamada.html', conviventes=conviventes, hoje=hoje, chamadas_salvas=chamadas_salvas)
 
 @app.route('/salvar_chamada', methods=['POST'])
-    def salvar_chamada():
+def salvar_chamada():
     dados = request.get_json()
     data = dados.get('data')
     presencas = dados.get('presencas', {})
@@ -92,7 +95,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     return jsonify({'status': 'ok'})
 
 @app.route('/relatorio_chamada')
-    def relatorio_chamada():
+def relatorio_chamada():
     conn = get_db_connection()
     cursor = conn.cursor()
     hoje = datetime.now()
@@ -135,7 +138,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
                            hoje=hoje_formatado)
 
 @app.route('/relatorio_chamada_branco')
-    def relatorio_chamada_branco():
+def relatorio_chamada_branco():
     mes = datetime.now().month
     ano = datetime.now().year
     hoje = datetime.now().strftime('%d/%m/%Y')
@@ -144,7 +147,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     dias_semana = [calendar.weekday(ano, mes, dia) for dia in dias_mes]
     nome_mes = calendar.month_name[mes].capitalize()
 
-    # CORRIGIDO: usando sqlite3, não SQLAlchemy
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM {TABELA_CONVIVENTE} ORDER BY CAST(quarto AS INTEGER), CAST(leito AS TEXT)")
@@ -162,8 +164,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     )
 
 # ========== CADASTRO DE CONVIVENTES COM FOTO ==========
-@app.route('/conviventes', endpoint='listar_conviventes')
-    def conviventes(): # MUDEI O NOME DA FUNÇÃO DE listar_conviventes PRA conviventes
+@app.route('/conviventes')
+def conviventes():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM {TABELA_CONVIVENTE} ORDER BY CAST(quarto AS INTEGER), CAST(leito AS TEXT)")
@@ -172,7 +174,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     return render_template('conviventes.html', conviventes=conviventes)
 
 @app.route('/convivente/novo', methods=['GET', 'POST'])
-    def novo_convivente():
+def novo_convivente():
     if request.method == 'POST':
         nome = request.form['nome']
         quarto = request.form['quarto']
@@ -197,7 +199,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     return render_template('form_convivente.html', convivente=None, titulo="Novo Convivente")
 
 @app.route('/convivente/editar/<int:id>', methods=['GET', 'POST'])
-    def editar_convivente(id):
+def editar_convivente(id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -206,8 +208,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
         quarto = request.form['quarto']
         leito = request.form['leito']
 
+        # CORREÇÃO 1: Verifica se o convivente existe antes
         cursor.execute(f"SELECT foto FROM {TABELA_CONVIVENTE} WHERE id=?", (id,))
-        foto_atual = cursor.fetchone()['foto']
+        resultado = cursor.fetchone()
+        if not resultado:
+            conn.close()
+            flash('Convivente não encontrado!')
+            return redirect(url_for('conviventes'))
+
+        foto_atual = resultado['foto']
         foto_path = foto_atual
 
         if 'foto' in request.files:
@@ -216,8 +225,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
                 filename = secure_filename(f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 foto_path = f'fotos_conviventes/{filename}'
-                if foto_atual and os.path.exists(os.path.join('static', foto_atual)):
-                    os.remove(os.path.join('static', foto_atual))
+                # CORREÇÃO 2: Só tenta apagar se a foto existir
+                if foto_atual:
+                    caminho_foto_antiga = os.path.join('static', foto_atual)
+                    if os.path.exists(caminho_foto_antiga):
+                        os.remove(caminho_foto_antiga)
 
         cursor.execute(f"UPDATE {TABELA_CONVIVENTE} SET nome=?, quarto=?, leito=?, foto=? WHERE id=?", (nome, quarto, leito, foto_path, id))
         conn.commit()
@@ -228,16 +240,25 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     cursor.execute(f"SELECT * FROM {TABELA_CONVIVENTE} WHERE id=?", (id,))
     convivente = cursor.fetchone()
     conn.close()
+
+    # CORREÇÃO 3: Se não achar o convivente, volta pra lista
+    if not convivente:
+        flash('Convivente não encontrado!')
+        return redirect(url_for('conviventes'))
+
     return render_template('form_convivente.html', convivente=convivente, titulo="Editar Convivente")
 
 @app.route('/convivente/excluir/<int:id>')
-    def excluir_convivente(id):
+def excluir_convivente(id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(f"SELECT foto FROM {TABELA_CONVIVENTE} WHERE id=?", (id,))
-    foto = cursor.fetchone()['foto']
-    if foto and os.path.exists(os.path.join('static', foto)):
-        os.remove(os.path.join('static', foto))
+    resultado = cursor.fetchone()
+    if resultado and resultado['foto']:
+        foto = resultado['foto']
+        caminho_foto = os.path.join('static', foto)
+        if os.path.exists(caminho_foto):
+            os.remove(caminho_foto)
 
     cursor.execute(f"DELETE FROM {TABELA_CONVIVENTE} WHERE id=?", (id,))
     conn.commit()
@@ -245,9 +266,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     flash('Convivente excluído!')
     return redirect(url_for('conviventes'))
 
-# ADICIONEI ESSA ROTA DE LOGOUT QUE FALTAVA
 @app.route('/logout')
-    def logout():
+def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
