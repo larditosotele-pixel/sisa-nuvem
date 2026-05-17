@@ -6,8 +6,10 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'sisa_secreto_2026'
 
+DB_PATH = '/data/sisa.db' # CAMINHO DO DISCO PERSISTENTE
+
 def get_db():
-    conn = sqlite3.connect('sisa.db')
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -18,7 +20,8 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             quarto INTEGER NOT NULL,
-            leito INTEGER NOT NULL
+            leito INTEGER NOT NULL,
+            foto TEXT
         )
     ''')
     conn.commit()
@@ -39,18 +42,27 @@ def conviventes():
 
 @app.route('/novo_convivente', methods=['GET', 'POST'])
 def novo_convivente():
+    # Pega lista de fotos disponíveis na pasta static/fotos
+    fotos_dir = os.path.join(app.static_folder, 'fotos')
+    fotos_disponiveis = []
+    if os.path.exists(fotos_dir):
+        fotos_disponiveis = [f for f in os.listdir(fotos_dir) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+
     if request.method == 'POST':
         nome = request.form['nome']
         quarto = request.form['quarto']
         leito = request.form['leito']
+        foto = request.form.get('foto', '')
+
         conn = get_db()
-        conn.execute('INSERT INTO conviventes (nome, quarto, leito) VALUES (?,?,?)',
-                     (nome, quarto, leito))
+        conn.execute('INSERT INTO conviventes (nome, quarto, leito, foto) VALUES (?,?,?,?)',
+                     (nome, quarto, leito, foto))
         conn.commit()
         conn.close()
         flash('Convivente cadastrado!')
         return redirect(url_for('conviventes'))
-    return render_template('novo_convivente.html')
+
+    return render_template('novo_convivente.html', fotos=fotos_disponiveis)
 
 @app.route('/atualizar_convivente/<int:id>', methods=['GET', 'POST'])
 def atualizar_convivente(id):
@@ -59,7 +71,6 @@ def atualizar_convivente(id):
         nome = request.form['nome']
         quarto = request.form['quarto']
         leito = request.form['leito']
-
         conn.execute('UPDATE conviventes SET nome=?, quarto=?, leito=? WHERE id=?',
                      (nome, quarto, leito, id))
         conn.commit()
@@ -75,10 +86,6 @@ def atualizar_convivente(id):
 def editar_convivente(id):
     return atualizar_convivente(id)
 
-@app.route('/convivente/editar/<int:id>', methods=['GET', 'POST'])
-def editar_convivente_alias(id):
-    return atualizar_convivente(id)
-
 @app.route('/excluir_convivente/<int:id>')
 def excluir_convivente(id):
     conn = get_db()
@@ -88,35 +95,9 @@ def excluir_convivente(id):
     flash('Convivente excluído!')
     return redirect(url_for('conviventes'))
 
-@app.route('/desocupar_leito/<int:id>', methods=['POST'])
-def desocupar_leito(id):
-    conn = get_db()
-    conn.execute('UPDATE conviventes SET nome=?, quarto=?, leito=? WHERE id=?',
-                 ('VAGO', 0, 0, id))
-    conn.commit()
-    conn.close()
-    flash('Leito desocupado!')
-    return redirect(url_for('conviventes'))
-
 @app.route('/chamada')
 def chamada():
     return "Página de Chamada em construção"
-
-@app.route('/relatorio_chamada')
-def relatorio_chamada():
-    return "Página de Relatório de Chamada em construção"
-
-@app.route('/relatorio_chamada_branco')
-def relatorio_chamada_branco():
-    return "Relatório de Chamada em Branco - Em construção"
-
-@app.route('/relatorio')
-def relatorio():
-    return "Página de Relatório em construção"
-
-@app.route('/config')
-def config():
-    return "Página de Configurações em construção"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
