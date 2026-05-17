@@ -2,70 +2,36 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conviventes - SISA</title>
+    <title>Cadastro de Conviventes - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 18px; }
+        body { font-family: Arial, sans-serif; background: #f0f0f0; }
 
-.header {
+     .header {
             background: #1b5e20;
             color: white;
-            padding: 16px;
+            padding: 3mm 5mm;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 3mm;
         }
-.header img { height: 50px; width: 50px; }
-.header-text h1 { margin: 0; font-size: 24px; }
-.header-text span { font-size: 16px; }
+     .header img { height: 10mm; width: 10mm; }
+     .header-text h1 { margin: 0; font-size: 14pt; }
+     .header-text span { font-size: 9pt; }
 
-.container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
-.btn {
-            width: 100%;
-            background: #43a047;
-            color: white;
-            text-decoration: none;
-            padding: 18px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            display: block;
-            margin: 12px 0;
-            font-size: 20px;
-            min-height: 60px;
-            font-weight: bold;
-            text-align: center;
-        }
-.btn-voltar { background: #95a5a6; }
-.btn-editar { background: #1976d2; }
-.btn-excluir { background: #d32f2f; }
-.flash { background: #c8e6c9; padding: 16px; border-radius: 8px; margin-bottom: 16px; font-size: 18px; text-align: center; }
-
-.card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-.card-linha {
-            display: flex;
-            justify-content: space-between;
-            margin: 12px 0;
-            font-size: 19px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 12px;
-        }
-.card-linha:last-of-type { border-bottom: none; }
-.card-linha strong { color: #1b5e20; font-size: 21px; text-transform: uppercase; }
-.card-botoes {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 16px;
-        }
-.card-botoes.btn { margin: 0; }
+     .container { max-width: 1100px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; }
+        h2 { color: #1b5e20; margin-bottom: 15px; }
+     .btn { background: #43a047; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px; border: none; cursor: pointer; display: inline-block; margin: 5px 0; }
+     .btn-voltar { background: #95a5a6; }
+     .btn-editar { background: #1976d2; font-size: 12px; padding: 5px 10px; }
+     .btn-excluir { background: #d32f2f; font-size: 12px; padding: 5px 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
+        th { background: #1b5e20; color: white; }
+        tr:nth-child(even) { background: #f2f2f2; }
+     .flash { background: #c8e6c9; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+     .foto-mini { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 1px solid #ccc; }
+     .nome-foto { display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
@@ -78,7 +44,8 @@
     </div>
 
     <div class="container">
-        <a href="{{ url_for('index') }}" class="btn btn-voltar">VOLTAR AO MENU</a>
+        <a href="{{ url_for('index') }}" class="btn btn-voltar">Voltar ao Menu</a>
+        <h2>Cadastro de Conviventes</h2>
 
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -86,29 +53,44 @@
           {% endif %}
         {% endwith %}
 
-        <a href="{{ url_for('novo_convivente') }}" class="btn">+ NOVO CONVIVENTE</a>
+        <a href="{{ url_for('novo_convivente') }}" class="btn">+ Novo Convivente</a>
 
-        {% for c in conviventes %}
-        <div class="card">
-            <div class="card-linha">
-                <span>NOME:</span>
-                <strong>{{ c.nome }}</strong>
-            </div>
-            <div class="card-linha">
-                <span>QUARTO:</span>
-                <strong>{{ c.quarto }}</strong>
-            </div>
-            <div class="card-linha">
-                <span>LEITO:</span>
-                <strong>{{ c.leito }}</strong>
-            </div>
-
-            <div class="card-botoes">
-                <a href="{{ url_for('editar_convivente', id=c.id) }}" class="btn btn-editar">EDITAR</a>
-                <a href="{{ url_for('excluir_convivente', id=c.id) }}" class="btn btn-excluir" onclick="return confirm('Excluir {{ c.nome }}?')">EXCLUIR</a>
-            </div>
-        </div>
-        {% endfor %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Convivente</th>
+                    <th>Quarto</th>
+                    <th>Leito</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in conviventes %}
+                <tr>
+                    <td>{{ c.id }}</td>
+                    <td>
+                        <div class="nome-foto">
+                            {% if c.foto %}
+                                <img src="{{ url_for('static', filename=c.foto) }}"
+                                     onerror="this.src='{{ url_for('static', filename='sem-foto.jpg') }}'"
+                                     class="foto-mini" alt="">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='sem-foto.jpg') }}" class="foto-mini" alt="">
+                            {% endif %}
+                            <span>{{ c.nome }}</span>
+                        </div>
+                    </td>
+                    <td>{{ c.quarto }}</td>
+                    <td>{{ c.leito }}</td>
+                    <td>
+                        <a href="{{ url_for('editar_convivente', id=c.id) }}" class="btn btn-editar">Editar</a>
+                        <a href="{{ url_for('excluir_convivente', id=c.id) }}" class="btn btn-excluir" onclick="return confirm('Tem certeza que quer excluir {{ c.nome }}?')">Excluir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
