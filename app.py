@@ -59,7 +59,7 @@ def atualizar_convivente(id):
         nome = request.form['nome']
         quarto = request.form['quarto']
         leito = request.form['leito']
-        
+
         conn.execute('UPDATE conviventes SET nome=?, quarto=?, leito=? WHERE id=?',
                      (nome, quarto, leito, id))
         conn.commit()
@@ -71,7 +71,10 @@ def atualizar_convivente(id):
     conn.close()
     return render_template('editar_convivente.html', c=c)
 
-# ALIAS PRA COMPATIBILIDADE COM LINK ANTIGO
+@app.route('/editar_convivente/<int:id>', methods=['GET', 'POST'])
+def editar_convivente(id):
+    return atualizar_convivente(id)
+
 @app.route('/convivente/editar/<int:id>', methods=['GET', 'POST'])
 def editar_convivente_alias(id):
     return atualizar_convivente(id)
@@ -88,14 +91,13 @@ def excluir_convivente(id):
 @app.route('/desocupar_leito/<int:id>', methods=['POST'])
 def desocupar_leito(id):
     conn = get_db()
-    conn.execute('UPDATE conviventes SET nome=?, quarto=?, leito=? WHERE id=?', 
+    conn.execute('UPDATE conviventes SET nome=?, quarto=?, leito=? WHERE id=?',
                  ('VAGO', 0, 0, id))
     conn.commit()
     conn.close()
     flash('Leito desocupado!')
     return redirect(url_for('conviventes'))
 
-# ROTAS STUB - SÓ PRA NÃO DAR ERRO 500 NO MENU
 @app.route('/chamada')
 def chamada():
     return "Página de Chamada em construção"
