@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Conviventes - SISA</title>
+    <title>Conviventes - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 18px; }
@@ -42,7 +42,6 @@
 .btn-excluir { background: #d32f2f; }
 .flash { background: #c8e6c9; padding: 16px; border-radius: 8px; margin-bottom: 16px; font-size: 18px; text-align: center; }
 
-        /* CARD SIMPLES - FUNCIONA EM QUALQUER CELULAR */
 .card {
             background: white;
             border-radius: 12px;
@@ -59,7 +58,7 @@
             padding-bottom: 12px;
         }
 .card-linha:last-of-type { border-bottom: none; }
-.card-linha strong { color: #1b5e20; font-size: 21px; }
+.card-linha strong { color: #1b5e20; font-size: 21px; text-transform: uppercase; }
 .card-botoes {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -102,10 +101,6 @@
             <div class="card-linha">
                 <span>LEITO:</span>
                 <strong>{{ c.leito }}</strong>
-            </div>
-            <div class="card-linha">
-                <span>ID:</span>
-                <strong>{{ c.id }}</strong>
             </div>
 
             <div class="card-botoes">
