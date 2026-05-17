@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import sqlite3
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'sisa_secreto_2026'
@@ -21,6 +22,23 @@ def init_db():
             quarto INTEGER NOT NULL,
             leito INTEGER NOT NULL,
             foto TEXT
+        )
+    ''')
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS chamadas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            data TEXT NOT NULL,
+            periodo TEXT NOT NULL
+        )
+    ''')
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS presencas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chamada_id INTEGER NOT NULL,
+            convivente_id INTEGER NOT NULL,
+            presente INTEGER NOT NULL,
+            FOREIGN KEY (chamada_id) REFERENCES chamadas (id),
+            FOREIGN KEY (convivente_id) REFERENCES conviventes (id)
         )
     ''')
     conn.commit()
@@ -80,7 +98,6 @@ def editar_convivente(id):
     conn.close()
     return render_template('editar_convivente.html', c=c)
 
-# Alias pra não quebrar o template antigo
 @app.route('/atualizar_convivente/<int:id>', methods=['GET', 'POST'])
 def atualizar_convivente(id):
     return editar_convivente(id)
@@ -93,6 +110,20 @@ def excluir_convivente(id):
     conn.close()
     flash('Convivente excluído!')
     return redirect(url_for('conviventes'))
+
+# ROTAS QUE ESTAVAM FALTANDO
+@app.route('/chamada')
+def chamada():
+    return render_template('chamada.html')
+
+@app.route('/relatorios')
+def relatorios():
+    return render_template('relatorios.html')
+
+@app.route('/salvar_chamada', methods=['POST'])
+def salvar_chamada():
+    flash('Chamada salva!')
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
