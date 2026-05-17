@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import sqlite3
 import os
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'sisa_secreto_2026'
 
-DB_PATH = '/data/sisa.db' # CAMINHO DO DISCO PERSISTENTE
+DB_PATH = 'sisa.db' # VOLTEI PRO NORMAL PRA SUBIR
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -42,7 +41,6 @@ def conviventes():
 
 @app.route('/novo_convivente', methods=['GET', 'POST'])
 def novo_convivente():
-    # Pega lista de fotos disponíveis na pasta static/fotos
     fotos_dir = os.path.join(app.static_folder, 'fotos')
     fotos_disponiveis = []
     if os.path.exists(fotos_dir):
@@ -64,8 +62,8 @@ def novo_convivente():
 
     return render_template('novo_convivente.html', fotos=fotos_disponiveis)
 
-@app.route('/atualizar_convivente/<int:id>', methods=['GET', 'POST'])
-def atualizar_convivente(id):
+@app.route('/editar_convivente/<int:id>', methods=['GET', 'POST'])
+def editar_convivente(id):
     conn = get_db()
     if request.method == 'POST':
         nome = request.form['nome']
@@ -82,10 +80,6 @@ def atualizar_convivente(id):
     conn.close()
     return render_template('editar_convivente.html', c=c)
 
-@app.route('/editar_convivente/<int:id>', methods=['GET', 'POST'])
-def editar_convivente(id):
-    return atualizar_convivente(id)
-
 @app.route('/excluir_convivente/<int:id>')
 def excluir_convivente(id):
     conn = get_db()
@@ -94,10 +88,6 @@ def excluir_convivente(id):
     conn.close()
     flash('Convivente excluído!')
     return redirect(url_for('conviventes'))
-
-@app.route('/chamada')
-def chamada():
-    return "Página de Chamada em construção"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
