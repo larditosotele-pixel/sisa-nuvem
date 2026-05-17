@@ -46,7 +46,7 @@ def index():
 @app.route('/conviventes')
 def conviventes():
     conn = get_db()
-    conviventes = conn.execute('SELECT * FROM conviventes ORDER BY quarto, leito').fetchall()
+    conviventes = conn.execute('SELECT * FROM conviventes ORDER BY id').fetchall()
     conn.close()
     return render_template('conviventes.html', conviventes=conviventes)
 
