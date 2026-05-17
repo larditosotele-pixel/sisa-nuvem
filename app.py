@@ -77,13 +77,22 @@ def excluir_convivente(id):
     flash('Convivente excluído!')
     return redirect(url_for('conviventes'))
 
+# ROTAS STUB - SÓ PRA NÃO DAR ERRO 500
 @app.route('/chamada')
 def chamada():
-    return "Página de chamada em construção"
+    return "Página de Chamada em construção"
 
-# COLA SUAS OUTRAS ROTAS AQUI EMBAIXO
-# @app.route('/medicamentos')...
-# @app.route('/relatorios')...
+@app.route('/relatorio_chamada')
+def relatorio_chamada():
+    return "Página de Relatório de Chamada em construção"
+
+@app.route('/relatorio')
+def relatorio():
+    return "Página de Relatório em construção"
+
+@app.route('/config')
+def config():
+    return "Página de Configurações em construção"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
