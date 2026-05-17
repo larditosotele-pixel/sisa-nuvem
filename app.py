@@ -111,19 +111,45 @@ def excluir_convivente(id):
     flash('Convivente excluído!')
     return redirect(url_for('conviventes'))
 
-# ROTAS QUE ESTAVAM FALTANDO
 @app.route('/chamada')
 def chamada():
-    return render_template('chamada.html')
+    conn = get_db()
+    conviventes = conn.execute('SELECT * FROM conviventes ORDER BY quarto, leito').fetchall()
+    conn.close()
+    return render_template('chamada.html', conviventes=conviventes)
+
+@app.route('/salvar_chamada', methods=['POST'])
+def salvar_chamada():
+    periodo = request.form['periodo']
+    data = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute('INSERT INTO chamadas (data, periodo) VALUES (?,?)', (data, periodo))
+    chamada_id = cur.lastrowid
+
+    for key, value in request.form.items():
+        if key.startswith('presente_'):
+            convivente_id = key.split('_')[1]
+            presente = 1 if value == 'on' else 0
+            cur.execute('INSERT INTO presencas (chamada_id, convivente_id, presente) VALUES (?,?,?)',
+                       (chamada_id, convivente_id, presente))
+
+    conn.commit()
+    conn.close()
+    flash('Chamada salva com sucesso!')
+    return redirect(url_for('index'))
 
 @app.route('/relatorios')
 def relatorios():
     return render_template('relatorios.html')
 
-@app.route('/salvar_chamada', methods=['POST'])
-def salvar_chamada():
-    flash('Chamada salva!')
-    return redirect(url_for('index'))
+@app.route('/relatorio_chamada')
+def relatorio_chamada():
+    conn = get_db()
+    chamadas = conn.execute('SELECT * FROM chamadas ORDER BY data DESC').fetchall()
+    conn.close()
+    return render_template('relatorio_chamada.html', chamadas=chamadas)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
