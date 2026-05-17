@@ -151,5 +151,12 @@ def relatorio_chamada():
     conn.close()
     return render_template('relatorio_chamada.html', chamadas=chamadas)
 
+@app.route('/relatorio_chamada_branco')
+def relatorio_chamada_branco():
+    conn = get_db()
+    conviventes = conn.execute('SELECT * FROM conviventes ORDER BY quarto, leito').fetchall()
+    conn.close()
+    return render_template('relatorio_chamada_branco.html', conviventes=conviventes)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
