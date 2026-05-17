@@ -84,7 +84,7 @@
                     <td>{{ c.quarto }}</td>
                     <td>{{ c.leito }}</td>
                     <td>
-                        <a href="{{ url_for('atualizar_convivente', id=c.id) }}" class="btn btn-editar">Editar</a>
+                        <a href="{{ url_for('editar_convivente', id=c.id) }}" class="btn btn-editar">Editar</a>
                         <a href="{{ url_for('excluir_convivente', id=c.id) }}" class="btn btn-excluir" onclick="return confirm('Tem certeza que quer excluir {{ c.nome }}?')">Excluir</a>
                     </td>
                 </tr>
