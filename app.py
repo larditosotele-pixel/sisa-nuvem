@@ -21,11 +21,6 @@ def init_db():
             leito INTEGER NOT NULL
         )
     ''')
-    # Se quiser usar foto no futuro, roda isso uma vez:
-    # try:
-    #     conn.execute('ALTER TABLE conviventes ADD COLUMN foto TEXT')
-    # except:
-    #     pass
     conn.commit()
     conn.close()
 
@@ -75,6 +70,11 @@ def atualizar_convivente(id):
     c = conn.execute('SELECT * FROM conviventes WHERE id =?', (id,)).fetchone()
     conn.close()
     return render_template('editar_convivente.html', c=c)
+
+# ALIAS PRA COMPATIBILIDADE COM LINK ANTIGO
+@app.route('/convivente/editar/<int:id>', methods=['GET', 'POST'])
+def editar_convivente_alias(id):
+    return atualizar_convivente(id)
 
 @app.route('/excluir_convivente/<int:id>')
 def excluir_convivente(id):
