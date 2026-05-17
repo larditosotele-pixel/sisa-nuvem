@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Novo Convivente - SISA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 18px; }
+       .header { background: #1b5e20; color: white; padding: 16px; }
+       .container { max-width: 800px; margin: 16px auto; padding: 0 12px; background: white; padding: 20px; border-radius: 8px; }
+       .btn { width: 100%; background: #43a047; color: white; padding: 18px; border: none; border-radius: 8px; font-size: 20px; margin: 12px 0; cursor: pointer; }
+        input { width: 100%; padding: 16px; font-size: 18px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; }
+        label { font-weight: bold; margin-top: 12px; display: block; }
+       .fotos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+       .foto-opcao { text-align: center; cursor: pointer; border: 3px solid transparent; border-radius: 8px; padding: 5px; }
+       .foto-opcao img { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; }
+       .foto-opcao.selecionada { border-color: #43a047; background: #e8f5e9; }
+       .foto-opcao p { font-size: 14px; margin-top: 4px; word-break: break-word; }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>NOVO CONVIVENTE</h1></div>
+    <div class="container">
+        <form method="POST">
+            <label>1. CLIQUE NA FOTO DO CONVIVENTE:</label>
+            <div class="fotos-grid">
+                {% for foto in fotos %}
+                <div class="foto-opcao" onclick="selecionarFoto('{{ foto }}')">
+                    <img src="{{ url_for('static', filename='fotos/' + foto) }}" alt="">
+                    <p>{{ foto.split('.')[0].replace('_', ' ').title() }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <input type="hidden" name="foto" id="foto_selecionada">
+
+            <label>2. NOME:</label>
+            <input type="text" name="nome" id="nome" required>
+
+            <label>3. QUARTO:</label>
+            <input type="number" name="quarto" required>
+
+            <label>4. LEITO:</label>
+            <input type="number" name="leito" required>
+
+            <button type="submit" class="btn">SALVAR CONVIVENTE</button>
+        </form>
+    </div>
+
+    <script>
+        function selecionarFoto(nomeArquivo) {
+            // Remove seleção anterior
+            document.querySelectorAll('.foto-opcao').forEach(el => el.classList.remove('selecionada'));
+            // Adiciona seleção na foto clicada
+            event.currentTarget.classList.add('selecionada');
+
+            // Preenche campo foto
+            document.getElementById('foto_selecionada').value = 'fotos/' + nomeArquivo;
+
+            // Preenche nome automático: tira extensão e _ vira espaço
+            let nome = nomeArquivo.split('.')[0].replace(/_/g, ' ');
+            nome = nome.split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+            document.getElementById('nome').value = nome;
+        }
+    </script>
+</body>
+</html>
