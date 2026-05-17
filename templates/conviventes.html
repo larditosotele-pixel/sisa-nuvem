@@ -8,7 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f0f0f0; }
 
-    .header {
+   .header {
             background: #1b5e20;
             color: white;
             padding: 12px 16px;
@@ -16,11 +16,11 @@
             align-items: center;
             gap: 12px;
         }
-    .header img { height: 40px; width: 40px; }
-    .header-text h1 { margin: 0; font-size: 18px; }
-    .header-text span { font-size: 12px; }
+   .header img { height: 40px; width: 40px; }
+   .header-text h1 { margin: 0; font-size: 18px; }
+   .header-text span { font-size: 12px; }
 
-    .container {
+   .container {
             max-width: 1100px;
             margin: 16px auto;
             background: white;
@@ -28,7 +28,7 @@
             border-radius: 8px;
         }
         h2 { color: #1b5e20; margin-bottom: 15px; font-size: 20px; }
-    .btn {
+   .btn {
             background: #43a047;
             color: white;
             text-decoration: none;
@@ -40,28 +40,22 @@
             margin: 5px 0;
             font-size: 14px;
         }
-    .btn-voltar { background: #95a5a6; }
-    .btn-editar { background: #1976d2; font-size: 12px; padding: 6px 10px; }
-    .btn-excluir { background: #d32f2f; font-size: 12px; padding: 6px 10px; }
+   .btn-voltar { background: #95a5a6; }
+   .btn-editar { background: #1976d2; font-size: 12px; padding: 6px 10px; }
+   .btn-excluir { background: #d32f2f; font-size: 12px; padding: 6px 10px; }
+   .flash { background: #c8e6c9; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
 
-        /* TABELA RESPONSIVA */
-       .tabela-wrapper { overflow-x: auto; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            min-width: 600px;
-        }
-        th, td {
+        /* TABELA DESKTOP */
+   .tabela-desktop { width: 100%; border-collapse: collapse; margin-top: 20px; }
+   .tabela-desktop th,.tabela-desktop td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
             vertical-align: middle;
         }
-        th { background: #1b5e20; color: white; font-size: 14px; }
-        tr:nth-child(even) { background: #f2f2f2; }
-    .flash { background: #c8e6c9; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
-    .foto-mini {
+   .tabela-desktop th { background: #1b5e20; color: white; }
+   .tabela-desktop tr:nth-child(even) { background: #f2f2f2; }
+   .foto-mini {
             width: 40px;
             height: 40px;
             object-fit: cover;
@@ -69,26 +63,55 @@
             border: 1px solid #ccc;
             flex-shrink: 0;
         }
-    .nome-foto {
+   .nome-foto {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-    .nome-foto span { font-size: 14px; }
-    .acoes { white-space: nowrap; }
 
-        /* MELHORIAS SÓ PRA CELULAR */
+        /* CARDS MOBILE */
+   .cards-mobile { display: none; }
+   .card-convivente {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+   .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+   .card-header.foto-mini { width: 50px; height: 50px; }
+   .card-nome { font-size: 16px; font-weight: bold; color: #1b5e20; }
+   .card-id { font-size: 12px; color: #666; }
+   .card-info { font-size: 14px; }
+   .card-linha {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+   .card-acoes {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+   .card-acoes.btn {
+            flex: 1;
+            text-align: center;
+            margin: 0;
+        }
+
+        /* MÁGICA: NO CELULAR SOME A TABELA E APARECE OS CARDS */
         @media (max-width: 768px) {
-           .container { margin: 8px; padding: 12px; }
-            h2 { font-size: 18px; }
-           .btn { padding: 8px 12px; font-size: 13px; }
-            th, td { padding: 6px; font-size: 13px; }
-           .foto-mini { width: 32px; height: 32px; }
-           .btn-editar,.btn-excluir {
-                display: block;
-                margin: 3px 0;
-                text-align: center;
-            }
+         .container { margin: 8px; padding: 12px; }
+         .tabela-desktop { display: none; }
+         .cards-mobile { display: block; }
         }
     </style>
 </head>
@@ -113,43 +136,76 @@
 
         <a href="{{ url_for('novo_convivente') }}" class="btn">+ Novo Convivente</a>
 
-        <div class="tabela-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Convivente</th>
-                        <th>Quarto</th>
-                        <th>Leito</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for c in conviventes %}
-                    <tr>
-                        <td>{{ c.id }}</td>
-                        <td>
-                            <div class="nome-foto">
-                                {% if c.foto %}
-                                    <img src="{{ url_for('static', filename=c.foto) }}"
-                                         onerror="this.src='{{ url_for('static', filename='sem-foto.jpg') }}'"
-                                         class="foto-mini" alt="">
-                                {% else %}
-                                    <img src="{{ url_for('static', filename='sem-foto.jpg') }}" class="foto-mini" alt="">
-                                {% endif %}
-                                <span>{{ c.nome }}</span>
-                            </div>
-                        </td>
-                        <td>{{ c.quarto }}</td>
-                        <td>{{ c.leito }}</td>
-                        <td class="acoes">
-                            <a href="{{ url_for('editar_convivente', id=c.id) }}" class="btn btn-editar">Editar</a>
-                            <a href="{{ url_for('excluir_convivente', id=c.id) }}" class="btn btn-excluir" onclick="return confirm('Tem certeza que quer excluir {{ c.nome }}?')">Excluir</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- TABELA SÓ PRA PC -->
+        <table class="tabela-desktop">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Convivente</th>
+                    <th>Quarto</th>
+                    <th>Leito</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in conviventes %}
+                <tr>
+                    <td>{{ c.id }}</td>
+                    <td>
+                        <div class="nome-foto">
+                            {% if c.foto %}
+                                <img src="{{ url_for('static', filename=c.foto) }}"
+                                     onerror="this.src='{{ url_for('static', filename='sem-foto.jpg') }}'"
+                                     class="foto-mini" alt="">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='sem-foto.jpg') }}" class="foto-mini" alt="">
+                            {% endif %}
+                            <span>{{ c.nome }}</span>
+                        </div>
+                    </td>
+                    <td>{{ c.quarto }}</td>
+                    <td>{{ c.leito }}</td>
+                    <td>
+                        <a href="{{ url_for('editar_convivente', id=c.id) }}" class="btn btn-editar">Editar</a>
+                        <a href="{{ url_for('excluir_convivente', id=c.id) }}" class="btn btn-excluir" onclick="return confirm('Tem certeza que quer excluir {{ c.nome }}?')">Excluir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- CARDS SÓ PRA CELULAR - AGORA COM BOTÕES -->
+        <div class="cards-mobile">
+            {% for c in conviventes %}
+            <div class="card-convivente">
+                <div class="card-header">
+                    {% if c.foto %}
+                        <img src="{{ url_for('static', filename=c.foto) }}"
+                             onerror="this.src='{{ url_for('static', filename='sem-foto.jpg') }}'"
+                             class="foto-mini" alt="">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='sem-foto.jpg') }}" class="foto-mini" alt="">
+                    {% endif %}
+                    <div>
+                        <div class="card-nome">{{ c.nome }}</div>
+                        <div class="card-id">ID: {{ c.id }}</div>
+                    </div>
+                <div class="card-info">
+                    <div class="card-linha">
+                        <span>Quarto:</span>
+                        <strong>{{ c.quarto }}</strong>
+                    </div>
+                    <div class="card-linha">
+                        <span>Leito:</span>
+                        <strong>{{ c.leito }}</strong>
+                    </div>
+                </div>
+                <div class="card-acoes">
+                    <a href="{{ url_for('editar_convivente', id=c.id) }}" class="btn btn-editar">Editar</a>
+                    <a href="{{ url_for('excluir_convivente', id=c.id) }}" class="btn btn-excluir" onclick="return confirm('Tem certeza que quer excluir {{ c.nome }}?')">Excluir</a>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </body>
