@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Conviventes - SISA</title>
+    <title>Cadastro de Conviventes - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
-            font-size: 16px;
-        }
+        body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 18px; }
 
 .header {
             background: #1b5e20;
@@ -19,206 +15,58 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
 .header img { height: 50px; width: 50px; }
-.header-text h1 { margin: 0; font-size: 22px; }
-.header-text span { font-size: 15px; }
+.header-text h1 { margin: 0; font-size: 24px; }
+.header-text span { font-size: 16px; }
 
-.container {
-            max-width: 1200px;
-            margin: 16px auto;
-            padding: 0 12px;
-        }
+.container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
 .btn {
             width: 100%;
             background: #43a047;
             color: white;
             text-decoration: none;
-            padding: 16px;
+            padding: 18px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
             display: block;
             margin: 12px 0;
-            font-size: 18px;
-            min-height: 55px;
+            font-size: 20px;
+            min-height: 60px;
             font-weight: bold;
             text-align: center;
         }
 .btn-voltar { background: #95a5a6; }
-.btn-adicionar { background: #1b5e20; }
-.flash { background: #c8e6c9; padding: 16px; border-radius: 8px; margin-bottom: 16px; font-size: 17px; text-align: center; }
+.btn-editar { background: #1976d2; }
+.btn-excluir { background: #d32f2f; }
+.flash { background: #c8e6c9; padding: 16px; border-radius: 8px; margin-bottom: 16px; font-size: 18px; text-align: center; }
 
-        /* QUARTO - IGUAL SEU PRINT */
-.quarto-bloco {
+        /* CARD SIMPLES - FUNCIONA EM QUALQUER CELULAR */
+.card {
             background: white;
             border-radius: 12px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-.quarto-titulo {
-            background: #e0e0e0;
-            padding: 14px 16px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
+.card-linha {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-.btn-leito {
-            background: #43a047;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 15px;
-            min-height: auto;
-            width: auto;
-            margin: 0;
-        }
-.leitos-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            padding: 16px;
-        }
-        @media (min-width: 600px) {
-.leitos-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (min-width: 900px) {
-.leitos-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        /* CARD DO LEITO - IGUAL SEU PRINT */
-.leito-card {
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            overflow: hidden;
-            background: white;
-            position: relative;
-            cursor: pointer;
-        }
-.leito-card:active { transform: scale(0.98); }
-.leito-numero {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: #1976d2;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 10;
-        }
-.leito-foto {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background: #f5f5f5;
-        }
-.leito-nome {
-            padding: 10px 8px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-            text-transform: uppercase;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-.leito-vazio {
-            border: 2px dashed #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-            font-size: 14px;
-            min-height: 230px;
-        }
-
-        /* MODAL EDITAR - IGUAL SEU PRINT */
-.modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-.modal.ativo { display: flex; }
-.modal-conteudo {
-            background: white;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-.modal-header {
-            color: #1976d2;
-            font-size: 22px;
-            font-weight: bold;
-            padding: 20px;
-            text-align: center;
+            margin: 12px 0;
+            font-size: 19px;
             border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
         }
-.modal-body { padding: 20px; }
-.modal-quarto {
-            background: #f5f5f5;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-.modal label {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            display: block;
+.card-linha:last-of-type { border-bottom: none; }
+.card-linha strong { color: #1b5e20; font-size: 21px; }
+.card-botoes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-top: 16px;
-            margin-bottom: 6px;
         }
-.modal input[type="text"],.modal input[type="file"] {
-            width: 100%;
-            padding: 14px;
-            font-size: 17px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            min-height: 50px;
-        }
-.modal input[type="file"] {
-            padding: 12px;
-            font-size: 16px;
-        }
-.modal.btn {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-.btn-salvar { background: #43a047; }
-.btn-desocupar { background: #f9a825; color: #333; }
-.btn-excluir-leito { background: #d32f2f; }
-.btn-cancelar {
-            background: transparent;
-            color: #666;
-            text-decoration: underline;
-            font-size: 16px;
-            min-height: auto;
-            padding: 12px;
-        }
+.card-botoes.btn { margin: 0; }
     </style>
 </head>
 <body>
@@ -239,84 +87,33 @@
           {% endif %}
         {% endwith %}
 
-        <a href="{{ url_for('novo_convivente') }}" class="btn btn-adicionar">+ NOVO CONVIVENTE</a>
+        <a href="{{ url_for('novo_convivente') }}" class="btn">+ NOVO CONVIVENTE</a>
 
-        <!-- MAPA DE LEITOS AGRUPADO POR QUARTO -->
-        {% set quartos = conviventes|groupby('quarto') %}
-        {% for quarto, pessoas in quartos %}
-        <div class="quarto-bloco">
-            <div class="quarto-titulo">
-                QUARTO {{ quarto }}
-                <a href="{{ url_for('novo_convivente') }}?quarto={{ quarto }}" class="btn btn-leito">+ Leito</a>
+        {% for c in conviventes %}
+        <div class="card">
+            <div class="card-linha">
+                <span>NOME:</span>
+                <strong>{{ c.nome }}</strong>
             </div>
-            <div class="leitos-grid">
-                {% for c in pessoas|sort(attribute='leito') %}
-                <div class="leito-card" onclick="abrirModal({{ c.id }}, '{{ c.nome }}', {{ c.quarto }}, {{ c.leito }})">
-                    <div class="leito-numero">L. {{ c.leito }}</div>
-                    {% if c.foto %}
-                        <img src="{{ url_for('static', filename=c.foto) }}"
-                             onerror="this.src='{{ url_for('static', filename='sem-foto.jpg') }}'"
-                             class="leito-foto" alt="{{ c.nome }}">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='sem-foto.jpg') }}" class="leito-foto" alt="">
-                    {% endif %}
-                    <div class="leito-nome">{{ c.nome }}</div>
-                </div>
-                {% endfor %}
+            <div class="card-linha">
+                <span>QUARTO:</span>
+                <strong>{{ c.quarto }}</strong>
             </div>
-        {% endfor %}
-    </div>
+            <div class="card-linha">
+                <span>LEITO:</span>
+                <strong>{{ c.leito }}</strong>
+            </div>
+            <div class="card-linha">
+                <span>ID:</span>
+                <strong>{{ c.id }}</strong>
+            </div>
 
-    <!-- MODAL GERENCIAR LEITO - IGUAL SEU PRINT -->
-    <div class="modal" id="modalLeito">
-        <div class="modal-conteudo">
-            <div class="modal-header">GERENCIAR LEITO</div>
-            <div class="modal-body">
-                <div class="modal-quarto" id="modalQuartoLeito">Q. 1 - LEITO 1</div>
-
-                <form id="formEditar" method="POST" enctype="multipart/form-data">
-                    <label>NOME:</label>
-                    <input type="text" id="modalNome" name="nome" required>
-
-                    <label>FOTO:</label>
-                    <input type="file" id="modalFoto" name="foto" accept="image/*">
-
-                    <button type="submit" class="btn btn-salvar">SALVAR</button>
-                </form>
-
-                <form id="formDesocupar" method="POST" style="margin: 0;">
-                    <button type="submit" class="btn btn-desocupar">DESOCUPAR</button>
-                </form>
-
-                <form id="formExcluir" method="POST" style="margin: 0;" onsubmit="return confirm('Tem certeza que deseja EXCLUIR este leito?')">
-                    <button type="submit" class="btn btn-excluir-leito">EXCLUIR LEITO</button>
-                </form>
-
-                <button class="btn btn-cancelar" onclick="fecharModal()">Cancelar</button>
+            <div class="card-botoes">
+                <a href="{{ url_for('editar_convivente', id=c.id) }}" class="btn btn-editar">EDITAR</a>
+                <a href="{{ url_for('excluir_convivente', id=c.id) }}" class="btn btn-excluir" onclick="return confirm('Excluir {{ c.nome }}?')">EXCLUIR</a>
             </div>
         </div>
+        {% endfor %}
     </div>
-
-    <script>
-        function abrirModal(id, nome, quarto, leito) {
-            document.getElementById('modalLeito').classList.add('ativo');
-            document.getElementById('modalQuartoLeito').textContent = `Q. ${quarto} - LEITO ${leito}`;
-            document.getElementById('modalNome').value = nome;
-
-            // Ajusta as actions dos forms
-            document.getElementById('formEditar').action = `/editar_convivente/${id}`;
-            document.getElementById('formDesocupar').action = `/desocupar_convivente/${id}`;
-            document.getElementById('formExcluir').action = `/excluir_convivente/${id}`;
-        }
-
-        function fecharModal() {
-            document.getElementById('modalLeito').classList.remove('ativo');
-        }
-
-        // Fecha ao clicar fora
-        document.getElementById('modalLeito').addEventListener('click', function(e) {
-            if (e.target === this) fecharModal();
-        });
-    </script>
 </body>
 </html>
