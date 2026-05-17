@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 app.secret_key = 'sisa_secreto_2026'
 
-DB_PATH = 'sisa.db' # VOLTEI PRO NORMAL PRA SUBIR
+DB_PATH = 'sisa.db'
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -79,6 +79,11 @@ def editar_convivente(id):
     c = conn.execute('SELECT * FROM conviventes WHERE id =?', (id,)).fetchone()
     conn.close()
     return render_template('editar_convivente.html', c=c)
+
+# Alias pra não quebrar o template antigo
+@app.route('/atualizar_convivente/<int:id>', methods=['GET', 'POST'])
+def atualizar_convivente(id):
+    return editar_convivente(id)
 
 @app.route('/excluir_convivente/<int:id>')
 def excluir_convivente(id):
