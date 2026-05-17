@@ -77,6 +77,10 @@ def excluir_convivente(id):
     flash('Convivente excluído!')
     return redirect(url_for('conviventes'))
 
+@app.route('/chamada')
+def chamada():
+    return "Página de chamada em construção"
+
 # COLA SUAS OUTRAS ROTAS AQUI EMBAIXO
 # @app.route('/medicamentos')...
 # @app.route('/relatorios')...
