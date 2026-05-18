@@ -1,5 +1,5 @@
 import os
-import psycopg2
+import psycopg
 from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 import pytz
@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 def get_db_connection():
     DATABASE_URL = os.environ.get('DATABASE_URL')
-    conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg.connect(DATABASE_URL)
     return conn
 
 def init_db():
