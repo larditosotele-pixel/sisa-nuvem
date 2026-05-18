@@ -1,52 +1,66 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<div class="container">
-    <h2>Fazer Chamada</h2>
-    
-    <form method="POST" action="{{ url_for('salvar_chamada') }}">
-        <div class="form-group">
-            <label>Período:</label>
-            <select name="periodo" class="form-control" required>
-                <option value="Manhã">Manhã</option>
-                <option value="Tarde">Tarde</option>
-                <option value="Noite">Noite</option>
-            </select>
-        </div>
-
-        <table class="table">
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>SISA - Chamada Diária</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f0f0; margin: 0; }
+       .header { background: #1b5e20; color: white; padding: 15px; text-align: center; }
+       .container { max-width: 1000px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; }
+       .data { text-align: center; font-size: 14pt; color: #1b5e20; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #1b5e20; color: white; padding: 12px; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+       .foto { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+       .btn-status { padding: 8px 12px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; text-decoration: none; display: inline-block; }
+       .btn-P { background: #2e7d32; } /* Verde - Presente */
+       .btn-F { background: #c62828; } /* Vermelho - Falta */
+       .btn-A { background: #ff9800; } /* Amarelo - Ausente */
+       .btn-H { background: #1976d2; } /* Azul - Hospitalizado */
+       .ativo { box-shadow: 0 0 0 3px #000; transform: scale(1.1); }
+       .voltar { display: block; text-align: center; margin-top: 20px; color: #1976d2; }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>Chamada Diária</h1></div>
+    <div class="container">
+        <div class="data">Data: {{ data_hoje }}</div>
+        <table>
             <thead>
                 <tr>
                     <th>Foto</th>
                     <th>Nome</th>
-                    <th>Quarto</th>
-                    <th>Leito</th>
-                    <th>Presente?</th>
+                    <th>Status</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for c in conviventes %}
                 <tr>
                     <td>
-                        {% if c.foto %}
-                            <img src="{{ url_for('static', filename='fotos/' + c.foto) }}" width="50">
+                        {% if c['foto'] %}
+                        <img src="{{ c['foto'] }}" class="foto">
                         {% else %}
-                            <img src="{{ url_for('static', filename='sem-foto.jpg') }}" width="50">
+                        👤
                         {% endif %}
                     </td>
-                    <td>{{ c.nome }}</td>
-                    <td>{{ c.quarto }}</td>
-                    <td>{{ c.leito }}</td>
+                    <td>{{ c['nome'] }}</td>
+                    <td>{{ c['status'] }}</td>
                     <td>
-                        <input type="checkbox" name="presente_{{ c.id }}" checked>
+                        <a href="{{ url_for('marcar_status', id=c['id'], status='P') }}"
+                           class="btn-status btn-P {% if c['status_chamada'] == 'P' %}ativo{% endif %}">P</a>
+                        <a href="{{ url_for('marcar_status', id=c['id'], status='F') }}"
+                           class="btn-status btn-F {% if c['status_chamada'] == 'F' %}ativo{% endif %}">F</a>
+                        <a href="{{ url_for('marcar_status', id=c['id'], status='A') }}"
+                           class="btn-status btn-A {% if c['status_chamada'] == 'A' %}ativo{% endif %}">A</a>
+                        <a href="{{ url_for('marcar_status', id=c['id'], status='H') }}"
+                           class="btn-status btn-H {% if c['status_chamada'] == 'H' %}ativo{% endif %}">H</a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
-        <button type="submit" class="btn btn-success">Salvar Chamada</button>
-        <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
-    </form>
-</div>
-{% endblock %}
+        <a href="{{ url_for('index') }}" class="voltar">← Voltar ao Menu</a>
+    </div>
+</body>
+</html>
