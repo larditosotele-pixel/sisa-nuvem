@@ -36,7 +36,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             convivente_id INTEGER REFERENCES conviventes(id),
             data TEXT NOT NULL,
-            presente BOOLEAN NOT NULL
+            status TEXT -- AGORA SALVA P, F, A, H
         )
     ''')
     conn.commit()
@@ -50,41 +50,6 @@ def get_brazil_time():
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/chamada')
-def chamada():
-    init_db()
-    conn = get_db_connection()
-    cur = conn.cursor()
-    data_hoje = get_brazil_time().strftime('%Y-%m-%d')
-    cur.execute('''
-        SELECT c.id, c.nome, c.status, c.foto, p.presente
-        FROM conviventes c
-        LEFT JOIN presencas p ON c.id = p.convivente_id AND p.data = %s
-        ORDER BY c.nome
-    ''', (data_hoje,))
-    conviventes = cur.fetchall()
-    cur.close()
-    conn.close()
-    data_formatada = get_brazil_time().strftime('%d/%m/%Y')
-    return render_template('chamada.html', conviventes=conviventes, data_hoje=data_formatada)
-
-@app.route('/marcar_presenca/<int:id>', methods=['POST'])
-def marcar_presenca(id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    data_hoje = get_brazil_time().strftime('%Y-%m-%d')
-    presente = 'presente' in request.form
-    cur.execute('SELECT id FROM presencas WHERE convivente_id = %s AND data = %s', (id, data_hoje))
-    existe = cur.fetchone()
-    if existe:
-        cur.execute('UPDATE presencas SET presente = %s WHERE convivente_id = %s AND data = %s', (presente, id, data_hoje))
-    else:
-        cur.execute('INSERT INTO presencas (convivente_id, data, presente) VALUES (%s, %s, %s)', (id, data_hoje, presente))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return redirect(url_for('chamada'))
 
 @app.route('/conviventes')
 def lista_conviventes():
@@ -142,17 +107,57 @@ def excluir(id):
     conn.close()
     return redirect(url_for('lista_conviventes'))
 
+@app.route('/chamada')
+def chamada():
+    init_db()
+    conn = get_db_connection()
+    cur = conn.cursor()
+    data_hoje = get_brazil_time().strftime('%Y-%m-%d')
+    cur.execute('''
+        SELECT c.id, c.nome, c.status, c.foto, p.status as status_chamada
+        FROM conviventes c
+        LEFT JOIN presencas p ON c.id = p.convivente_id AND p.data = %s
+        ORDER BY c.nome
+    ''', (data_hoje,))
+    conviventes = cur.fetchall()
+    cur.close()
+    conn.close()
+    data_formatada = get_brazil_time().strftime('%d/%m/%Y')
+    return render_template('chamada.html', conviventes=conviventes, data_hoje=data_formatada)
+
+@app.route('/marcar_status/<int:id>/<status>')
+def marcar_status(id, status):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    data_hoje = get_brazil_time().strftime('%Y-%m-%d')
+
+    # Se clicar no mesmo status, apaga = desmarca
+    cur.execute('SELECT status FROM presencas WHERE convivente_id = %s AND data = %s', (id, data_hoje))
+    existe = cur.fetchone()
+
+    if existe and existe['status'] == status:
+        cur.execute('DELETE FROM presencas WHERE convivente_id = %s AND data = %s', (id, data_hoje))
+    elif existe:
+        cur.execute('UPDATE presencas SET status = %s WHERE convivente_id = %s AND data = %s', (status, id, data_hoje))
+    else:
+        cur.execute('INSERT INTO presencas (convivente_id, data, status) VALUES (%s, %s, %s)', (id, data_hoje, status))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('chamada'))
+
 @app.route('/relatorio_chamada')
 def relatorio_chamada():
-    return "<h1>Relatório em construção</h1><a href='/'>Voltar</a>"
+    return "<h1>Relatório Preenchido - Em construção</h1><a href='/'>Voltar</a>"
 
 @app.route('/relatorio_chamada_branco')
 def relatorio_chamada_branco():
-    return "<h1>Espelho em branco em construção</h1><a href='/'>Voltar</a>"
+    return "<h1>Espelho em Branco - Em construção</h1><a href='/'>Voltar</a>"
 
 @app.route('/logout')
 def logout():
-    return "<h1>Logout em construção</h1><a href='/'>Voltar</a>"
+    return "<h1>Sistema encerrado</h1><a href='/'>Voltar ao Menu</a>"
 
 if __name__ == '__main__':
     init_db()
