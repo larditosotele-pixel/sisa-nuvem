@@ -23,11 +23,12 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
+    # Cria tabelas se não existem
     cur.execute('''
         CREATE TABLE IF NOT EXISTS conviventes (
             id SERIAL PRIMARY KEY,
             nome TEXT NOT NULL,
-            status TEXT NOT NULL,
+            status TEXT,
             foto TEXT
         )
     ''')
@@ -35,10 +36,25 @@ def init_db():
         CREATE TABLE IF NOT EXISTS presencas (
             id SERIAL PRIMARY KEY,
             convivente_id INTEGER REFERENCES conviventes(id),
-            data TEXT NOT NULL,
-            status TEXT -- AGORA SALVA P, F, A, H
+            data TEXT,
+            status TEXT
         )
     ''')
+    
+    # Adiciona colunas que faltam nas tabelas antigas
+    try:
+        cur.execute('ALTER TABLE conviventes ADD COLUMN IF NOT EXISTS status TEXT')
+    except: pass
+    try:
+        cur.execute('ALTER TABLE conviventes ADD COLUMN IF NOT EXISTS foto TEXT')
+    except: pass
+    try:
+        cur.execute('ALTER TABLE presencas ADD COLUMN IF NOT EXISTS data TEXT')
+    except: pass
+    try:
+        cur.execute('ALTER TABLE presencas ADD COLUMN IF NOT EXISTS status TEXT')
+    except: pass
+    
     conn.commit()
     cur.close()
     conn.close()
