@@ -8,7 +8,11 @@ app = Flask(__name__)
 
 def get_db_connection():
     DATABASE_URL = os.environ.get('DATABASE_URL')
-    conn = psycopg.connect(DATABASE_URL)
+    # Render usa postgres:// mas psycopg3 precisa de postgresql://
+    if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    # Força SSL que o Render exige
+    conn = psycopg.connect(DATABASE_URL, sslmode='require')
     return conn
 
 def init_db():
