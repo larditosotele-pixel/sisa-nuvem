@@ -49,7 +49,6 @@ def get_brazil_time():
 
 @app.route('/')
 def index():
-    # AGORA A PÁGINA INICIAL É O MENU
     return render_template('index.html')
 
 @app.route('/chamada')
@@ -143,7 +142,6 @@ def excluir(id):
     conn.close()
     return redirect(url_for('lista_conviventes'))
 
-# ROTAS FALSAS SÓ PRA NÃO QUEBRAR O MENU POR ENQUANTO
 @app.route('/relatorio_chamada')
 def relatorio_chamada():
     return "<h1>Relatório em construção</h1><a href='/'>Voltar</a>"
