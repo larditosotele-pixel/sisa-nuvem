@@ -3,7 +3,7 @@
 {% block title %}SISA - Cadastrar Convivente{% endblock %}
 
 {% block content %}
-<a href="{{ url_for('lista_conviventes') }}" class="btn btn-voltar"><i class="fas fa-arrow-left"></i> Voltar</a>
+<a href="{{ url_for('mapa_leitos') }}" class="btn btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Mapa</a>
 
 <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Convivente</h2>
 
@@ -30,7 +30,10 @@
         <select name="quarto_id" id="quarto" required onchange="carregarLeitos()" style="width: 100%; padding: 8px;">
             <option value="">Selecione o Quarto</option>
             {% for quarto in quartos %}
-                <option value="{{ quarto.id }}">Quarto {{ quarto.numero }}</option>
+                <option value="{{ quarto.id }}"
+                    {% if quarto_pre_selecionado and quarto_pre_selecionado == quarto.id %}selected{% endif %}>
+                    Quarto {{ quarto.numero }}
+                </option>
             {% endfor %}
         </select>
     </div>
@@ -38,7 +41,11 @@
     <div style="margin-bottom: 16px;">
         <label><strong>Leito:</strong></label><br>
         <select name="leito_id" id="leito" required style="width: 100%; padding: 8px;">
-            <option value="">Selecione o Quarto Primeiro</option>
+            {% if leito_pre_selecionado %}
+                <option value="{{ leito_pre_selecionado.id }}" selected>Leito {{ leito_pre_selecionado.numero_leito }}</option>
+            {% else %}
+                <option value="">Selecione o Quarto Primeiro</option>
+            {% endif %}
         </select>
     </div>
 
@@ -65,12 +72,18 @@ function previewImage(event) {
 function carregarLeitos() {
     const quartoId = document.getElementById('quarto').value;
     const leitoSelect = document.getElementById('leito');
+
+    // Se já tem leito pré-selecionado, não recarrega
+    if({{ 'true' if leito_pre_selecionado else 'false' }} && leitoSelect.options.length > 1) {
+        return;
+    }
+
     leitoSelect.innerHTML = '<option value="">Carregando...</option>';
-    
+
     if (quartoId) {
         fetch('/api/leitos_vagos/' + quartoId)
-          .then(response => response.json())
-          .then(data => {
+      .then(response => response.json())
+      .then(data => {
                 leitoSelect.innerHTML = '<option value="">Selecione o Leito</option>';
                 data.forEach(leito => {
                     leitoSelect.innerHTML += '<option value="' + leito.id + '">Leito ' + leito.numero_leito + '</option>';
@@ -79,6 +92,12 @@ function carregarLeitos() {
     } else {
         leitoSelect.innerHTML = '<option value="">Selecione o Quarto Primeiro</option>';
     }
+}
+
+window.onload = function() {
+    {% if not leito_pre_selecionado %}
+    if(document.getElementById('quarto').value) carregarLeitos();
+    {% endif %}
 }
 </script>
 {% endblock %}
