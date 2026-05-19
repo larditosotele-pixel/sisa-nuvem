@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Leitos - Quarto {{ quarto.numero }}{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-bed"></i> Quarto {{ quarto.numero }} - {{ quarto.nome }}</h2>
+
+<div class="card" style="padding: 16px; margin-bottom: 20px;">
+    <h3 style="color: #1b5e20; margin-bottom: 12px;">Adicionar Novo Leito</h3>
+    <form method="POST" action="{{ url_for('adicionar_leito', quarto_id=quarto.id) }}" style="display: flex; gap: 8px;">
+        <input type="text" name="numero_leito" placeholder="Nº do Leito: 1, 2, A, B..." required>
+        <button type="submit" class="btn"><i class="fas fa-plus"></i> Adicionar Leito</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Leito</th>
+            <th>Status</th>
+            <th>Convivente</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in leitos %}
+        <tr>
+            <td><strong>Leito {{ l.numero_leito }}</strong></td>
+            <td>
+                {% if l.ocupado %}
+                    <span style="background: #ffcdd2; color: #c62828; padding: 4px 8px; border-radius: 4px;">
+                        <i class="fas fa-user"></i> Ocupado
+                    </span>
+                {% else %}
+                    <span style="background: #c8e6c9; color: #2e7d32; padding: 4px 8px; border-radius: 4px;">
+                        <i class="fas fa-check"></i> Vago
+                    </span>
+                {% endif %}
+            </td>
+            <td>{{ l.convivente_nome or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" style="text-align: center; padding: 30px;">
+                Nenhum leito cadastrado. Adicione o Leito 1 acima.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="margin-top: 20px;">
+    <a href="{{ url_for('lista_quartos') }}" class="btn btn-voltar">
+        <i class="fas fa-arrow-left"></i> Voltar aos Quartos
+    </a>
+</div>
+{% endblock %}
