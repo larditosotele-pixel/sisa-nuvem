@@ -49,12 +49,10 @@
 function previewImage(event) {
     const file = event.target.files[0];
     if (file) {
-        // 1. Pega o nome do arquivo e joga no campo Nome
-        let fileName = file.name.replace(/\.[^/.]+$/, ""); // remove extensão
-        fileName = fileName.replace(/_/g, " ").replace(/-/g, " "); // troca _ e - por espaço
+        let fileName = file.name.replace(/\.[^/.]+$/, "");
+        fileName = fileName.replace(/_/g, " ").replace(/-/g, " ");
         document.getElementById('nome').value = fileName;
 
-        // 2. Mostra preview da foto
         const reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('preview').innerHTML = '<img src="' + e.target.result + '" style="max-width: 200px; border-radius: 8px;">';
@@ -71,8 +69,8 @@ function carregarLeitos() {
     
     if (quartoId) {
         fetch('/api/leitos_vagos/' + quartoId)
-           .then(response => response.json())
-           .then(data => {
+          .then(response => response.json())
+          .then(data => {
                 leitoSelect.innerHTML = '<option value="">Selecione o Leito</option>';
                 data.forEach(leito => {
                     leitoSelect.innerHTML += '<option value="' + leito.id + '">Leito ' + leito.numero_leito + '</option>';
