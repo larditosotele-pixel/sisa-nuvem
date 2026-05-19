@@ -1,64 +1,61 @@
 {% extends "base.html" %}
 
-{% block title %}Gerenciar Conviventes - SISA{% endblock %}
+{% block title %}Conviventes - SISA{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="fas fa-users"></i> Gerenciar Conviventes</h2>
+    <h2><i class="fas fa-users"></i> Conviventes Ativos</h2>
     <a href="{{ url_for('cadastrar_convivente') }}" class="btn">
-        <i class="fas fa-plus"></i> Cadastrar Novo
+        <i class="fas fa-user-plus"></i> Novo Convivente
     </a>
 </div>
 
-<div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 60px;">Foto</th>
-                <th>Nome</th>
-                <th>Quarto</th>
-                <th>Leito</th>
-                <th>Nascimento</th>
-                <th style="width: 120px;">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for c in conviventes %}
-            <tr>
-                <td>
-                    {% if c.foto_base64 %}
-                        <img src="{{ c.foto_base64 }}" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
-                    {% else %}
-                        <div style="width: 45px; height: 45px; border-radius: 50%; background: #43a047; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                            {{ c.nome[0] }}
-                        </div>
-                    {% endif %}
-                </td>
-                <td><strong>{{ c.nome }}</strong></td>
-                <td>{{ c.quarto or '-' }}</td>
-                <td>{{ c.leito or '-' }}</td>
-                <td>{{ c.data_nascimento or '-' }}</td>
-                <td>
-                    <button class="btn btn-voltar" disabled style="padding: 6px 10px; font-size: 14px;">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger" disabled style="padding: 6px 10px; font-size: 14px;">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 30px; color: #666;">
-                    <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
-                    <p>Nenhum convivente cadastrado ainda.</p>
-                    <a href="{{ url_for('cadastrar_convivente') }}" class="btn">Cadastrar Primeiro Convivente</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<table>
+    <thead>
+        <tr>
+            <th>Foto</th>
+            <th>Nome</th>
+            <th>Quarto/Leito</th>
+            <th>Data Entrada</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in conviventes %}
+        <tr>
+            <td>
+                {% if c.foto_base64 %}
+                <img src="{{ c.foto_base64 }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user"></i>
+                </div>
+                {% endif %}
+            </td>
+            <td><strong>{{ c.nome }}</strong></td>
+            <td>Quarto {{ c.quarto_numero }} - Leito {{ c.numero_leito }}</td>
+            <td>{{ c.data_entrada.strftime('%d/%m/%Y') if c.data_entrada else '-' }}</td>
+            <td>
+                <a href="{{ url_for('desocupar_leito', convivente_id=c.id) }}" 
+                   class="btn" 
+                   style="background: #f44336; padding: 6px 12px; font-size: 14px;"
+                   onclick="return confirm('Dar alta para {{ c.nome }}? O leito será liberado.')">
+                    <i class="fas fa-sign-out-alt"></i> Dar Alta
+                </a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5" style="text-align: center; padding: 30px;">
+                Nenhum convivente cadastrado ainda.<br>
+                <a href="{{ url_for('cadastrar_convivente') }}" class="btn" style="margin-top: 10px;">
+                    Cadastrar Primeiro Convivente
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <div style="margin-top: 20px;">
     <a href="{{ url_for('index') }}" class="btn btn-voltar">
