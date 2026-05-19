@@ -6,7 +6,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'lar-ditoso-2024')
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 # 5MB limite - CORRIGIDO
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 # 5MB limite
 
 def get_db_connection():
     conn = psycopg2.connect(os.environ['DATABASE_URL'], cursor_factory=RealDictCursor)
@@ -50,7 +50,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             convivente_id INTEGER REFERENCES conviventes(id),
             data_chamada DATE NOT NULL,
-            presente BOOLEAN DEFAULT FALSE,
+            status VARCHAR(1),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(convivente_id, data_chamada)
         )
@@ -64,7 +64,7 @@ def init_db():
 @app.route('/')
 def index():
     init_db()
-    return redirect(url_for('mapa_leitos'))
+    return render_template('index.html')
 
 @app.route('/mapa_leitos')
 def mapa_leitos():
@@ -300,30 +300,49 @@ def leitos_vagos(quarto_id):
     conn.close()
     return jsonify(leitos)
 
-@app.route('/chamada')
+@app.route('/chamada', methods=['GET', 'POST'])
 def chamada():
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('''
-            SELECT c.*, q.numero as quarto_numero, l.numero_leito
-            FROM conviventes c
-            LEFT JOIN leitos l ON c.leito_id = l.id
-            LEFT JOIN quartos q ON l.quarto_id = q.id
-            WHERE c.ativo = TRUE
-            ORDER BY q.numero, 
-                     CASE WHEN l.numero_leito ~ '^[0-9]+$' 
-                          THEN CAST(l.numero_leito AS INTEGER) 
-                          ELSE 999 END,
-                     l.numero_leito
-        ''')
-        conviventes = cur.fetchall()
-        cur.close()
-        conn.close()
-        return render_template('chamada.html', conviventes=conviventes, data_hoje=datetime.now().strftime('%Y-%m-%d'))
-    except Exception as e:
-        flash(f'Erro: {str(e)}')
-        return render_template('chamada.html', conviventes=[], data_hoje=datetime.now().strftime('%Y-%m-%d'))
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    if request.method == 'POST':
+        data_hoje = datetime.now().strftime('%Y-%m-%d')
+        try:
+            for key, value in request.form.items():
+                if key.startswith('status_') and value:
+                    convivente_id = key.replace('status_', '')
+                    cur.execute('''
+                        INSERT INTO chamadas (convivente_id, data_chamada, status)
+                        VALUES (%s, %s, %s)
+                        ON CONFLICT (convivente_id, data_chamada) 
+                        DO UPDATE SET status = EXCLUDED.status
+                    ''', (convivente_id, data_hoje, value))
+            conn.commit()
+            flash('Chamada salva com sucesso!')
+        except Exception as e:
+            flash(f'Erro ao salvar: {str(e)}')
+            conn.rollback()
+        return redirect(url_for('chamada'))
+
+    data_hoje = datetime.now().strftime('%Y-%m-%d')
+    cur.execute('''
+        SELECT c.*, q.numero as quarto_numero, l.numero_leito,
+               ch.status as status_hoje
+        FROM conviventes c
+        LEFT JOIN leitos l ON c.leito_id = l.id
+        LEFT JOIN quartos q ON l.quarto_id = q.id
+        LEFT JOIN chamadas ch ON c.id = ch.convivente_id AND ch.data_chamada = %s
+        WHERE c.ativo = TRUE
+        ORDER BY q.numero, 
+                 CASE WHEN l.numero_leito ~ '^[0-9]+$' 
+                      THEN CAST(l.numero_leito AS INTEGER) 
+                      ELSE 999 END,
+                 l.numero_leito
+    ''', (data_hoje,))
+    conviventes = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('chamada.html', conviventes=conviventes, data_hoje=datetime.now().strftime('%d/%m/%Y'))
 
 if __name__ == '__main__':
     app.run(debug=True)
