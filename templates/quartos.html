@@ -1,43 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Gestão de Quartos - SISA{% endblock %}
+{% block title %}SISA - Gestão de Quartos{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="fas fa-bed"></i> Gestão de Quartos</h2>
-    <form method="POST" action="{{ url_for('adicionar_quarto') }}" style="display: flex; gap: 8px;">
-        <input type="number" name="numero" placeholder="Nº Quarto" required style="width: 100px;">
-        <input type="text" name="nome" placeholder="Nome opcional">
-        <button type="submit" class="btn"><i class="fas fa-plus"></i> Novo Quarto</button>
+<a href="{{ url_for('index') }}" class="btn btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Menu</a>
+
+<h2><i class="fas fa-bed"></i> Gestão de Quartos</h2>
+
+<div style="background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+    <h3><i class="fas fa-plus-circle"></i> Adicionar Novo Quarto</h3>
+    <form method="POST" action="{{ url_for('adicionar_quarto') }}">
+        <input type="text" name="nome" placeholder="Nome do Quarto (opcional) Ex: Quarto Térreo">
+        <button type="submit" class="btn"><i class="fas fa-plus"></i> Adicionar Próximo Quarto</button>
     </form>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
-    {% for q in quartos %}
-    <div class="card" style="padding: 16px;">
-        <h3 style="color: #1b5e20; margin-bottom: 8px;">
-            <i class="fas fa-door-closed"></i> Quarto {{ q.numero }}
-        </h3>
-        <p style="color: #666; margin-bottom: 12px;">{{ q.nome }}</p>
-
-        <div style="background: #e8f5e9; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
-            <strong>Leitos:</strong> {{ q.leitos_ocupados or 0 }} / {{ q.total_leitos or 0 }} ocupados
-        </div>
-
-        <a href="{{ url_for('lista_leitos', quarto_id=q.id) }}" class="btn" style="width: 100%; text-align: center;">
-            <i class="fas fa-list"></i> Gerenciar Leitos
-        </a>
-    </div>
-    {% else %}
-    <div class="card" style="padding: 30px; text-align: center; grid-column: 1/-1;">
-        <p>Nenhum quarto cadastrado.</p>
-    </div>
-    {% endfor %}
-</div>
-
-<div style="margin-top: 20px;">
-    <a href="{{ url_for('index') }}" class="btn btn-voltar">
-        <i class="fas fa-arrow-left"></i> Voltar ao Menu
-    </a>
-</div>
+<table>
+    <thead>
+        <tr>
+            <th>Nº</th>
+            <th>Nome</th>
+            <th>Ocupação</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for quarto in quartos %}
+        <tr>
+            <td><strong>{{ quarto.numero }}</strong></td>
+            <td>{{ quarto.nome }}</td>
+            <td>{{ quarto.leitos_ocupados or 0 }}/{{ quarto.total_leitos or 0 }} leitos</td>
+            <td>
+                <a href="{{ url_for('lista_leitos', quarto_id=quarto.id) }}" class="btn">
+                    <i class="fas fa-door-open"></i> Gerenciar Leitos
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
