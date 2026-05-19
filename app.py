@@ -1,57 +1,158 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import os
 from datetime import datetime
-import pytz
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
-
-DATABASE_URL = os.environ.get('DATABASE_URL')
+app.secret_key = os.environ.get('SECRET_KEY', 'lar-ditoso-2024')
 
 def get_db_connection():
-    if not DATABASE_URL:
-        raise ValueError("DATABASE_URL não configurada!")
-    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    conn = psycopg2.connect(os.environ['DATABASE_URL'], cursor_factory=RealDictCursor)
     return conn
 
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
+    # Tabela de Quartos
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS quartos (
+            id SERIAL PRIMARY KEY,
+            numero INTEGER UNIQUE NOT NULL,
+            nome VARCHAR(100),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    # Tabela de Leitos
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS leitos (
+            id SERIAL PRIMARY KEY,
+            quarto_id INTEGER REFERENCES quartos(id) ON DELETE CASCADE,
+            numero_leito VARCHAR(10) NOT NULL,
+            ocupado BOOLEAN DEFAULT FALSE,
+            UNIQUE(quarto_id, numero_leito)
+        )
+    ''')
+    # Tabela de Conviventes
     cur.execute('''
         CREATE TABLE IF NOT EXISTS conviventes (
             id SERIAL PRIMARY KEY,
-            nome TEXT NOT NULL,
+            nome VARCHAR(200) NOT NULL,
             data_nascimento DATE,
-            quarto TEXT,
-            leito TEXT,
             foto_base64 TEXT,
-            data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            leito_id INTEGER REFERENCES leitos(id),
+            data_entrada DATE DEFAULT CURRENT_DATE,
+            data_saida DATE,
+            ativo BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    # Tabela de Chamadas
     cur.execute('''
         CREATE TABLE IF NOT EXISTS chamadas (
             id SERIAL PRIMARY KEY,
+            convivente_id INTEGER REFERENCES conviventes(id),
             data_chamada DATE NOT NULL,
-            presentes TEXT,
-            ausentes TEXT,
-            data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            presente BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(convivente_id, data_chamada)
         )
     ''')
+    
+    # Cria os 17 quartos iniciais se não existirem
+    for i in range(1, 18):
+        cur.execute('INSERT INTO quartos (numero, nome) VALUES (%s, %s) ON CONFLICT (numero) DO NOTHING', (i, f'Quarto {i}'))
+    
     conn.commit()
     cur.close()
     conn.close()
 
 @app.route('/')
 def index():
+    init_db()
     return render_template('index.html')
 
+# GESTÃO DE QUARTOS
+@app.route('/quartos')
+def lista_quartos():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT q.id, q.numero, q.nome, 
+               COUNT(l.id) as total_leitos,
+               SUM(CASE WHEN l.ocupado = TRUE THEN 1 ELSE 0 END) as leitos_ocupados
+        FROM quartos q 
+        LEFT JOIN leitos l ON q.id = l.quarto_id 
+        GROUP BY q.id, q.numero, q.nome 
+        ORDER BY q.numero
+    ''')
+    quartos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('quartos.html', quartos=quartos)
+
+@app.route('/quarto/<int:quarto_id>/leitos')
+def lista_leitos(quarto_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM quartos WHERE id = %s', (quarto_id,))
+    quarto = cur.fetchone()
+    cur.execute('''
+        SELECT l.*, c.nome as convivente_nome 
+        FROM leitos l 
+        LEFT JOIN conviventes c ON l.id = c.leito_id AND c.ativo = TRUE
+        WHERE l.quarto_id = %s 
+        ORDER BY l.numero_leito
+    ''', (quarto_id,))
+    leitos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('leitos.html', quarto=quarto, leitos=leitos)
+
+@app.route('/quarto/<int:quarto_id>/adicionar_leito', methods=['POST'])
+def adicionar_leito(quarto_id):
+    numero_leito = request.form['numero_leito']
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute('INSERT INTO leitos (quarto_id, numero_leito) VALUES (%s, %s)', (quarto_id, numero_leito))
+        conn.commit()
+        flash(f'Leito {numero_leito} adicionado com sucesso!')
+    except:
+        flash('Erro: Leito já existe neste quarto!')
+    cur.close()
+    conn.close()
+    return redirect(url_for('lista_leitos', quarto_id=quarto_id))
+
+@app.route('/adicionar_quarto', methods=['POST'])
+def adicionar_quarto():
+    numero = request.form['numero']
+    nome = request.form.get('nome', f'Quarto {numero}')
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute('INSERT INTO quartos (numero, nome) VALUES (%s, %s)', (numero, nome))
+        conn.commit()
+        flash(f'Quarto {numero} criado com sucesso!')
+    except:
+        flash('Erro: Quarto já existe!')
+    cur.close()
+    conn.close()
+    return redirect(url_for('lista_quartos'))
+
+# GESTÃO DE CONVIVENTES
 @app.route('/conviventes')
 def lista_conviventes():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM conviventes ORDER BY nome')
+    cur.execute('''
+        SELECT c.*, q.numero as quarto_numero, l.numero_leito 
+        FROM conviventes c 
+        JOIN leitos l ON c.leito_id = l.id 
+        JOIN quartos q ON l.quarto_id = q.id 
+        WHERE c.ativo = TRUE 
+        ORDER BY q.numero, l.numero_leito
+    ''')
     conviventes = cur.fetchall()
     cur.close()
     conn.close()
@@ -62,57 +163,83 @@ def cadastrar_convivente():
     if request.method == 'POST':
         nome = request.form['nome']
         data_nascimento = request.form['data_nascimento'] or None
-        quarto = request.form['quarto']
-        leito = request.form['leito']
-        foto_base64 = request.form.get('foto_base64', '')
+        foto_base64 = request.form['foto_base64']
+        leito_id = request.form['leito_id']
         
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('INSERT INTO conviventes (nome, data_nascimento, quarto, leito, foto_base64) VALUES (%s, %s, %s, %s, %s)',
-                    (nome, data_nascimento, quarto, leito, foto_base64))
+        # Cadastra convivente
+        cur.execute('''
+            INSERT INTO conviventes (nome, data_nascimento, foto_base64, leito_id) 
+            VALUES (%s, %s, %s, %s)
+        ''', (nome, data_nascimento, foto_base64, leito_id))
+        # Marca leito como ocupado
+        cur.execute('UPDATE leitos SET ocupado = TRUE WHERE id = %s', (leito_id,))
         conn.commit()
         cur.close()
         conn.close()
         flash('Convivente cadastrado com sucesso!')
         return redirect(url_for('lista_conviventes'))
     
-    return render_template('form_convivente.html')
+    # GET: Buscar quartos e leitos vagos
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT q.id, q.numero, q.nome 
+        FROM quartos q 
+        WHERE EXISTS (SELECT 1 FROM leitos l WHERE l.quarto_id = q.id AND l.ocupado = FALSE)
+        ORDER BY q.numero
+    ''')
+    quartos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('form_convivente.html', quartos=quartos)
 
+@app.route('/api/leitos_vagos/<int:quarto_id>')
+def leitos_vagos(quarto_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT id, numero_leito FROM leitos WHERE quarto_id = %s AND ocupado = FALSE ORDER BY numero_leito', (quarto_id,))
+    leitos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(leitos)
+
+@app.route('/desocupar/<int:convivente_id>')
+def desocupar_leito(convivente_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    # Pega leito_id
+    cur.execute('SELECT leito_id FROM conviventes WHERE id = %s', (convivente_id,))
+    result = cur.fetchone()
+    if result:
+        leito_id = result['leito_id']
+        # Desativa convivente e libera leito
+        cur.execute('UPDATE conviventes SET ativo = FALSE, data_saida = CURRENT_DATE WHERE id = %s', (convivente_id,))
+        cur.execute('UPDATE leitos SET ocupado = FALSE WHERE id = %s', (leito_id,))
+        conn.commit()
+        flash('Convivente desocupado e leito liberado!')
+    cur.close()
+    conn.close()
+    return redirect(url_for('lista_conviventes'))
+
+# CHAMADA
 @app.route('/chamada')
 def chamada():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM conviventes ORDER BY nome')
+    cur.execute('''
+        SELECT c.*, q.numero as quarto_numero, l.numero_leito 
+        FROM conviventes c 
+        JOIN leitos l ON c.leito_id = l.id 
+        JOIN quartos q ON l.quarto_id = q.id 
+        WHERE c.ativo = TRUE 
+        ORDER BY q.numero, l.numero_leito
+    ''')
     conviventes = cur.fetchall()
     cur.close()
     conn.close()
-    fuso_sp = pytz.timezone('America/Sao_Paulo')
-    data_hoje = datetime.now(fuso_sp).strftime('%Y-%m-%d')
-    return render_template('chamada.html', conviventes=conviventes, data_hoje=data_hoje)
-
-@app.route('/salvar_chamada', methods=['POST'])
-def salvar_chamada():
-    data_chamada = request.form['data_chamada']
-    presentes = request.form.getlist('presentes')
-    ausentes = request.form.getlist('ausentes')
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('INSERT INTO chamadas (data_chamada, presentes, ausentes) VALUES (%s, %s, %s)',
-                (data_chamada, ','.join(presentes), ','.join(ausentes)))
-    conn.commit()
-    cur.close()
-    conn.close()
-    flash('Chamada salva com sucesso!')
-    return redirect(url_for('index'))
-
-# Roda init_db uma vez quando o app sobe
-with app.app_context():
-    try:
-        init_db()
-        print("Tabelas criadas/verificadas!")
-    except Exception as e:
-        print(f"Erro no init_db: {e}")
+    return render_template('chamada.html', conviventes=conviventes, data_hoje=datetime.now().strftime('%Y-%m-%d'))
 
 if __name__ == '__main__':
     app.run(debug=True)
