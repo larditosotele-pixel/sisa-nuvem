@@ -6,7 +6,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'lar-ditoso-2024')
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 # 5MB limite
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 # 5MB limite - CORRIGIDO
 
 def get_db_connection():
     conn = psycopg2.connect(os.environ['DATABASE_URL'], cursor_factory=RealDictCursor)
@@ -78,7 +78,11 @@ def mapa_leitos():
             FROM quartos q
             LEFT JOIN leitos l ON q.id = l.quarto_id
             LEFT JOIN conviventes c ON l.id = c.leito_id AND c.ativo = TRUE
-            ORDER BY q.numero, CAST(l.numero_leito AS INTEGER)
+            ORDER BY q.numero, 
+                     CASE WHEN l.numero_leito ~ '^[0-9]+$' 
+                          THEN CAST(l.numero_leito AS INTEGER) 
+                          ELSE 999 END,
+                     l.numero_leito
         ''')
         dados = cur.fetchall()
 
@@ -283,7 +287,14 @@ def editar_convivente(convivente_id):
 def leitos_vagos(quarto_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT id, numero_leito FROM leitos WHERE quarto_id = %s AND ocupado = FALSE ORDER BY CAST(numero_leito AS INTEGER)', (quarto_id,))
+    cur.execute('''
+        SELECT id, numero_leito FROM leitos 
+        WHERE quarto_id = %s AND ocupado = FALSE 
+        ORDER BY CASE WHEN numero_leito ~ '^[0-9]+$' 
+                      THEN CAST(numero_leito AS INTEGER) 
+                      ELSE 999 END,
+                 numero_leito
+    ''', (quarto_id,))
     leitos = cur.fetchall()
     cur.close()
     conn.close()
@@ -300,7 +311,11 @@ def chamada():
             LEFT JOIN leitos l ON c.leito_id = l.id
             LEFT JOIN quartos q ON l.quarto_id = q.id
             WHERE c.ativo = TRUE
-            ORDER BY q.numero, CAST(l.numero_leito AS INTEGER)
+            ORDER BY q.numero, 
+                     CASE WHEN l.numero_leito ~ '^[0-9]+$' 
+                          THEN CAST(l.numero_leito AS INTEGER) 
+                          ELSE 999 END,
+                     l.numero_leito
         ''')
         conviventes = cur.fetchall()
         cur.close()
