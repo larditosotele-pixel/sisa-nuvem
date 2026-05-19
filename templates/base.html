@@ -3,33 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SISA{% endblock %}</title>
+    <title>{% block title %}SISA - Lar Ditoso{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 16px; }
-    .header { background: #1b5e20; color: white; padding: 16px; display: flex; align-items: center; gap: 12px; }
-    .header img { height: 45px; width: 45px; }
-    .header-text h1 { margin: 0; font-size: 20px; }
-    .header-text span { font-size: 14px; }
-    .container { max-width: 1200px; margin: 16px auto; background: white; padding: 16px; border-radius: 8px; }
-    .btn { background: #43a047; color: white; text-decoration: none; padding: 12px 18px; border-radius: 6px; border: none; cursor: pointer; display: inline-block; margin: 6px 0; font-size: 16px; min-height: 44px; }
-    .btn-voltar { background: #95a5a6; }
+        .header { background: #1b5e20; color: white; padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header img { height: 45px; width: 45px; border-radius: 50%; background: white; padding: 3px; }
+        .header-text h1 { margin: 0; font-size: 20px; }
+        .header-text span { font-size: 14px; opacity: 0.9; }
+        .container { max-width: 1200px; margin: 16px auto; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .btn { background: #43a047; color: white; text-decoration: none; padding: 12px 18px; border-radius: 6px; border: none; cursor: pointer; display: inline-block; margin: 6px 4px 6px 0; font-size: 16px; min-height: 44px; transition: all 0.2s; }
+        .btn:hover { background: #388e3c; transform: translateY(-1px); }
+        .btn-voltar { background: #95a5a6; }
+        .btn-voltar:hover { background: #7f8c8d; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
         h2 { color: #1b5e20; margin-bottom: 16px; font-size: 22px; }
-    .flash { background: #c8e6c9; padding: 12px; border-radius: 6px; margin-bottom: 16px; }
+        .flash { background: #c8e6c9; padding: 12px; border-radius: 6px; margin-bottom: 16px; border-left: 4px solid #43a047; }
         input, select, textarea { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; margin: 6px 0; }
-        label { font-size: 16px; font-weight: bold; color: #333; }
-        @media (max-width: 768px) {.container { margin: 8px; padding: 12px; } }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #43a047; box-shadow: 0 0 0 3px rgba(67,160,71,0.1); }
+        label { font-size: 16px; font-weight: bold; color: #333; display: block; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #e8f5e9; color: #1b5e20; }
+        .card { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+        @media (max-width: 768px) {
+            .container { margin: 8px; padding: 12px; } 
+            .header-text h1 { font-size: 18px; }
+            table { font-size: 14px; }
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo">
+        <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
         <div class="header-text">
             <h1>SISA</h1>
-            <span>CAE Idoso Lar Ditoso</span>
+            <span>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</span>
         </div>
     </div>
     <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash"><i class="fas fa-check-circle"></i> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
         {% block content %}{% endblock %}
     </div>
 </body>
