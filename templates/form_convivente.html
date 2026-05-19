@@ -67,7 +67,6 @@ function previewImage(event) {
     reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-            // Redimensiona pra no máximo 800x800
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             let width = img.width;
@@ -95,7 +94,6 @@ function previewImage(event) {
             document.getElementById('preview').innerHTML = '<img src="' + compressedBase64 + '" style="max-width: 200px; border-radius: 8px;">';
             document.getElementById('foto_base64').value = compressedBase64;
 
-            // Mostra o tamanho
             const sizeKB = Math.round(compressedBase64.length * 0.75 / 1024);
             document.getElementById('tamanhoFoto').innerText = `Foto comprimida: ${sizeKB}KB`;
         };
@@ -116,8 +114,8 @@ function carregarLeitos() {
 
     if (quartoId) {
         fetch('/api/leitos_vagos/' + quartoId)
-     .then(response => response.json())
-     .then(data => {
+    .then(response => response.json())
+    .then(data => {
                 leitoSelect.innerHTML = '<option value="">Selecione o Leito</option>';
                 data.forEach(leito => {
                     leitoSelect.innerHTML += '<option value="' + leito.id + '">Leito ' + leito.numero_leito + '</option>';
@@ -134,7 +132,6 @@ window.onload = function() {
     {% endif %}
 }
 
-// Previne duplo clique
 document.getElementById('formConvivente').onsubmit = function() {
     document.getElementById('btnSalvar').disabled = true;
     document.getElementById('btnSalvar').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
