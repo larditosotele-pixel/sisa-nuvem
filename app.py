@@ -1,47 +1,42 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from datetime import datetime
-import calendar
 import os
-import base64
+from datetime import datetime
 import pytz
 
 app = Flask(__name__)
-app.secret_key = 'sisa_2026'
+app.secret_key = os.urandom(24)
 
-# ===== CONFIG NEON POSTGRES =====
 DATABASE_URL = os.environ.get('DATABASE_URL')
-TABELA_CONVIVENTE = 'convivente'
-TABELA_CHAMADA = 'chamada'
-COLUNA_DATA_CHAMADA = 'data_chamada'
-TZ = pytz.timezone('America/Sao_Paulo')
-# ================================
 
 def get_db_connection():
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL não configurada!")
     conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
     return conn
 
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute(f'''
-        CREATE TABLE IF NOT EXISTS {TABELA_CONVIVENTE} (
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS conviventes (
             id SERIAL PRIMARY KEY,
             nome TEXT NOT NULL,
+            data_nascimento DATE,
             quarto TEXT,
             leito TEXT,
-            foto TEXT,
-            status TEXT DEFAULT 'Ativo'
+            foto_base64 TEXT,
+            data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    cur.execute(f'''
-        CREATE TABLE IF NOT EXISTS {TABELA_CHAMADA} (
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS chamadas (
             id SERIAL PRIMARY KEY,
-            convivente_id INTEGER REFERENCES {TABELA_CONVIVENTE}(id),
-            {COLUNA_DATA_CHAMADA} DATE NOT NULL,
-            status TEXT,
-            hora_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            data_chamada DATE NOT NULL,
+            presentes TEXT,
+            ausentes TEXT,
+            data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     conn.commit()
@@ -50,119 +45,74 @@ def init_db():
 
 @app.route('/')
 def index():
-    init_db() # Cria tabelas se não existirem
     return render_template('index.html')
 
-# ========== CADASTRO DE CONVIVENTES COM FOTO BASE64 ==========
 @app.route('/conviventes')
-def conviventes():
+def lista_conviventes(): # <- NOME CERTO PRO INDEX.HTML
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute(f"SELECT * FROM {TABELA_CONVIVENTE} ORDER BY CAST(NULLIF(quarto,'') AS INTEGER), leito")
+    cur.execute('SELECT * FROM conviventes ORDER BY nome')
     conviventes = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('conviventes.html', conviventes=conviventes)
 
-@app.route('/convivente/novo', methods=['GET', 'POST'])
-def novo_convivente():
+@app.route('/cadastrar_convivente', methods=['GET', 'POST'])
+def cadastrar_convivente():
     if request.method == 'POST':
         nome = request.form['nome']
+        data_nascimento = request.form['data_nascimento']
         quarto = request.form['quarto']
         leito = request.form['leito']
-        status = request.form['status']
-        foto_base64 = None
-
-        if 'foto' in request.files:
-            file = request.files['foto']
-            if file and file.filename!= '':
-                foto_bytes = file.read()
-                foto_base64 = base64.b64encode(foto_bytes).decode('utf-8')
-                foto_base64 = f"data:{file.content_type};base64,{foto_base64}"
-
+        foto_base64 = request.form.get('foto_base64', '')
+        
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute(f"INSERT INTO {TABELA_CONVIVENTE} (nome, quarto, leito, foto, status) VALUES (%s,%s,%s,%s,%s)", 
-                    (nome, quarto, leito, foto_base64, status))
+        cur.execute('INSERT INTO conviventes (nome, data_nascimento, quarto, leito, foto_base64) VALUES (%s, %s, %s, %s, %s)',
+                    (nome, data_nascimento, quarto, leito, foto_base64))
         conn.commit()
         cur.close()
         conn.close()
         flash('Convivente cadastrado com sucesso!')
-        return redirect(url_for('conviventes'))
+        return redirect(url_for('lista_conviventes'))
+    
+    return render_template('form_convivente.html')
 
-    return render_template('form_convivente.html', convivente=None, titulo="Novo Convivente")
-
-@app.route('/convivente/editar/<int:id>', methods=['GET', 'POST'])
-def editar_convivente(id):
+@app.route('/chamada')
+def chamada(): # <- NOME CERTO PRO INDEX.HTML
     conn = get_db_connection()
     cur = conn.cursor()
-
-    if request.method == 'POST':
-        nome = request.form['nome']
-        quarto = request.form['quarto']
-        leito = request.form['leito']
-        status = request.form['status']
-        
-        cur.execute(f"SELECT foto FROM {TABELA_CONVIVENTE} WHERE id=%s", (id,))
-        foto_atual = cur.fetchone()['foto']
-        foto_base64 = foto_atual
-
-        if 'foto' in request.files:
-            file = request.files['foto']
-            if file and file.filename!= '':
-                foto_bytes = file.read()
-                foto_base64 = base64.b64encode(foto_bytes).decode('utf-8')
-                foto_base64 = f"data:{file.content_type};base64,{foto_base64}"
-
-        cur.execute(f"UPDATE {TABELA_CONVIVENTE} SET nome=%s, quarto=%s, leito=%s, foto=%s, status=%s WHERE id=%s", 
-                    (nome, quarto, leito, foto_base64, status, id))
-        conn.commit()
-        cur.close()
-        conn.close()
-        flash('Convivente atualizado com sucesso!')
-        return redirect(url_for('conviventes'))
-
-    cur.execute(f"SELECT * FROM {TABELA_CONVIVENTE} WHERE id=%s", (id,))
-    convivente = cur.fetchone()
+    cur.execute('SELECT * FROM conviventes ORDER BY nome')
+    conviventes = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('form_convivente.html', convivente=convivente, titulo="Editar Convivente")
+    fuso_sp = pytz.timezone('America/Sao_Paulo')
+    data_hoje = datetime.now(fuso_sp).strftime('%Y-%m-%d')
+    return render_template('chamada.html', conviventes=conviventes, data_hoje=data_hoje)
 
-@app.route('/convivente/excluir/<int:id>')
-def excluir_convivente(id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(f"DELETE FROM {TABELA_CONVIVENTE} WHERE id=%s", (id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    flash('Convivente excluído!')
-    return redirect(url_for('conviventes'))
-
-# ========== CHAMADA COM HORA CERTA DE SP ==========
 @app.route('/salvar_chamada', methods=['POST'])
 def salvar_chamada():
-    dados = request.get_json()
-    data = dados.get('data')
-    presencas = dados.get('presencas', {})
-    hora_sp = datetime.now(TZ)
-
+    data_chamada = request.form['data_chamada']
+    presentes = request.form.getlist('presentes')
+    ausentes = request.form.getlist('ausentes')
+    
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute(f"DELETE FROM {TABELA_CHAMADA} WHERE {COLUNA_DATA_CHAMADA} = %s", (data,))
-
-    for conv_id, status in presencas.items():
-        if status:
-            cur.execute(f"INSERT INTO {TABELA_CHAMADA} (convivente_id, {COLUNA_DATA_CHAMADA}, status, hora_registro) VALUES (%s,%s,%s,%s)", 
-                        (conv_id, data, status, hora_sp))
-
+    cur.execute('INSERT INTO chamadas (data_chamada, presentes, ausentes) VALUES (%s, %s, %s)',
+                (data_chamada, ','.join(presentes), ','.join(ausentes)))
     conn.commit()
     cur.close()
     conn.close()
-    return jsonify({'status': 'ok'})
+    flash('Chamada salva com sucesso!')
+    return redirect(url_for('index'))
 
-# RESTO DAS ROTAS: carometro, chamada, relatorio... troca sqlite3 por psycopg2 igual fiz acima
-# Se quiser te mando o arquivo completo, mas o importante é esse esquema acima
+# Roda init_db uma vez quando o app sobe
+with app.app_context():
+    try:
+        init_db()
+        print("Tabelas criadas/verificadas!")
+    except Exception as e:
+        print(f"Erro no init_db: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True)
