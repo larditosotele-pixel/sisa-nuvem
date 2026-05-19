@@ -14,7 +14,6 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    # Tabela de Quartos
     cur.execute('''
         CREATE TABLE IF NOT EXISTS quartos (
             id SERIAL PRIMARY KEY,
@@ -23,7 +22,6 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    # Tabela de Leitos
     cur.execute('''
         CREATE TABLE IF NOT EXISTS leitos (
             id SERIAL PRIMARY KEY,
@@ -33,7 +31,6 @@ def init_db():
             UNIQUE(quarto_id, numero_leito)
         )
     ''')
-    # Tabela de Conviventes
     cur.execute('''
         CREATE TABLE IF NOT EXISTS conviventes (
             id SERIAL PRIMARY KEY,
@@ -47,7 +44,6 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    # Tabela de Chamadas
     cur.execute('''
         CREATE TABLE IF NOT EXISTS chamadas (
             id SERIAL PRIMARY KEY,
@@ -58,11 +54,8 @@ def init_db():
             UNIQUE(convivente_id, data_chamada)
         )
     ''')
-    
-    # Cria os 17 quartos iniciais se não existirem
     for i in range(1, 18):
         cur.execute('INSERT INTO quartos (numero, nome) VALUES (%s, %s) ON CONFLICT (numero) DO NOTHING', (i, f'Quarto {i}'))
-    
     conn.commit()
     cur.close()
     conn.close()
@@ -72,7 +65,6 @@ def index():
     init_db()
     return render_template('index.html')
 
-# GESTÃO DE QUARTOS
 @app.route('/quartos')
 def lista_quartos():
     try:
@@ -107,7 +99,7 @@ def lista_leitos(quarto_id):
             FROM leitos l 
             LEFT JOIN conviventes c ON l.id = c.leito_id AND c.ativo = TRUE
             WHERE l.quarto_id = %s 
-            ORDER BY l.numero_leito
+            ORDER BY CAST(l.numero_leito AS INTEGER)
         ''', (quarto_id,))
         leitos = cur.fetchall()
         cur.close()
@@ -119,16 +111,17 @@ def lista_leitos(quarto_id):
 
 @app.route('/quarto/<int:quarto_id>/adicionar_leito', methods=['POST'])
 def adicionar_leito(quarto_id):
-    numero_leito = request.form['numero_leito']
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        cur.execute('INSERT INTO leitos (quarto_id, numero_leito) VALUES (%s, %s)', (quarto_id, numero_leito))
+        cur.execute('SELECT numero_leito FROM leitos WHERE quarto_id = %s', (quarto_id,))
+        leitos_existentes = [int(row['numero_leito']) for row in cur.fetchall() if row['numero_leito'].isdigit()]
+        proximo_numero = 1
+        while proximo_numero in leitos_existentes:
+            proximo_numero += 1
+        cur.execute('INSERT INTO leitos (quarto_id, numero_leito) VALUES (%s, %s)', (quarto_id, str(proximo_numero)))
         conn.commit()
-        flash(f'Leito {numero_leito} adicionado com sucesso!')
-    except psycopg2.IntegrityError:
-        flash('Erro: Leito já existe neste quarto!')
-        conn.rollback()
+        flash(f'Leito {proximo_numero} adicionado com sucesso!')
     except Exception as e:
         flash(f'Erro: {str(e)}')
         conn.rollback()
@@ -139,23 +132,26 @@ def adicionar_leito(quarto_id):
 
 @app.route('/adicionar_quarto', methods=['POST'])
 def adicionar_quarto():
-    numero = request.form['numero']
-    nome = request.form.get('nome', f'Quarto {numero}')
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        cur.execute('INSERT INTO quartos (numero, nome) VALUES (%s, %s)', (numero, nome))
+        cur.execute('SELECT numero FROM quartos')
+        quartos_existentes = [row['numero'] for row in cur.fetchall()]
+        proximo_numero = 1
+        while proximo_numero in quartos_existentes:
+            proximo_numero += 1
+        nome = request.form.get('nome', f'Quarto {proximo_numero}')
+        cur.execute('INSERT INTO quartos (numero, nome) VALUES (%s, %s)', (proximo_numero, nome))
         conn.commit()
-        flash(f'Quarto {numero} criado com sucesso!')
-    except psycopg2.IntegrityError:
-        flash('Erro: Quarto já existe!')
+        flash(f'Quarto {proximo_numero} criado com sucesso!')
+    except Exception as e:
+        flash(f'Erro: {str(e)}')
         conn.rollback()
     finally:
         cur.close()
         conn.close()
     return redirect(url_for('lista_quartos'))
 
-# GESTÃO DE CONVIVENTES - AQUI TAVA O ERRO 500
 @app.route('/conviventes')
 def lista_conviventes():
     try:
@@ -169,7 +165,7 @@ def lista_conviventes():
             LEFT JOIN leitos l ON c.leito_id = l.id 
             LEFT JOIN quartos q ON l.quarto_id = q.id 
             WHERE c.ativo = TRUE 
-            ORDER BY q.numero, l.numero_leito
+            ORDER BY q.numero, CAST(l.numero_leito AS INTEGER)
         ''')
         conviventes = cur.fetchall()
         cur.close()
@@ -186,7 +182,6 @@ def cadastrar_convivente():
         data_nascimento = request.form['data_nascimento'] or None
         foto_base64 = request.form.get('foto_base64', '')
         leito_id = request.form['leito_id']
-        
         conn = get_db_connection()
         cur = conn.cursor()
         try:
@@ -205,7 +200,6 @@ def cadastrar_convivente():
             conn.close()
         return redirect(url_for('lista_conviventes'))
     
-    # GET: Buscar quartos e leitos vagos
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
@@ -223,7 +217,7 @@ def cadastrar_convivente():
 def leitos_vagos(quarto_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT id, numero_leito FROM leitos WHERE quarto_id = %s AND ocupado = FALSE ORDER BY numero_leito', (quarto_id,))
+    cur.execute('SELECT id, numero_leito FROM leitos WHERE quarto_id = %s AND ocupado = FALSE ORDER BY CAST(numero_leito AS INTEGER)', (quarto_id,))
     leitos = cur.fetchall()
     cur.close()
     conn.close()
@@ -252,7 +246,6 @@ def desocupar_leito(convivente_id):
         conn.close()
     return redirect(url_for('lista_conviventes'))
 
-# CHAMADA
 @app.route('/chamada')
 def chamada():
     try:
@@ -264,7 +257,7 @@ def chamada():
             LEFT JOIN leitos l ON c.leito_id = l.id 
             LEFT JOIN quartos q ON l.quarto_id = q.id 
             WHERE c.ativo = TRUE 
-            ORDER BY q.numero, l.numero_leito
+            ORDER BY q.numero, CAST(l.numero_leito AS INTEGER)
         ''')
         conviventes = cur.fetchall()
         cur.close()
