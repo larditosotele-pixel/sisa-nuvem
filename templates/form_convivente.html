@@ -7,34 +7,40 @@
 
 <form method="POST" class="card" style="padding: 20px;">
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div style="grid-column: 1/-1;">
+            <label>Foto do Convivente</label>
+            <input type="file" id="foto_input" accept="image/*" style="margin-bottom: 10px;">
+            <input type="hidden" name="foto_base64" id="foto_base64">
+            <div id="preview_container" style="display: none;">
+                <img id="preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e0e0e0;">
+            </div>
+        </div>
+
         <div>
             <label>Nome Completo *</label>
-            <input type="text" name="nome" id="nome" required placeholder="Digite o nome completo">
+            <input type="text" name="nome" id="nome" required placeholder="Digite ou selecione a foto">
         </div>
 
         <div>
             <label>Data de Nascimento</label>
-            <input type="date" name="data_nascimento" id="data_nascimento">
+            <input type="date" name="data_nascimento">
         </div>
 
         <div>
             <label>Quarto *</label>
-            <input type="text" name="quarto" id="quarto" required placeholder="Ex: 101">
+            <select name="quarto_id" id="quarto_select" required onchange="carregarLeitos()">
+                <option value="">Selecione o Quarto</option>
+                {% for q in quartos %}
+                <option value="{{ q.id }}">Quarto {{ q.numero }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <div>
             <label>Leito *</label>
-            <input type="text" name="leito" id="leito" required placeholder="Ex: A">
-        </div>
-    </div>
-
-    <div style="margin-top: 16px;">
-        <label>Foto do Convivente</label>
-        <input type="file" id="foto_input" accept="image/*" style="margin-bottom: 10px;">
-        <input type="hidden" name="foto_base64" id="foto_base64">
-        <div id="preview_container" style="display: none;">
-            <img id="preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e0e0e0;">
-            <p style="font-size: 14px; color: #666; margin-top: 5px;">Prévia da foto</p>
+            <select name="leito_id" id="leito_select" required disabled>
+                <option value="">Selecione o quarto primeiro</option>
+            </select>
         </div>
     </div>
 
@@ -49,11 +55,10 @@
 </form>
 
 <script>
-// 1. Preenche nome automático pela foto
+// 1. Foto → base64 + nome automático
 document.getElementById('foto_input').addEventListener('change', function(e) {
     let arquivo = e.target.files[0];
     if (arquivo) {
-        // Converte foto pra base64
         const reader = new FileReader();
         reader.onload = function(event) {
             document.getElementById('foto_base64').value = event.target.result;
@@ -62,7 +67,6 @@ document.getElementById('foto_input').addEventListener('change', function(e) {
         };
         reader.readAsDataURL(arquivo);
 
-        // Preenche nome automático
         let nomeArquivo = arquivo.name.split('.')[0];
         nomeArquivo = nomeArquivo.replace(/_/g, ' ').replace(/-/g, ' ');
         nomeArquivo = nomeArquivo.toLowerCase().split(' ').map(word =>
@@ -72,17 +76,33 @@ document.getElementById('foto_input').addEventListener('change', function(e) {
     }
 });
 
-// 2. Validação básica antes de enviar
-document.querySelector('form').addEventListener('submit', function(e) {
-    const nome = document.getElementById('nome').value.trim();
-    const quarto = document.getElementById('quarto').value.trim();
-    const leito = document.getElementById('leito').value.trim();
+// 2. Carrega leitos vagos quando escolhe quarto
+async function carregarLeitos() {
+    const quartoId = document.getElementById('quarto_select').value;
+    const leitoSelect = document.getElementById('leito_select');
 
-    if (!nome ||!quarto ||!leito) {
-        e.preventDefault();
-        alert('Preencha Nome, Quarto e Leito!');
+    if (!quartoId) {
+        leitoSelect.innerHTML = '<option value="">Selecione o quarto primeiro</option>';
+        leitoSelect.disabled = true;
+        return;
     }
-});
+
+    leitoSelect.innerHTML = '<option value="">Carregando...</option>';
+    leitoSelect.disabled = true;
+
+    const response = await fetch(`/api/leitos_vagos/${quartoId}`);
+    const leitos = await response.json();
+
+    if (leitos.length === 0) {
+        leitoSelect.innerHTML = '<option value="">Nenhum leito vago neste quarto</option>';
+    } else {
+        leitoSelect.innerHTML = '<option value="">Selecione o Leito</option>';
+        leitos.forEach(l => {
+            leitoSelect.innerHTML += `<option value="${l.id}">Leito ${l.numero_leito}</option>`;
+        });
+        leitoSelect.disabled = false;
+    }
+}
 </script>
 
 <style>
