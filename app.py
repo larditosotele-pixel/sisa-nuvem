@@ -185,13 +185,18 @@ def cadastrar_convivente():
         conn = get_db_connection()
         cur = conn.cursor()
         try:
-            cur.execute('''
-                INSERT INTO conviventes (nome, data_nascimento, foto_base64, leito_id) 
-                VALUES (%s, %s, %s, %s)
-            ''', (nome, data_nascimento, foto_base64, leito_id))
-            cur.execute('UPDATE leitos SET ocupado = TRUE WHERE id = %s', (leito_id,))
-            conn.commit()
-            flash('Convivente cadastrado com sucesso!')
+            cur.execute('SELECT id FROM conviventes WHERE leito_id = %s AND ativo = TRUE', (leito_id,))
+            if cur.fetchone():
+                flash('Erro: Este leito já está ocupado!')
+                conn.rollback()
+            else:
+                cur.execute('''
+                    INSERT INTO conviventes (nome, data_nascimento, foto_base64, leito_id) 
+                    VALUES (%s, %s, %s, %s)
+                ''', (nome, data_nascimento, foto_base64, leito_id))
+                cur.execute('UPDATE leitos SET ocupado = TRUE WHERE id = %s', (leito_id,))
+                conn.commit()
+                flash('Convivente cadastrado com sucesso!')
         except Exception as e:
             flash(f'Erro ao cadastrar: {str(e)}')
             conn.rollback()
