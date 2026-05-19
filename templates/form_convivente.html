@@ -1,44 +1,95 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ titulo }}</title>
-</head>
-<body>
-    <h1>{{ titulo }}</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <label>Foto:</label><br>
-        <input type="file" name="foto" id="foto" accept="image/*"><br><br>
-        
-        <label>Nome:</label><br>
-        <input type="text" name="nome" id="nome" value="{{ convivente.nome if convivente else '' }}" required><br><br>
-        
-        <label>Quarto:</label><br>
-        <input type="text" name="quarto" value="{{ convivente.quarto if convivente else '' }}"><br><br>
-        
-        <label>Leito:</label><br>
-        <input type="text" name="leito" value="{{ convivente.leito if convivente else '' }}"><br><br>
-        
-        <label>Status:</label><br>
-        <select name="status">
-            <option value="Ativo" {% if convivente and convivente.status == 'Ativo' %}selected{% endif %}>Ativo</option>
-            <option value="Inativo" {% if convivente and convivente.status == 'Inativo' %}selected{% endif %}>Inativo</option>
-        </select><br><br>
-        
-        <button type="submit">Cadastrar</button>
-    </form>
+{% extends "base.html" %}
 
-    <script>
-    document.getElementById('foto').addEventListener('change', function(e) {
-        let arquivo = e.target.files[0];
-        if (arquivo) {
-            let nomeArquivo = arquivo.name.split('.')[0];
-            nomeArquivo = nomeArquivo.replace(/_/g, ' ').replace(/-/g, ' ');
-            nomeArquivo = nomeArquivo.toLowerCase().split(' ').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ');
-            document.getElementById('nome').value = nomeArquivo;
-        }
-    });
-    </script>
-</body>
-</html>
+{% block title %}Cadastrar Convivente - SISA{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-user-plus"></i> Cadastrar Novo Convivente</h2>
+
+<form method="POST" class="card" style="padding: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+            <label>Nome Completo *</label>
+            <input type="text" name="nome" id="nome" required placeholder="Digite o nome completo">
+        </div>
+
+        <div>
+            <label>Data de Nascimento</label>
+            <input type="date" name="data_nascimento" id="data_nascimento">
+        </div>
+
+        <div>
+            <label>Quarto *</label>
+            <input type="text" name="quarto" id="quarto" required placeholder="Ex: 101">
+        </div>
+
+        <div>
+            <label>Leito *</label>
+            <input type="text" name="leito" id="leito" required placeholder="Ex: A">
+        </div>
+    </div>
+
+    <div style="margin-top: 16px;">
+        <label>Foto do Convivente</label>
+        <input type="file" id="foto_input" accept="image/*" style="margin-bottom: 10px;">
+        <input type="hidden" name="foto_base64" id="foto_base64">
+        <div id="preview_container" style="display: none;">
+            <img id="preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e0e0e0;">
+            <p style="font-size: 14px; color: #666; margin-top: 5px;">Prévia da foto</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+        <button type="submit" class="btn">
+            <i class="fas fa-save"></i> Salvar Convivente
+        </button>
+        <a href="{{ url_for('lista_conviventes') }}" class="btn btn-voltar">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+    </div>
+</form>
+
+<script>
+// 1. Preenche nome automático pela foto
+document.getElementById('foto_input').addEventListener('change', function(e) {
+    let arquivo = e.target.files[0];
+    if (arquivo) {
+        // Converte foto pra base64
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('foto_base64').value = event.target.result;
+            document.getElementById('preview').src = event.target.result;
+            document.getElementById('preview_container').style.display = 'block';
+        };
+        reader.readAsDataURL(arquivo);
+
+        // Preenche nome automático
+        let nomeArquivo = arquivo.name.split('.')[0];
+        nomeArquivo = nomeArquivo.replace(/_/g, ' ').replace(/-/g, ' ');
+        nomeArquivo = nomeArquivo.toLowerCase().split(' ').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+        document.getElementById('nome').value = nomeArquivo;
+    }
+});
+
+// 2. Validação básica antes de enviar
+document.querySelector('form').addEventListener('submit', function(e) {
+    const nome = document.getElementById('nome').value.trim();
+    const quarto = document.getElementById('quarto').value.trim();
+    const leito = document.getElementById('leito').value.trim();
+
+    if (!nome ||!quarto ||!leito) {
+        e.preventDefault();
+        alert('Preencha Nome, Quarto e Leito!');
+    }
+});
+</script>
+
+<style>
+@media (max-width: 768px) {
+    div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr!important;
+    }
+}
+</style>
+{% endblock %}
