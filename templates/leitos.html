@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Leitos - Quarto {{ quarto.numero }}{% endblock %}
+{% block title %}SISA - Leitos do Quarto {{ quarto.numero }}{% endblock %}
 
 {% block content %}
+<a href="{{ url_for('lista_quartos') }}" class="btn btn-voltar"><i class="fas fa-arrow-left"></i> Voltar aos Quartos</a>
+
 <h2><i class="fas fa-bed"></i> Quarto {{ quarto.numero }} - {{ quarto.nome }}</h2>
 
-<div class="card" style="padding: 16px; margin-bottom: 20px;">
-    <h3 style="color: #1b5e20; margin-bottom: 12px;">Adicionar Novo Leito</h3>
-    <form method="POST" action="{{ url_for('adicionar_leito', quarto_id=quarto.id) }}" style="display: flex; gap: 8px;">
-        <input type="text" name="numero_leito" placeholder="Nº do Leito: 1, 2, A, B..." required>
-        <button type="submit" class="btn"><i class="fas fa-plus"></i> Adicionar Leito</button>
+<div style="background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+    <h3><i class="fas fa-plus-circle"></i> Adicionar Novo Leito</h3>
+    <p>Os leitos são criados automaticamente em sequência. Se deletar o Leito 2, o próximo criado será o 2 novamente.</p>
+    <form method="POST" action="{{ url_for('adicionar_leito', quarto_id=quarto.id) }}">
+        <button type="submit" class="btn"><i class="fas fa-plus"></i> Adicionar Próximo Leito</button>
     </form>
 </div>
 
@@ -22,35 +24,19 @@
         </tr>
     </thead>
     <tbody>
-        {% for l in leitos %}
+        {% for leito in leitos %}
         <tr>
-            <td><strong>Leito {{ l.numero_leito }}</strong></td>
+            <td><strong>Leito {{ leito.numero_leito }}</strong></td>
             <td>
-                {% if l.ocupado %}
-                    <span style="background: #ffcdd2; color: #c62828; padding: 4px 8px; border-radius: 4px;">
-                        <i class="fas fa-user"></i> Ocupado
-                    </span>
+                {% if leito.ocupado %}
+                    <span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> Ocupado</span>
                 {% else %}
-                    <span style="background: #c8e6c9; color: #2e7d32; padding: 4px 8px; border-radius: 4px;">
-                        <i class="fas fa-check"></i> Vago
-                    </span>
+                    <span style="color: #27ae60;"><i class="fas fa-check-circle"></i> Vago</span>
                 {% endif %}
             </td>
-            <td>{{ l.convivente_nome or '-' }}</td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="3" style="text-align: center; padding: 30px;">
-                Nenhum leito cadastrado. Adicione o Leito 1 acima.
-            </td>
+            <td>{{ leito.convivente_nome or '-' }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-
-<div style="margin-top: 20px;">
-    <a href="{{ url_for('lista_quartos') }}" class="btn btn-voltar">
-        <i class="fas fa-arrow-left"></i> Voltar aos Quartos
-    </a>
-</div>
 {% endblock %}
