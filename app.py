@@ -48,7 +48,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/conviventes')
-def lista_conviventes(): # <- NOME CERTO PRO INDEX.HTML
+def lista_conviventes():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT * FROM conviventes ORDER BY nome')
@@ -61,7 +61,7 @@ def lista_conviventes(): # <- NOME CERTO PRO INDEX.HTML
 def cadastrar_convivente():
     if request.method == 'POST':
         nome = request.form['nome']
-        data_nascimento = request.form['data_nascimento']
+        data_nascimento = request.form['data_nascimento'] or None
         quarto = request.form['quarto']
         leito = request.form['leito']
         foto_base64 = request.form.get('foto_base64', '')
@@ -79,7 +79,7 @@ def cadastrar_convivente():
     return render_template('form_convivente.html')
 
 @app.route('/chamada')
-def chamada(): # <- NOME CERTO PRO INDEX.HTML
+def chamada():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT * FROM conviventes ORDER BY nome')
