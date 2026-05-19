@@ -1,3 +1,153 @@
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from datetime import datetime
+
+app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'lar-ditoso-2024')
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 # 5MB limite
+
+def get_db_connection():
+    conn = psycopg2.connect(os.environ['DATABASE_URL'], cursor_factory=RealDictCursor)
+    return conn
+
+def init_db():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS quartos (
+            id SERIAL PRIMARY KEY,
+            numero INTEGER UNIQUE NOT NULL,
+            nome VARCHAR(100),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS leitos (
+            id SERIAL PRIMARY KEY,
+            quarto_id INTEGER REFERENCES quartos(id) ON DELETE CASCADE,
+            numero_leito VARCHAR(10) NOT NULL,
+            ocupado BOOLEAN DEFAULT FALSE,
+            UNIQUE(quarto_id, numero_leito)
+        )
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS conviventes (
+            id SERIAL PRIMARY KEY,
+            nome VARCHAR(200) NOT NULL,
+            data_nascimento DATE,
+            foto_base64 TEXT,
+            leito_id INTEGER REFERENCES leitos(id),
+            data_entrada DATE DEFAULT CURRENT_DATE,
+            data_saida DATE,
+            ativo BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS chamadas (
+            id SERIAL PRIMARY KEY,
+            convivente_id INTEGER REFERENCES conviventes(id),
+            data_chamada DATE NOT NULL,
+            presente BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(convivente_id, data_chamada)
+        )
+    ''')
+    for i in range(1, 18):
+        cur.execute('INSERT INTO quartos (numero, nome) VALUES (%s, %s) ON CONFLICT (numero) DO NOTHING', (i, f'Quarto {i}'))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+@app.route('/')
+def index():
+    init_db()
+    return redirect(url_for('mapa_leitos'))
+
+@app.route('/mapa_leitos')
+def mapa_leitos():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT q.id as quarto_id, q.numero as quarto_numero,
+                   l.id as leito_id, l.numero_leito, l.ocupado,
+                   c.id as convivente_id, c.nome as convivente_nome, c.foto_base64, c.data_nascimento
+            FROM quartos q
+            LEFT JOIN leitos l ON q.id = l.quarto_id
+            LEFT JOIN conviventes c ON l.id = c.leito_id AND c.ativo = TRUE
+            ORDER BY q.numero, CAST(l.numero_leito AS INTEGER)
+        ''')
+        dados = cur.fetchall()
+
+        quartos = {}
+        for row in dados:
+            q_num = row['quarto_numero']
+            if q_num not in quartos:
+                quartos[q_num] = {'id': row['quarto_id'], 'numero': q_num, 'leitos': []}
+            if row['leito_id']:
+                quartos[q_num]['leitos'].append(row)
+
+        cur.close()
+        conn.close()
+        return render_template('mapa_leitos.html', quartos=quartos.values())
+    except Exception as e:
+        flash(f'Erro ao carregar mapa: {str(e)}')
+        return render_template('mapa_leitos.html', quartos=[])
+
+@app.route('/quarto/<int:quarto_id>/adicionar_leito_mapa', methods=['POST'])
+def adicionar_leito_mapa(quarto_id):
+    quarto_numero_redirect = None
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute('SELECT numero FROM quartos WHERE id = %s', (quarto_id,))
+        result = cur.fetchone()
+        if result:
+            quarto_numero_redirect = result['numero']
+
+        cur.execute('SELECT numero_leito FROM leitos WHERE quarto_id = %s', (quarto_id,))
+        leitos_existentes = [int(row['numero_leito']) for row in cur.fetchall() if row['numero_leito'].isdigit()]
+        proximo_numero = 1
+        while proximo_numero in leitos_existentes:
+            proximo_numero += 1
+        cur.execute('INSERT INTO leitos (quarto_id, numero_leito) VALUES (%s, %s)', (quarto_id, str(proximo_numero)))
+        conn.commit()
+        flash(f'Leito {proximo_numero} adicionado!')
+    except Exception as e:
+        flash(f'Erro: {str(e)}')
+        conn.rollback()
+    finally:
+        cur.close()
+        conn.close()
+
+    if quarto_numero_redirect:
+        return redirect(url_for('mapa_leitos') + f'#quarto-{quarto_numero_redirect}')
+    return redirect(url_for('mapa_leitos'))
+
+@app.route('/adicionar_quarto_mapa', methods=['POST'])
+def adicionar_quarto_mapa():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute('SELECT numero FROM quartos')
+        quartos_existentes = [row['numero'] for row in cur.fetchall()]
+        proximo_numero = 1
+        while proximo_numero in quartos_existentes:
+            proximo_numero += 1
+        cur.execute('INSERT INTO quartos (numero, nome) VALUES (%s, %s)', (proximo_numero, f'Quarto {proximo_numero}'))
+        conn.commit()
+        flash(f'Quarto {proximo_numero} criado!')
+    except Exception as e:
+        flash(f'Erro: {str(e)}')
+        conn.rollback()
+    finally:
+        cur.close()
+        conn.close()
+    return redirect(url_for('mapa_leitos'))
+
 @app.route('/cadastrar_convivente', methods=['GET', 'POST'])
 def cadastrar_convivente():
     leito_id_pre = request.args.get('leito_id', type=int)
@@ -12,7 +162,6 @@ def cadastrar_convivente():
         conn = get_db_connection()
         cur = conn.cursor()
         try:
-            # Pega o número do quarto pra voltar pra âncora certa
             cur.execute('SELECT q.numero FROM leitos l JOIN quartos q ON l.quarto_id = q.id WHERE l.id = %s', (leito_id,))
             result = cur.fetchone()
             if result:
@@ -37,7 +186,6 @@ def cadastrar_convivente():
             cur.close()
             conn.close()
 
-        # Volta pro mapa na âncora do quarto
         if quarto_numero_redirect:
             return redirect(url_for('mapa_leitos') + f'#quarto-{quarto_numero_redirect}')
         return redirect(url_for('mapa_leitos'))
@@ -87,7 +235,6 @@ def editar_convivente(convivente_id):
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        # Pega o quarto antes de fazer qualquer coisa
         cur.execute('''
             SELECT q.numero FROM conviventes c
             JOIN leitos l ON c.leito_id = l.id
@@ -132,32 +279,36 @@ def editar_convivente(convivente_id):
         return redirect(url_for('mapa_leitos') + f'#quarto-{quarto_numero_redirect}')
     return redirect(url_for('mapa_leitos'))
 
-@app.route('/quarto/<int:quarto_id>/adicionar_leito_mapa', methods=['POST'])
-def adicionar_leito_mapa(quarto_id):
-    quarto_numero_redirect = None
+@app.route('/api/leitos_vagos/<int:quarto_id>')
+def leitos_vagos(quarto_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    try:
-        cur.execute('SELECT numero FROM quartos WHERE id = %s', (quarto_id,))
-        result = cur.fetchone()
-        if result:
-            quarto_numero_redirect = result['numero']
+    cur.execute('SELECT id, numero_leito FROM leitos WHERE quarto_id = %s AND ocupado = FALSE ORDER BY CAST(numero_leito AS INTEGER)', (quarto_id,))
+    leitos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(leitos)
 
-        cur.execute('SELECT numero_leito FROM leitos WHERE quarto_id = %s', (quarto_id,))
-        leitos_existentes = [int(row['numero_leito']) for row in cur.fetchall() if row['numero_leito'].isdigit()]
-        proximo_numero = 1
-        while proximo_numero in leitos_existentes:
-            proximo_numero += 1
-        cur.execute('INSERT INTO leitos (quarto_id, numero_leito) VALUES (%s, %s)', (quarto_id, str(proximo_numero)))
-        conn.commit()
-        flash(f'Leito {proximo_numero} adicionado!')
-    except Exception as e:
-        flash(f'Erro: {str(e)}')
-        conn.rollback()
-    finally:
+@app.route('/chamada')
+def chamada():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT c.*, q.numero as quarto_numero, l.numero_leito
+            FROM conviventes c
+            LEFT JOIN leitos l ON c.leito_id = l.id
+            LEFT JOIN quartos q ON l.quarto_id = q.id
+            WHERE c.ativo = TRUE
+            ORDER BY q.numero, CAST(l.numero_leito AS INTEGER)
+        ''')
+        conviventes = cur.fetchall()
         cur.close()
         conn.close()
+        return render_template('chamada.html', conviventes=conviventes, data_hoje=datetime.now().strftime('%Y-%m-%d'))
+    except Exception as e:
+        flash(f'Erro: {str(e)}')
+        return render_template('chamada.html', conviventes=[], data_hoje=datetime.now().strftime('%Y-%m-%d'))
 
-    if quarto_numero_redirect:
-        return redirect(url_for('mapa_leitos') + f'#quarto-{quarto_numero_redirect}')
-    return redirect(url_for('mapa_leitos'))
+if __name__ == '__main__':
+    app.run(debug=True)
