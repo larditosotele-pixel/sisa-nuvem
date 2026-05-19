@@ -5,11 +5,11 @@
 {% block content %}
 <a href="{{ url_for('lista_quartos') }}" class="btn btn-voltar"><i class="fas fa-arrow-left"></i> Voltar aos Quartos</a>
 
-<h2><i class="fas fa-bed"></i> Quarto {{ quarto.numero }} - {{ quarto.nome }}</h2>
+<h2><i class="fas fa-bed"></i> Quarto {{ quarto.numero }}</h2>
 
 <div style="background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
     <h3><i class="fas fa-plus-circle"></i> Adicionar Novo Leito</h3>
-    <p>Os leitos são criados automaticamente em sequência. Se deletar o Leito 2, o próximo criado será o 2 novamente.</p>
+    <p>Clique para criar o próximo leito vago automaticamente.</p>
     <form method="POST" action="{{ url_for('adicionar_leito', quarto_id=quarto.id) }}">
         <button type="submit" class="btn"><i class="fas fa-plus"></i> Adicionar Próximo Leito</button>
     </form>
