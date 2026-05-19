@@ -1,66 +1,216 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>SISA - Chamada Diária</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f0f0f0; margin: 0; }
-       .header { background: #1b5e20; color: white; padding: 15px; text-align: center; }
-       .container { max-width: 1000px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; }
-       .data { text-align: center; font-size: 14pt; color: #1b5e20; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #1b5e20; color: white; padding: 12px; }
-        td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
-       .foto { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
-       .btn-status { padding: 8px 12px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; text-decoration: none; display: inline-block; }
-       .btn-P { background: #2e7d32; } /* Verde - Presente */
-       .btn-F { background: #c62828; } /* Vermelho - Falta */
-       .btn-A { background: #ff9800; } /* Amarelo - Ausente */
-       .btn-H { background: #1976d2; } /* Azul - Hospitalizado */
-       .ativo { box-shadow: 0 0 0 3px #000; transform: scale(1.1); }
-       .voltar { display: block; text-align: center; margin-top: 20px; color: #1976d2; }
-    </style>
-</head>
-<body>
-    <div class="header"><h1>Chamada Diária</h1></div>
-    <div class="container">
-        <div class="data">Data: {{ data_hoje }}</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Foto</th>
-                    <th>Nome</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in conviventes %}
-                <tr>
-                    <td>
-                        {% if c['foto'] %}
-                        <img src="{{ c['foto'] }}" class="foto">
-                        {% else %}
-                        👤
-                        {% endif %}
-                    </td>
-                    <td>{{ c['nome'] }}</td>
-                    <td>{{ c['status'] }}</td>
-                    <td>
-                        <a href="{{ url_for('marcar_status', id=c['id'], status='P') }}"
-                           class="btn-status btn-P {% if c['status_chamada'] == 'P' %}ativo{% endif %}">P</a>
-                        <a href="{{ url_for('marcar_status', id=c['id'], status='F') }}"
-                           class="btn-status btn-F {% if c['status_chamada'] == 'F' %}ativo{% endif %}">F</a>
-                        <a href="{{ url_for('marcar_status', id=c['id'], status='A') }}"
-                           class="btn-status btn-A {% if c['status_chamada'] == 'A' %}ativo{% endif %}">A</a>
-                        <a href="{{ url_for('marcar_status', id=c['id'], status='H') }}"
-                           class="btn-status btn-H {% if c['status_chamada'] == 'H' %}ativo{% endif %}">H</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{{ url_for('index') }}" class="voltar">← Voltar ao Menu</a>
+{% extends "base.html" %}
+
+{% block title %}SISA - Chamada Diária{% endblock %}
+
+{% block content %}
+<style>
+    .chamada-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .chamada-header {
+        background: #f5f5f5;
+        padding: 16px;
+        border-radius: 8px 8px 0 0;
+        border-bottom: 2px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .chamada-header h2 { 
+        color: #1b5e20; 
+        margin: 0; 
+        font-size: 22px;
+    }
+    .data-chamada {
+        font-size: 16px;
+        background: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        color: #1b5e20;
+        font-weight: bold;
+        border: 1px solid #ddd;
+    }
+    .lista-conviventes {
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+    }
+    .item-convivente {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid #eee;
+        gap: 12px;
+    }
+    .item-convivente:last-child { border-bottom: none; }
+    .item-convivente:hover { background: #fafafa; }
+    
+    .foto-convivente {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: #e0e0e0;
+    }
+    .foto-placeholder {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #999;
+        flex-shrink: 0;
+    }
+    .info-convivente {
+        flex-grow: 1;
+        min-width: 0;
+    }
+    .info-convivente h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .info-convivente p {
+        margin: 2px 0 0 0;
+        color: #666;
+        font-size: 13px;
+    }
+    .botoes-chamada {
+        display: flex;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+    .btn-status {
+        width: 38px;
+        height: 38px;
+        border: 2px solid #ddd;
+        background: #f5f5f5;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.15s;
+        color: #555;
+    }
+    .btn-status:active { transform: scale(0.95); }
+    .btn-status.ativo-P { background: #4caf50; color: white; border-color: #4caf50; }
+    .btn-status.ativo-F { background: #f44336; color: white; border-color: #f44336; }
+    .btn-status.ativo-A { background: #ffc107; color: #333; border-color: #ffc107; }
+    .btn-status.ativo-H { background: #2196f3; color: white; border-color: #2196f3; }
+    
+    .barra-salvar {
+        background: #1b5e20;
+        padding: 0;
+        position: sticky;
+        bottom: 0;
+        border-radius: 0 0 8px 8px;
+    }
+    .btn-salvar {
+        width: 100%;
+        background: #1b5e20;
+        color: white;
+        padding: 16px;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .btn-salvar:hover { background: #2e7d32; }
+    .btn-salvar:active { background: #1b5e20; }
+
+    /* MOBILE - iPhone e Android */
+    @media (max-width: 600px) {
+        .container { padding: 10px; }
+        .chamada-container { margin: 0; }
+        .item-convivente { padding: 10px 12px; }
+        .foto-convivente, .foto-placeholder { width: 45px; height: 45px; }
+        .info-convivente h3 { font-size: 15px; }
+        .info-convivente p { font-size: 12px; }
+        .btn-status { width: 36px; height: 36px; font-size: 15px; }
+        .btn-salvar { font-size: 16px; padding: 14px; }
+    }
+</style>
+
+<div class="chamada-container">
+    <div class="chamada-header">
+        <h2><i class="fas fa-clipboard-check"></i> Chamada Diária</h2>
+        <div class="data-chamada">
+            <i class="fas fa-calendar"></i> {{ data_hoje }}
+        </div>
     </div>
-</body>
-</html>
+
+    <form method="POST" id="form-chamada">
+        <div class="lista-conviventes">
+            {% for c in conviventes %}
+            <div class="item-convivente" data-id="{{ c.id }}">
+                {% if c.foto_base64 %}
+                    <img src="{{ c.foto_base64 }}" class="foto-convivente" alt="{{ c.nome }}">
+                {% else %}
+                    <div class="foto-placeholder"><i class="fas fa-user"></i></div>
+                {% endif %}
+                
+                <div class="info-convivente">
+                    <h3>{{ c.nome }}</h3>
+                    <p>Q{{ c.quarto_numero }} - L{{ c.numero_leito }}</p>
+                </div>
+
+                <input type="hidden" name="status_{{ c.id }}" id="status_{{ c.id }}" value="{{ c.status_hoje or '' }}">
+                
+                <div class="botoes-chamada">
+                    <button type="button" class="btn-status {% if c.status_hoje == 'P' %}ativo-P{% endif %}" 
+                            onclick="selecionarStatus({{ c.id }}, 'P', this)">P</button>
+                    <button type="button" class="btn-status {% if c.status_hoje == 'F' %}ativo-F{% endif %}" 
+                            onclick="selecionarStatus({{ c.id }}, 'F', this)">F</button>
+                    <button type="button" class="btn-status {% if c.status_hoje == 'A' %}ativo-A{% endif %}" 
+                            onclick="selecionarStatus({{ c.id }}, 'A', this)">A</button>
+                    <button type="button" class="btn-status {% if c.status_hoje == 'H' %}ativo-H{% endif %}" 
+                            onclick="selecionarStatus({{ c.id }}, 'H', this)">H</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="barra-salvar">
+            <button type="submit" class="btn-salvar">
+                <i class="fas fa-save"></i> Salvar Chamada
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function selecionarStatus(conviventeId, status, btn) {
+    const input = document.getElementById('status_' + conviventeId);
+    const item = btn.closest('.item-convivente');
+    const botoes = item.querySelectorAll('.btn-status');
+    
+    // Clica no mesmo = desmarca
+    if (input.value === status) {
+        input.value = '';
+        botoes.forEach(b => b.className = 'btn-status');
+    } else {
+        input.value = status;
+        botoes.forEach(b => b.className = 'btn-status');
+        btn.className = 'btn-status ativo-' + status;
+    }
+}
+
+// Vibração no celular ao clicar
+document.querySelectorAll('.btn-status').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (navigator.vibrate) navigator.vibrate(30);
+    });
+});
+</script>
+{% endblock %}
