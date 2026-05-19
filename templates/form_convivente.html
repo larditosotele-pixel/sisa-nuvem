@@ -1,50 +1,44 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>{{ titulo }} - SISA</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-     .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
-        h1 { color: #1b5e20; }
-     .btn { background: #43a047; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px; border: none; cursor: pointer; }
-     .btn-voltar { background: #95a5a6; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input[type="text"], input[type="file"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-     .foto-atual { margin-top: 10px; }
-     .foto-atual img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 2px solid #ccc; }
-    </style>
+    <title>{{ titulo }}</title>
 </head>
 <body>
-    <div class="container">
-        <a href="{{ url_for('listar_conviventes') }}" class="btn btn-voltar">Voltar</a>
-        <h1>{{ titulo }}</h1>
+    <h1>{{ titulo }}</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <label>Foto:</label><br>
+        <input type="file" name="foto" id="foto" accept="image/*"><br><br>
+        
+        <label>Nome:</label><br>
+        <input type="text" name="nome" id="nome" value="{{ convivente.nome if convivente else '' }}" required><br><br>
+        
+        <label>Quarto:</label><br>
+        <input type="text" name="quarto" value="{{ convivente.quarto if convivente else '' }}"><br><br>
+        
+        <label>Leito:</label><br>
+        <input type="text" name="leito" value="{{ convivente.leito if convivente else '' }}"><br><br>
+        
+        <label>Status:</label><br>
+        <select name="status">
+            <option value="Ativo" {% if convivente and convivente.status == 'Ativo' %}selected{% endif %}>Ativo</option>
+            <option value="Inativo" {% if convivente and convivente.status == 'Inativo' %}selected{% endif %}>Inativo</option>
+        </select><br><br>
+        
+        <button type="submit">Cadastrar</button>
+    </form>
 
-        <form method="POST" enctype="multipart/form-data">
-            <label>Nome Completo:</label>
-            <input type="text" name="nome" value="{{ convivente.nome if convivente else '' }}" required>
-
-            <label>Quarto:</label>
-            <input type="text" name="quarto" value="{{ convivente.quarto if convivente else '' }}" required>
-
-            <label>Leito:</label>
-            <input type="text" name="leito" value="{{ convivente.leito if convivente else '' }}" required>
-
-            <label>Foto:</label>
-            <input type="file" name="foto" accept="image/*">
-
-            {% if convivente and convivente.foto %}
-            <div class="foto-atual">
-                <p><strong>Foto atual:</strong></p>
-                <img src="{{ url_for('static', filename=convivente.foto) }}"
-                     onerror="this.src='{{ url_for('static', filename='sem-foto.jpg') }}'" alt="Foto atual">
-                <p style="font-size: 10px; color: #666;">Envie uma nova foto para substituir</p>
-            </div>
-            {% endif %}
-
-            <br><br>
-            <button type="submit" class="btn">Salvar</button>
-        </form>
-    </div>
+    <script>
+    document.getElementById('foto').addEventListener('change', function(e) {
+        let arquivo = e.target.files[0];
+        if (arquivo) {
+            let nomeArquivo = arquivo.name.split('.')[0];
+            nomeArquivo = nomeArquivo.replace(/_/g, ' ').replace(/-/g, ' ');
+            nomeArquivo = nomeArquivo.toLowerCase().split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+            document.getElementById('nome').value = nomeArquivo;
+        }
+    });
+    </script>
 </body>
 </html>
