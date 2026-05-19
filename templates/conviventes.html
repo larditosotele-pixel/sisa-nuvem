@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Conviventes - SISA{% endblock %}
+{% block title %}SISA - Conviventes{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="fas fa-users"></i> Conviventes Ativos</h2>
-    <a href="{{ url_for('cadastrar_convivente') }}" class="btn">
-        <i class="fas fa-user-plus"></i> Novo Convivente
-    </a>
-</div>
+<a href="{{ url_for('index') }}" class="btn btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Menu</a>
+
+<h2><i class="fas fa-users"></i> Conviventes Ativos</h2>
+
+<a href="{{ url_for('cadastrar_convivente') }}" class="btn" style="margin-bottom: 16px;">
+    <i class="fas fa-user-plus"></i> Novo Convivente
+</a>
 
 <table>
     <thead>
@@ -21,45 +22,28 @@
         </tr>
     </thead>
     <tbody>
-        {% for c in conviventes %}
+        {% for convivente in conviventes %}
         <tr>
             <td>
-                {% if c.foto_base64 %}
-                <img src="{{ c.foto_base64 }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                {% if convivente.foto_base64 %}
+                    <img src="{{ convivente.foto_base64 }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                 {% else %}
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-user"></i>
-                </div>
+                    <i class="fas fa-user" style="font-size: 30px; color: #ccc;"></i>
                 {% endif %}
             </td>
-            <td><strong>{{ c.nome }}</strong></td>
-            <td>Quarto {{ c.quarto_numero }} - Leito {{ c.numero_leito }}</td>
-            <td>{{ c.data_entrada.strftime('%d/%m/%Y') if c.data_entrada else '-' }}</td>
+            <td><strong>{{ convivente.nome }}</strong></td>
+            <td>Quarto {{ convivente.quarto_numero }} - Leito {{ convivente.numero_leito }}</td>
+            <td>{{ convivente.data_entrada.strftime('%d/%m/%Y') if convivente.data_entrada else '-' }}</td>
             <td>
-                <a href="{{ url_for('desocupar_leito', convivente_id=c.id) }}" 
+                <a href="{{ url_for('desocupar_leito', convivente_id=convivente.id) }}" 
                    class="btn" 
-                   style="background: #f44336; padding: 6px 12px; font-size: 14px;"
-                   onclick="return confirm('Dar alta para {{ c.nome }}? O leito será liberado.')">
+                   style="background-color: #e74c3c;"
+                   onclick="return confirm('Tem certeza que deseja dar alta para {{ convivente.nome }}?')">
                     <i class="fas fa-sign-out-alt"></i> Dar Alta
-                </a>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="5" style="text-align: center; padding: 30px;">
-                Nenhum convivente cadastrado ainda.<br>
-                <a href="{{ url_for('cadastrar_convivente') }}" class="btn" style="margin-top: 10px;">
-                    Cadastrar Primeiro Convivente
                 </a>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-
-<div style="margin-top: 20px;">
-    <a href="{{ url_for('index') }}" class="btn btn-voltar">
-        <i class="fas fa-arrow-left"></i> Voltar ao Menu
-    </a>
-</div>
 {% endblock %}
