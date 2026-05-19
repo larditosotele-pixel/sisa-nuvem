@@ -1,115 +1,86 @@
 {% extends "base.html" %}
 
-{% block title %}Cadastrar Convivente - SISA{% endblock %}
+{% block title %}SISA - Cadastrar Convivente{% endblock %}
 
 {% block content %}
+<a href="{{ url_for('lista_conviventes') }}" class="btn btn-voltar"><i class="fas fa-arrow-left"></i> Voltar</a>
+
 <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Convivente</h2>
 
-<form method="POST" class="card" style="padding: 20px;">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <div style="grid-column: 1/-1;">
-            <label>Foto do Convivente</label>
-            <input type="file" id="foto_input" accept="image/*" style="margin-bottom: 10px;">
-            <input type="hidden" name="foto_base64" id="foto_base64">
-            <div id="preview_container" style="display: none;">
-                <img id="preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e0e0e0;">
-            </div>
-        </div>
-
-        <div>
-            <label>Nome Completo *</label>
-            <input type="text" name="nome" id="nome" required placeholder="Digite ou selecione a foto">
-        </div>
-
-        <div>
-            <label>Data de Nascimento</label>
-            <input type="date" name="data_nascimento">
-        </div>
-
-        <div>
-            <label>Quarto *</label>
-            <select name="quarto_id" id="quarto_select" required onchange="carregarLeitos()">
-                <option value="">Selecione o Quarto</option>
-                {% for q in quartos %}
-                <option value="{{ q.id }}">Quarto {{ q.numero }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div>
-            <label>Leito *</label>
-            <select name="leito_id" id="leito_select" required disabled>
-                <option value="">Selecione o quarto primeiro</option>
-            </select>
-        </div>
+<form method="POST" enctype="multipart/form-data">
+    <div style="margin-bottom: 16px;">
+        <label><strong>Foto do Convivente:</strong></label><br>
+        <input type="file" id="foto" name="foto" accept="image/*" onchange="previewImage(event)">
+        <input type="hidden" name="foto_base64" id="foto_base64">
+        <div id="preview" style="margin-top: 10px;"></div>
     </div>
 
-    <div style="margin-top: 24px;">
-        <button type="submit" class="btn">
-            <i class="fas fa-save"></i> Salvar Convivente
-        </button>
-        <a href="{{ url_for('lista_conviventes') }}" class="btn btn-voltar">
-            <i class="fas fa-times"></i> Cancelar
-        </a>
+    <div style="margin-bottom: 16px;">
+        <label><strong>Nome Completo:</strong></label><br>
+        <input type="text" name="nome" id="nome" required style="width: 100%; padding: 8px;">
     </div>
+
+    <div style="margin-bottom: 16px;">
+        <label><strong>Data de Nascimento:</strong></label><br>
+        <input type="date" name="data_nascimento" style="padding: 8px;">
+    </div>
+
+    <div style="margin-bottom: 16px;">
+        <label><strong>Quarto:</strong></label><br>
+        <select name="quarto_id" id="quarto" required onchange="carregarLeitos()" style="width: 100%; padding: 8px;">
+            <option value="">Selecione o Quarto</option>
+            {% for quarto in quartos %}
+                <option value="{{ quarto.id }}">Quarto {{ quarto.numero }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+        <label><strong>Leito:</strong></label><br>
+        <select name="leito_id" id="leito" required style="width: 100%; padding: 8px;">
+            <option value="">Selecione o Quarto Primeiro</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn"><i class="fas fa-save"></i> Salvar Convivente</button>
 </form>
 
 <script>
-// 1. Foto → base64 + nome automático pelo nome do arquivo
-document.getElementById('foto_input').addEventListener('change', function(e) {
-    let arquivo = e.target.files[0];
-    if (arquivo) {
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // 1. Pega o nome do arquivo e joga no campo Nome
+        let fileName = file.name.replace(/\.[^/.]+$/, ""); // remove extensão
+        fileName = fileName.replace(/_/g, " ").replace(/-/g, " "); // troca _ e - por espaço
+        document.getElementById('nome').value = fileName;
+
+        // 2. Mostra preview da foto
         const reader = new FileReader();
-        reader.onload = function(event) {
-            document.getElementById('foto_base64').value = event.target.result;
-            document.getElementById('preview').src = event.target.result;
-            document.getElementById('preview_container').style.display = 'block';
-        };
-        reader.readAsDataURL(arquivo);
-
-        let nomeArquivo = arquivo.name.split('.')[0];
-        nomeArquivo = nomeArquivo.replace(/_/g, ' ').replace(/-/g, ' ');
-        nomeArquivo = nomeArquivo.toLowerCase().split(' ').map(word =>
-            word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(' ');
-        document.getElementById('nome').value = nomeArquivo;
+        reader.onload = function(e) {
+            document.getElementById('preview').innerHTML = '<img src="' + e.target.result + '" style="max-width: 200px; border-radius: 8px;">';
+            document.getElementById('foto_base64').value = e.target.result;
+        }
+        reader.readAsDataURL(file);
     }
-});
+}
 
-// 2. Carrega leitos vagos quando escolhe quarto
-async function carregarLeitos() {
-    const quartoId = document.getElementById('quarto_select').value;
-    const leitoSelect = document.getElementById('leito_select');
-
-    if (!quartoId) {
-        leitoSelect.innerHTML = '<option value="">Selecione o quarto primeiro</option>';
-        leitoSelect.disabled = true;
-        return;
-    }
-
+function carregarLeitos() {
+    const quartoId = document.getElementById('quarto').value;
+    const leitoSelect = document.getElementById('leito');
     leitoSelect.innerHTML = '<option value="">Carregando...</option>';
-    leitoSelect.disabled = true;
-
-    const response = await fetch(`/api/leitos_vagos/${quartoId}`);
-    const leitos = await response.json();
-
-    if (leitos.length === 0) {
-        leitoSelect.innerHTML = '<option value="">Nenhum leito vago neste quarto</option>';
+    
+    if (quartoId) {
+        fetch('/api/leitos_vagos/' + quartoId)
+           .then(response => response.json())
+           .then(data => {
+                leitoSelect.innerHTML = '<option value="">Selecione o Leito</option>';
+                data.forEach(leito => {
+                    leitoSelect.innerHTML += '<option value="' + leito.id + '">Leito ' + leito.numero_leito + '</option>';
+                });
+            });
     } else {
-        leitoSelect.innerHTML = '<option value="">Selecione o Leito</option>';
-        leitos.forEach(l => {
-            leitoSelect.innerHTML += `<option value="${l.id}">Leito ${l.numero_leito}</option>`;
-        });
-        leitoSelect.disabled = false;
+        leitoSelect.innerHTML = '<option value="">Selecione o Quarto Primeiro</option>';
     }
 }
 </script>
-
-<style>
-@media (max-width: 768px) {
-    div[style*="grid-template-columns"] {
-        grid-template-columns: 1fr!important;
-    }
-}
-</style>
 {% endblock %}
