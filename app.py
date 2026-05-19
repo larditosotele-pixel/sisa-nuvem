@@ -75,39 +75,47 @@ def index():
 # GESTÃO DE QUARTOS
 @app.route('/quartos')
 def lista_quartos():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        SELECT q.id, q.numero, q.nome, 
-               COUNT(l.id) as total_leitos,
-               SUM(CASE WHEN l.ocupado = TRUE THEN 1 ELSE 0 END) as leitos_ocupados
-        FROM quartos q 
-        LEFT JOIN leitos l ON q.id = l.quarto_id 
-        GROUP BY q.id, q.numero, q.nome 
-        ORDER BY q.numero
-    ''')
-    quartos = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('quartos.html', quartos=quartos)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT q.id, q.numero, q.nome, 
+                   COUNT(l.id) as total_leitos,
+                   SUM(CASE WHEN l.ocupado = TRUE THEN 1 ELSE 0 END) as leitos_ocupados
+            FROM quartos q 
+            LEFT JOIN leitos l ON q.id = l.quarto_id 
+            GROUP BY q.id, q.numero, q.nome 
+            ORDER BY q.numero
+        ''')
+        quartos = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('quartos.html', quartos=quartos)
+    except Exception as e:
+        flash(f'Erro ao carregar quartos: {str(e)}')
+        return render_template('quartos.html', quartos=[])
 
 @app.route('/quarto/<int:quarto_id>/leitos')
 def lista_leitos(quarto_id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM quartos WHERE id = %s', (quarto_id,))
-    quarto = cur.fetchone()
-    cur.execute('''
-        SELECT l.*, c.nome as convivente_nome 
-        FROM leitos l 
-        LEFT JOIN conviventes c ON l.id = c.leito_id AND c.ativo = TRUE
-        WHERE l.quarto_id = %s 
-        ORDER BY l.numero_leito
-    ''', (quarto_id,))
-    leitos = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('leitos.html', quarto=quarto, leitos=leitos)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM quartos WHERE id = %s', (quarto_id,))
+        quarto = cur.fetchone()
+        cur.execute('''
+            SELECT l.*, c.nome as convivente_nome 
+            FROM leitos l 
+            LEFT JOIN conviventes c ON l.id = c.leito_id AND c.ativo = TRUE
+            WHERE l.quarto_id = %s 
+            ORDER BY l.numero_leito
+        ''', (quarto_id,))
+        leitos = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('leitos.html', quarto=quarto, leitos=leitos)
+    except Exception as e:
+        flash(f'Erro: {str(e)}')
+        return redirect(url_for('lista_quartos'))
 
 @app.route('/quarto/<int:quarto_id>/adicionar_leito', methods=['POST'])
 def adicionar_leito(quarto_id):
@@ -118,10 +126,15 @@ def adicionar_leito(quarto_id):
         cur.execute('INSERT INTO leitos (quarto_id, numero_leito) VALUES (%s, %s)', (quarto_id, numero_leito))
         conn.commit()
         flash(f'Leito {numero_leito} adicionado com sucesso!')
-    except:
+    except psycopg2.IntegrityError:
         flash('Erro: Leito já existe neste quarto!')
-    cur.close()
-    conn.close()
+        conn.rollback()
+    except Exception as e:
+        flash(f'Erro: {str(e)}')
+        conn.rollback()
+    finally:
+        cur.close()
+        conn.close()
     return redirect(url_for('lista_leitos', quarto_id=quarto_id))
 
 @app.route('/adicionar_quarto', methods=['POST'])
@@ -134,51 +147,62 @@ def adicionar_quarto():
         cur.execute('INSERT INTO quartos (numero, nome) VALUES (%s, %s)', (numero, nome))
         conn.commit()
         flash(f'Quarto {numero} criado com sucesso!')
-    except:
+    except psycopg2.IntegrityError:
         flash('Erro: Quarto já existe!')
-    cur.close()
-    conn.close()
+        conn.rollback()
+    finally:
+        cur.close()
+        conn.close()
     return redirect(url_for('lista_quartos'))
 
-# GESTÃO DE CONVIVENTES
+# GESTÃO DE CONVIVENTES - AQUI TAVA O ERRO 500
 @app.route('/conviventes')
 def lista_conviventes():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        SELECT c.*, q.numero as quarto_numero, l.numero_leito 
-        FROM conviventes c 
-        JOIN leitos l ON c.leito_id = l.id 
-        JOIN quartos q ON l.quarto_id = q.id 
-        WHERE c.ativo = TRUE 
-        ORDER BY q.numero, l.numero_leito
-    ''')
-    conviventes = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('conviventes.html', conviventes=conviventes)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT c.*, 
+                   COALESCE(q.numero, 0) as quarto_numero, 
+                   COALESCE(l.numero_leito, 'Sem leito') as numero_leito 
+            FROM conviventes c 
+            LEFT JOIN leitos l ON c.leito_id = l.id 
+            LEFT JOIN quartos q ON l.quarto_id = q.id 
+            WHERE c.ativo = TRUE 
+            ORDER BY q.numero, l.numero_leito
+        ''')
+        conviventes = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('conviventes.html', conviventes=conviventes)
+    except Exception as e:
+        flash(f'Erro ao carregar conviventes: {str(e)}')
+        return render_template('conviventes.html', conviventes=[])
 
 @app.route('/cadastrar_convivente', methods=['GET', 'POST'])
 def cadastrar_convivente():
     if request.method == 'POST':
         nome = request.form['nome']
         data_nascimento = request.form['data_nascimento'] or None
-        foto_base64 = request.form['foto_base64']
+        foto_base64 = request.form.get('foto_base64', '')
         leito_id = request.form['leito_id']
         
         conn = get_db_connection()
         cur = conn.cursor()
-        # Cadastra convivente
-        cur.execute('''
-            INSERT INTO conviventes (nome, data_nascimento, foto_base64, leito_id) 
-            VALUES (%s, %s, %s, %s)
-        ''', (nome, data_nascimento, foto_base64, leito_id))
-        # Marca leito como ocupado
-        cur.execute('UPDATE leitos SET ocupado = TRUE WHERE id = %s', (leito_id,))
-        conn.commit()
-        cur.close()
-        conn.close()
-        flash('Convivente cadastrado com sucesso!')
+        try:
+            cur.execute('''
+                INSERT INTO conviventes (nome, data_nascimento, foto_base64, leito_id) 
+                VALUES (%s, %s, %s, %s)
+            ''', (nome, data_nascimento, foto_base64, leito_id))
+            cur.execute('UPDATE leitos SET ocupado = TRUE WHERE id = %s', (leito_id,))
+            conn.commit()
+            flash('Convivente cadastrado com sucesso!')
+        except Exception as e:
+            flash(f'Erro ao cadastrar: {str(e)}')
+            conn.rollback()
+        finally:
+            cur.close()
+            conn.close()
         return redirect(url_for('lista_conviventes'))
     
     # GET: Buscar quartos e leitos vagos
@@ -209,37 +233,46 @@ def leitos_vagos(quarto_id):
 def desocupar_leito(convivente_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    # Pega leito_id
-    cur.execute('SELECT leito_id FROM conviventes WHERE id = %s', (convivente_id,))
-    result = cur.fetchone()
-    if result:
-        leito_id = result['leito_id']
-        # Desativa convivente e libera leito
-        cur.execute('UPDATE conviventes SET ativo = FALSE, data_saida = CURRENT_DATE WHERE id = %s', (convivente_id,))
-        cur.execute('UPDATE leitos SET ocupado = FALSE WHERE id = %s', (leito_id,))
-        conn.commit()
-        flash('Convivente desocupado e leito liberado!')
-    cur.close()
-    conn.close()
+    try:
+        cur.execute('SELECT leito_id FROM conviventes WHERE id = %s', (convivente_id,))
+        result = cur.fetchone()
+        if result and result['leito_id']:
+            leito_id = result['leito_id']
+            cur.execute('UPDATE conviventes SET ativo = FALSE, data_saida = CURRENT_DATE WHERE id = %s', (convivente_id,))
+            cur.execute('UPDATE leitos SET ocupado = FALSE WHERE id = %s', (leito_id,))
+            conn.commit()
+            flash('Convivente desocupado e leito liberado!')
+        else:
+            flash('Convivente não encontrado ou sem leito.')
+    except Exception as e:
+        flash(f'Erro: {str(e)}')
+        conn.rollback()
+    finally:
+        cur.close()
+        conn.close()
     return redirect(url_for('lista_conviventes'))
 
 # CHAMADA
 @app.route('/chamada')
 def chamada():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        SELECT c.*, q.numero as quarto_numero, l.numero_leito 
-        FROM conviventes c 
-        JOIN leitos l ON c.leito_id = l.id 
-        JOIN quartos q ON l.quarto_id = q.id 
-        WHERE c.ativo = TRUE 
-        ORDER BY q.numero, l.numero_leito
-    ''')
-    conviventes = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('chamada.html', conviventes=conviventes, data_hoje=datetime.now().strftime('%Y-%m-%d'))
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT c.*, q.numero as quarto_numero, l.numero_leito 
+            FROM conviventes c 
+            LEFT JOIN leitos l ON c.leito_id = l.id 
+            LEFT JOIN quartos q ON l.quarto_id = q.id 
+            WHERE c.ativo = TRUE 
+            ORDER BY q.numero, l.numero_leito
+        ''')
+        conviventes = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('chamada.html', conviventes=conviventes, data_hoje=datetime.now().strftime('%Y-%m-%d'))
+    except Exception as e:
+        flash(f'Erro: {str(e)}')
+        return render_template('chamada.html', conviventes=[], data_hoje=datetime.now().strftime('%Y-%m-%d'))
 
 if __name__ == '__main__':
     app.run(debug=True)
