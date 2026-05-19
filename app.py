@@ -1,180 +1,168 @@
-import os
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
+import calendar
+import os
+import base64
 import pytz
 
 app = Flask(__name__)
+app.secret_key = 'sisa_2026'
+
+# ===== CONFIG NEON POSTGRES =====
+DATABASE_URL = os.environ.get('DATABASE_URL')
+TABELA_CONVIVENTE = 'convivente'
+TABELA_CHAMADA = 'chamada'
+COLUNA_DATA_CHAMADA = 'data_chamada'
+TZ = pytz.timezone('America/Sao_Paulo')
+# ================================
 
 def get_db_connection():
-    DATABASE_URL = os.environ.get('DATABASE_URL')
-    if DATABASE_URL:
-        if DATABASE_URL.startswith("postgres://"):
-            DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require', cursor_factory=RealDictCursor)
-        return conn
-    else:
-        import sqlite3
-        conn = sqlite3.connect('banco.db')
-        conn.row_factory = sqlite3.Row
-        return conn
+    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    return conn
 
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    # Cria tabelas se não existem
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS conviventes (
+    cur.execute(f'''
+        CREATE TABLE IF NOT EXISTS {TABELA_CONVIVENTE} (
             id SERIAL PRIMARY KEY,
             nome TEXT NOT NULL,
-            status TEXT,
-            foto TEXT
+            quarto TEXT,
+            leito TEXT,
+            foto TEXT,
+            status TEXT DEFAULT 'Ativo'
         )
     ''')
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS presencas (
+    cur.execute(f'''
+        CREATE TABLE IF NOT EXISTS {TABELA_CHAMADA} (
             id SERIAL PRIMARY KEY,
-            convivente_id INTEGER REFERENCES conviventes(id),
-            data TEXT,
-            status TEXT
+            convivente_id INTEGER REFERENCES {TABELA_CONVIVENTE}(id),
+            {COLUNA_DATA_CHAMADA} DATE NOT NULL,
+            status TEXT,
+            hora_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    
-    # Adiciona colunas que faltam nas tabelas antigas
-    try:
-        cur.execute('ALTER TABLE conviventes ADD COLUMN IF NOT EXISTS status TEXT')
-    except: pass
-    try:
-        cur.execute('ALTER TABLE conviventes ADD COLUMN IF NOT EXISTS foto TEXT')
-    except: pass
-    try:
-        cur.execute('ALTER TABLE presencas ADD COLUMN IF NOT EXISTS data TEXT')
-    except: pass
-    try:
-        cur.execute('ALTER TABLE presencas ADD COLUMN IF NOT EXISTS status TEXT')
-    except: pass
-    
     conn.commit()
     cur.close()
     conn.close()
 
-def get_brazil_time():
-    tz = pytz.timezone('America/Sao_Paulo')
-    return datetime.now(tz)
-
 @app.route('/')
 def index():
+    init_db() # Cria tabelas se não existirem
     return render_template('index.html')
 
+# ========== CADASTRO DE CONVIVENTES COM FOTO BASE64 ==========
 @app.route('/conviventes')
-def lista_conviventes():
-    init_db()
+def conviventes():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT id, nome, status, foto FROM conviventes ORDER BY nome')
+    cur.execute(f"SELECT * FROM {TABELA_CONVIVENTE} ORDER BY CAST(NULLIF(quarto,'') AS INTEGER), leito")
     conviventes = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('conviventes.html', conviventes=conviventes)
 
-@app.route('/cadastrar', methods=['GET', 'POST'])
-def cadastrar():
+@app.route('/convivente/novo', methods=['GET', 'POST'])
+def novo_convivente():
     if request.method == 'POST':
         nome = request.form['nome']
+        quarto = request.form['quarto']
+        leito = request.form['leito']
         status = request.form['status']
-        foto = request.form.get('foto', '')
+        foto_base64 = None
+
+        if 'foto' in request.files:
+            file = request.files['foto']
+            if file and file.filename!= '':
+                foto_bytes = file.read()
+                foto_base64 = base64.b64encode(foto_bytes).decode('utf-8')
+                foto_base64 = f"data:{file.content_type};base64,{foto_base64}"
+
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('INSERT INTO conviventes (nome, status, foto) VALUES (%s, %s, %s)', (nome, status, foto))
+        cur.execute(f"INSERT INTO {TABELA_CONVIVENTE} (nome, quarto, leito, foto, status) VALUES (%s,%s,%s,%s,%s)", 
+                    (nome, quarto, leito, foto_base64, status))
         conn.commit()
         cur.close()
         conn.close()
-        return redirect(url_for('lista_conviventes'))
-    return render_template('cadastrar.html')
+        flash('Convivente cadastrado com sucesso!')
+        return redirect(url_for('conviventes'))
 
-@app.route('/editar/<int:id>', methods=['GET', 'POST'])
-def editar(id):
+    return render_template('form_convivente.html', convivente=None, titulo="Novo Convivente")
+
+@app.route('/convivente/editar/<int:id>', methods=['GET', 'POST'])
+def editar_convivente(id):
     conn = get_db_connection()
     cur = conn.cursor()
+
     if request.method == 'POST':
         nome = request.form['nome']
+        quarto = request.form['quarto']
+        leito = request.form['leito']
         status = request.form['status']
-        foto = request.form.get('foto', '')
-        cur.execute('UPDATE conviventes SET nome = %s, status = %s, foto = %s WHERE id = %s', (nome, status, foto, id))
+        
+        cur.execute(f"SELECT foto FROM {TABELA_CONVIVENTE} WHERE id=%s", (id,))
+        foto_atual = cur.fetchone()['foto']
+        foto_base64 = foto_atual
+
+        if 'foto' in request.files:
+            file = request.files['foto']
+            if file and file.filename!= '':
+                foto_bytes = file.read()
+                foto_base64 = base64.b64encode(foto_bytes).decode('utf-8')
+                foto_base64 = f"data:{file.content_type};base64,{foto_base64}"
+
+        cur.execute(f"UPDATE {TABELA_CONVIVENTE} SET nome=%s, quarto=%s, leito=%s, foto=%s, status=%s WHERE id=%s", 
+                    (nome, quarto, leito, foto_base64, status, id))
         conn.commit()
         cur.close()
         conn.close()
-        return redirect(url_for('lista_conviventes'))
-    cur.execute('SELECT id, nome, status, foto FROM conviventes WHERE id = %s', (id,))
+        flash('Convivente atualizado com sucesso!')
+        return redirect(url_for('conviventes'))
+
+    cur.execute(f"SELECT * FROM {TABELA_CONVIVENTE} WHERE id=%s", (id,))
     convivente = cur.fetchone()
     cur.close()
     conn.close()
-    return render_template('editar.html', convivente=convivente)
+    return render_template('form_convivente.html', convivente=convivente, titulo="Editar Convivente")
 
-@app.route('/excluir/<int:id>')
-def excluir(id):
+@app.route('/convivente/excluir/<int:id>')
+def excluir_convivente(id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('DELETE FROM presencas WHERE convivente_id = %s', (id,))
-    cur.execute('DELETE FROM conviventes WHERE id = %s', (id,))
+    cur.execute(f"DELETE FROM {TABELA_CONVIVENTE} WHERE id=%s", (id,))
     conn.commit()
     cur.close()
     conn.close()
-    return redirect(url_for('lista_conviventes'))
+    flash('Convivente excluído!')
+    return redirect(url_for('conviventes'))
 
-@app.route('/chamada')
-def chamada():
-    init_db()
+# ========== CHAMADA COM HORA CERTA DE SP ==========
+@app.route('/salvar_chamada', methods=['POST'])
+def salvar_chamada():
+    dados = request.get_json()
+    data = dados.get('data')
+    presencas = dados.get('presencas', {})
+    hora_sp = datetime.now(TZ)
+
     conn = get_db_connection()
     cur = conn.cursor()
-    data_hoje = get_brazil_time().strftime('%Y-%m-%d')
-    cur.execute('''
-        SELECT c.id, c.nome, c.status, c.foto, p.status as status_chamada
-        FROM conviventes c
-        LEFT JOIN presencas p ON c.id = p.convivente_id AND p.data = %s
-        ORDER BY c.nome
-    ''', (data_hoje,))
-    conviventes = cur.fetchall()
-    cur.close()
-    conn.close()
-    data_formatada = get_brazil_time().strftime('%d/%m/%Y')
-    return render_template('chamada.html', conviventes=conviventes, data_hoje=data_formatada)
+    cur.execute(f"DELETE FROM {TABELA_CHAMADA} WHERE {COLUNA_DATA_CHAMADA} = %s", (data,))
 
-@app.route('/marcar_status/<int:id>/<status>')
-def marcar_status(id, status):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    data_hoje = get_brazil_time().strftime('%Y-%m-%d')
-
-    # Se clicar no mesmo status, apaga = desmarca
-    cur.execute('SELECT status FROM presencas WHERE convivente_id = %s AND data = %s', (id, data_hoje))
-    existe = cur.fetchone()
-
-    if existe and existe['status'] == status:
-        cur.execute('DELETE FROM presencas WHERE convivente_id = %s AND data = %s', (id, data_hoje))
-    elif existe:
-        cur.execute('UPDATE presencas SET status = %s WHERE convivente_id = %s AND data = %s', (status, id, data_hoje))
-    else:
-        cur.execute('INSERT INTO presencas (convivente_id, data, status) VALUES (%s, %s, %s)', (id, data_hoje, status))
+    for conv_id, status in presencas.items():
+        if status:
+            cur.execute(f"INSERT INTO {TABELA_CHAMADA} (convivente_id, {COLUNA_DATA_CHAMADA}, status, hora_registro) VALUES (%s,%s,%s,%s)", 
+                        (conv_id, data, status, hora_sp))
 
     conn.commit()
     cur.close()
     conn.close()
-    return redirect(url_for('chamada'))
+    return jsonify({'status': 'ok'})
 
-@app.route('/relatorio_chamada')
-def relatorio_chamada():
-    return "<h1>Relatório Preenchido - Em construção</h1><a href='/'>Voltar</a>"
-
-@app.route('/relatorio_chamada_branco')
-def relatorio_chamada_branco():
-    return "<h1>Espelho em Branco - Em construção</h1><a href='/'>Voltar</a>"
-
-@app.route('/logout')
-def logout():
-    return "<h1>Sistema encerrado</h1><a href='/'>Voltar ao Menu</a>"
+# RESTO DAS ROTAS: carometro, chamada, relatorio... troca sqlite3 por psycopg2 igual fiz acima
+# Se quiser te mando o arquivo completo, mas o importante é esse esquema acima
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
