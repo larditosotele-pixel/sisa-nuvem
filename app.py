@@ -172,22 +172,41 @@ def cadastrar_convivente():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('''
-        SELECT q.id, q.numero
-        FROM quartos q
-        WHERE EXISTS (SELECT 1 FROM leitos l WHERE l.quarto_id = q.id AND l.ocupado = FALSE)
-        ORDER BY q.numero
-    ''')
-    quartos = cur.fetchall()
+    try:
+        cur.execute('''
+            SELECT DISTINCT q.id, q.numero
+            FROM quartos q
+            WHERE EXISTS (SELECT 1 FROM leitos l WHERE l.quarto_id = q.id AND l.ocupado = FALSE)
+            ORDER BY q.numero
+        ''')
+        quartos = cur.fetchall()
 
-    leito_pre_selecionado = None
-    if leito_id_pre:
-        cur.execute('SELECT l.id, l.numero_leito, q.numero as quarto_numero FROM leitos l JOIN quartos q ON l.quarto_id = q.id WHERE l.id = %s', (leito_id_pre,))
-        leito_pre_selecionado = cur.fetchone()
+        leito_pre_selecionado = None
+        quarto_pre_selecionado = None
+        if leito_id_pre:
+            cur.execute('''
+                SELECT l.id, l.numero_leito, l.quarto_id, q.numero as quarto_numero
+                FROM leitos l
+                JOIN quartos q ON l.quarto_id = q.id
+                WHERE l.id = %s AND l.ocupado = FALSE
+            ''', (leito_id_pre,))
+            leito_pre_selecionado = cur.fetchone()
+            if leito_pre_selecionado:
+                quarto_pre_selecionado = leito_pre_selecionado['quarto_id']
 
-    cur.close()
-    conn.close()
-    return render_template('form_convivente.html', quartos=quartos, leito_pre_selecionado=leito_pre_selecionado)
+    except Exception as e:
+        flash(f'Erro ao carregar formulário: {str(e)}')
+        quartos = []
+        leito_pre_selecionado = None
+        quarto_pre_selecionado = None
+    finally:
+        cur.close()
+        conn.close()
+
+    return render_template('form_convivente.html',
+                           quartos=quartos,
+                           leito_pre_selecionado=leito_pre_selecionado,
+                           quarto_pre_selecionado=quarto_pre_selecionado)
 
 @app.route('/editar_convivente/<int:convivente_id>', methods=['POST'])
 def editar_convivente(convivente_id):
