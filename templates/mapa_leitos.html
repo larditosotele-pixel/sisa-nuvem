@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}SISA - Mapa de Leitos{% endblock %}
+
+{% block content %}
+<style>
+  .mapa-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+  .quarto-bloco {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+  .quarto-titulo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #1b5e20;
+        padding-bottom: 8px;
+    }
+  .quarto-titulo h3 {
+        color: #1b5e20;
+        margin: 0;
+    }
+  .leitos-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+  .leito-card {
+        width: 120px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background: white;
+        text-align: center;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+  .leito-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  .leito-card.ocupado {
+        border-color: #e74c3c;
+    }
+  .leito-card.vago {
+        border-color: #27ae60;
+        background: #e8f5e9;
+    }
+  .leito-tag {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        background: #3498db;
+        color: white;
+        font-size: 11px;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 4px;
+        z-index: 1;
+    }
+  .leito-foto {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 6px 6px 0 0;
+    }
+  .leito-sem-foto {
+        width: 100%;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ecf0f1;
+        color: #7f8c8d;
+        font-size: 40px;
+    }
+  .leito-nome {
+        font-size: 12px;
+        padding: 6px 4px;
+        height: 32px;
+        overflow: hidden;
+        line-height: 1.2;
+    }
+  .btn-add {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+  .btn-add:hover {
+        background: #2980b9;
+    }
+   /* Modal */
+  .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+  .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+    }
+  .modal-content h3 {
+        margin-top: 0;
+        color: #1b5e20;
+    }
+  .modal-content input {
+        width: 100%;
+        padding: 8px;
+        margin: 8px 0;
+        box-sizing: border-box;
+    }
+  .btn-modal {
+        width: 100%;
+        padding: 12px;
+        margin: 5px 0;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+  .btn-salvar { background: #27ae60; color: white; }
+  .btn-cancelar { background: #e74c3c; color: white; }
+  .btn-desocupar { background: #f39c12; color: white; }
+</style>
+
+<div class="mapa-header">
+    <h2><i class="fas fa-th"></i> Mapa de Leitos - Lar Ditoso</h2>
+    <form method="POST" action="{{ url_for('adicionar_quarto_mapa') }}">
+        <button type="submit" class="btn"><i class="fas fa-plus"></i> Criar Quarto</button>
+    </form>
+</div>
+
+{% for quarto in quartos %}
+<div class="quarto-bloco">
+    <div class="quarto-titulo">
+        <h3>QUARTO {{ quarto.numero }}</h3>
+        <form method="POST" action="{{ url_for('adicionar_leito_mapa', quarto_id=quarto.id) }}">
+            <button type="submit" class="btn-add"><i class="fas fa-plus"></i> Leito</button>
+        </form>
+    </div>
+
+    <div class="leitos-grid">
+        {% for leito in quarto.leitos %}
+            <div class="leito-card {{ 'ocupado' if leito.ocupado else 'vago' }}"
+                 {% if leito.ocupado %}
+                 onclick="abrirModalEditar({{ leito.convivente_id }}, '{{ leito.convivente_nome }}', {{ quarto.numero }}, {{ leito.numero_leito }}, '{{ leito.foto_base64 or '' }}', '{{ leito.data_nascimento or '' }}')"
+                 {% else %}
+                 onclick="window.location.href='{{ url_for('cadastrar_convivente', leito_id=leito.leito_id) }}'"
+                 {% endif %}>
+                <div class="leito-tag">L{{ leito.numero_leito }}</div>
+                {% if leito.foto_base64 %}
+                    <img src="{{ leito.foto_base64 }}" class="leito-foto">
+                {% else %}
+                    <div class="leito-sem-foto">
+                        {% if leito.ocupado %}
+                            <i class="fas fa-user"></i>
+                        {% else %}
+                            <i class="fas fa-bed"></i>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="leito-nome">
+                    {{ leito.convivente_nome or 'Vago' }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+
+<!-- Modal Editar Residente -->
+<div id="modalEditar" class="modal">
+    <div class="modal-content">
+        <h3>Editar Residente</h3>
+        <form id="formEditar" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="acao" id="acaoForm">
+
+            <label><strong>Nome Completo:</strong></label>
+            <input type="text" name="nome" id="editNome" required>
+
+            <label><strong>Quarto:</strong></label>
+            <input type="text" id="editQuarto" disabled>
+
+            <label><strong>Leito:</strong></label>
+            <input type="text" id="editLeito" disabled>
+
+            <label><strong>Data de Nascimento:</strong></label>
+            <input type="date" name="data_nascimento" id="editDataNasc">
+
+            <label><strong>Foto (opcional):</strong></label>
+            <input type="file" name="foto" accept="image/*" onchange="previewNovaFoto(event)">
+            <input type="hidden" name="foto_base64" id="editFotoBase64">
+            <div id="previewEdit" style="margin: 10px 0; text-align: center;"></div>
+
+            <button type="button" class="btn-modal btn-salvar" onclick="submeterForm('salvar')">Salvar</button>
+            <button type="button" class="btn-modal btn-cancelar" onclick="fecharModal()">Cancelar</button>
+            <button type="button" class="btn-modal btn-desocupar" onclick="submeterForm('desocupar')">Desocupar Leito</button>
+        </form>
+    </div>
+</div>
+
+<script>
+let conviventeIdAtual = null;
+
+function abrirModalEditar(id, nome, quarto, leito, foto, dataNasc) {
+    conviventeIdAtual = id;
+    document.getElementById('editNome').value = nome;
+    document.getElementById('editQuarto').value = quarto;
+    document.getElementById('editLeito').value = leito;
+    document.getElementById('editDataNasc').value = dataNasc;
+    document.getElementById('editFotoBase64').value = '';
+
+    if(foto) {
+        document.getElementById('previewEdit').innerHTML = '<img src="' + foto + '" style="max-width: 150px; border-radius: 8px;">';
+    } else {
+        document.getElementById('previewEdit').innerHTML = '';
+    }
+
+    document.getElementById('formEditar').action = '/editar_convivente/' + id;
+    document.getElementById('modalEditar').style.display = 'block';
+}
+
+function fecharModal() {
+    document.getElementById('modalEditar').style.display = 'none';
+}
+
+function submeterForm(acao) {
+    if(acao === 'desocupar' &&!confirm('Tem certeza que deseja desocupar este leito? O convivente será inativado.')) {
+        return;
+    }
+    document.getElementById('acaoForm').value = acao;
+    document.getElementById('formEditar').submit();
+}
+
+function previewNovaFoto(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewEdit').innerHTML = '<img src="' + e.target.result + '" style="max-width: 150px; border-radius: 8px;">';
+            document.getElementById('editFotoBase64').value = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('modalEditar');
+    if (event.target == modal) {
+        fecharModal();
+    }
+}
+</script>
+{% endblock %}
