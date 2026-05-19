@@ -7,12 +7,13 @@
 
 <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Convivente</h2>
 
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" id="formConvivente">
     <div style="margin-bottom: 16px;">
         <label><strong>Foto do Convivente:</strong></label><br>
         <input type="file" id="foto" name="foto" accept="image/*" onchange="previewImage(event)">
         <input type="hidden" name="foto_base64" id="foto_base64">
         <div id="preview" style="margin-top: 10px;"></div>
+        <small id="tamanhoFoto" style="color: #666;"></small>
     </div>
 
     <div style="margin-bottom: 16px;">
@@ -49,31 +50,64 @@
         </select>
     </div>
 
-    <button type="submit" class="btn"><i class="fas fa-save"></i> Salvar Convivente</button>
+    <button type="submit" class="btn" id="btnSalvar"><i class="fas fa-save"></i> Salvar Convivente</button>
 </form>
 
 <script>
+// Comprime a imagem antes de enviar
 function previewImage(event) {
     const file = event.target.files[0];
-    if (file) {
-        let fileName = file.name.replace(/\.[^/.]+$/, "");
-        fileName = fileName.replace(/_/g, " ").replace(/-/g, " ");
-        document.getElementById('nome').value = fileName;
+    if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('preview').innerHTML = '<img src="' + e.target.result + '" style="max-width: 200px; border-radius: 8px;">';
-            document.getElementById('foto_base64').value = e.target.result;
-        }
-        reader.readAsDataURL(file);
-    }
+    let fileName = file.name.replace(/\.[^/.]+$/, "");
+    fileName = fileName.replace(/_/g, " ").replace(/-/g, " ");
+    document.getElementById('nome').value = fileName;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // Redimensiona pra no máximo 800x800
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            let width = img.width;
+            let height = img.height;
+            const maxSize = 800;
+
+            if (width > height) {
+                if (width > maxSize) {
+                    height *= maxSize / width;
+                    width = maxSize;
+                }
+            } else {
+                if (height > maxSize) {
+                    width *= maxSize / height;
+                    height = maxSize;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Comprime com 70% de qualidade
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('preview').innerHTML = '<img src="' + compressedBase64 + '" style="max-width: 200px; border-radius: 8px;">';
+            document.getElementById('foto_base64').value = compressedBase64;
+
+            // Mostra o tamanho
+            const sizeKB = Math.round(compressedBase64.length * 0.75 / 1024);
+            document.getElementById('tamanhoFoto').innerText = `Foto comprimida: ${sizeKB}KB`;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
 function carregarLeitos() {
     const quartoId = document.getElementById('quarto').value;
     const leitoSelect = document.getElementById('leito');
 
-    // Se já tem leito pré-selecionado, não recarrega
     if({{ 'true' if leito_pre_selecionado else 'false' }} && leitoSelect.options.length > 1) {
         return;
     }
@@ -82,8 +116,8 @@ function carregarLeitos() {
 
     if (quartoId) {
         fetch('/api/leitos_vagos/' + quartoId)
-      .then(response => response.json())
-      .then(data => {
+     .then(response => response.json())
+     .then(data => {
                 leitoSelect.innerHTML = '<option value="">Selecione o Leito</option>';
                 data.forEach(leito => {
                     leitoSelect.innerHTML += '<option value="' + leito.id + '">Leito ' + leito.numero_leito + '</option>';
@@ -99,5 +133,11 @@ window.onload = function() {
     if(document.getElementById('quarto').value) carregarLeitos();
     {% endif %}
 }
+
+// Previne duplo clique
+document.getElementById('formConvivente').onsubmit = function() {
+    document.getElementById('btnSalvar').disabled = true;
+    document.getElementById('btnSalvar').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+};
 </script>
 {% endblock %}
