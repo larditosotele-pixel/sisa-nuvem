@@ -1,61 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}SISA - Menu Principal{% endblock %}
+{% block title %}Menu Principal - SISA{% endblock %}
 
 {% block content %}
-<style>
-   .menu-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-   .menu-card {
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 30px 20px;
-        text-align: center;
-        transition: all 0.3s;
-        text-decoration: none;
-        color: #333;
-    }
-   .menu-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        border-color: #43a047;
-    }
-   .menu-card i {
-        font-size: 48px;
-        color: #43a047;
-        margin-bottom: 15px;
-        display: block;
-    }
-   .menu-card h3 {
-        color: #1b5e20;
-        margin-bottom: 10px;
-    }
-</style>
-
-<h2 style="text-align: center; color: #1b5e20;"><i class="fas fa-home"></i> Menu Principal SISA</h2>
-
-<div class="menu-grid">
-    <a href="{{ url_for('lista_quartos') }}" class="menu-card">
-        <i class="fas fa-bed"></i>
-        <h3>Gestão de Quartos</h3>
-        <p>Cadastre quartos e gerencie os leitos da casa</p>
-    </a>
-
-    <a href="{{ url_for('lista_conviventes') }}" class="menu-card">
-        <i class="fas fa-users"></i>
-        <h3>Conviventes</h3>
-        <p>Cadastre e gerencie os conviventes da casa</p>
-    </a>
-
-    <a href="{{ url_for('chamada') }}" class="menu-card">
-        <i class="fas fa-clipboard-check"></i>
-        <h3>Chamada Diária</h3>
-        <p>Registre a presença dos conviventes</p>
-    </a>
+<div class="container">
+    <h1 class="titulo-principal">Sistema SISA - Lar Ditoso</h1>
+    <p class="subtitulo">Gestão de Conviventes</p>
+    
+    <div class="menu-grid">
+        <a href="{{ url_for('mapa_leitos') }}" class="menu-card">
+            <div class="menu-icon">🗺️</div>
+            <h3>Mapa de Leitos</h3>
+            <p>Visualizar quartos, leitos e conviventes</p>
+        </a>
+        
+        <a href="{{ url_for('cadastrar_convivente') }}" class="menu-card">
+            <div class="menu-icon">➕</div>
+            <h3>Cadastrar Convivente</h3>
+            <p>Adicionar novo morador em leito vago</p>
+        </a>
+        
+        <a href="{{ url_for('chamada') }}" class="menu-card">
+            <div class="menu-icon">📋</div>
+            <h3>Chamada Diária</h3>
+            <p>Registrar presença dos conviventes</p>
+        </a>
+    </div>
 </div>
+
+<style>
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+.titulo-principal {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+.subtitulo {
+    color: #7f8c8d;
+    margin-bottom: 40px;
+    font-size: 1.2em;
+}
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+.menu-card {
+    background: white;
+    border-radius: 15px;
+    padding: 40px 20px;
+    text-decoration: none;
+    color: #2c3e50;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-color: #3498db;
+}
+.menu-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+.menu-card h3 {
+    margin: 15px 0 10px 0;
+    font-size: 1.4em;
+}
+.menu-card p {
+    color: #7f8c8d;
+    margin: 0;
+}
+</style>
 {% endblock %}
