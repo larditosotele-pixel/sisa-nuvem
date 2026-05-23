@@ -39,91 +39,52 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .header-nav a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-        }
+        .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
         .container { max-width: 100%; margin: 0 auto; overflow-x: auto; }
         h1 { text-align: center; margin-bottom: 5px; color: #333; }
         .subtitulo { text-align: center; margin-bottom: 20px; color: #666; font-size: 18px; }
-        .controles {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .controles select, .controles button {
-            padding: 8px 15px;
-            font-size: 14px;
-            margin: 0 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-            table-layout: fixed;
-        }
-        th, td {
-            border: 1px solid #999;
-            padding: 3px 1px;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 28px;
-        }
-        th {
-            background: #f0f0f0;
-            font-weight: bold;
-            height: 30px;
-        }
-        .nome {
-            text-align: left;
-            font-weight: bold;
-            width: 180px;
-            padding-left: 8px;
-            white-space: nowrap;
-            font-size: 12px;
-        }
+        .controles { text-align: center; margin-bottom: 20px; }
+        .controles select, .controles button { padding: 8px 15px; font-size: 14px; margin: 0 5px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
+        th, td { border: 1px solid #999; padding: 3px 1px; text-align: center; overflow: hidden; text-overflow: ellipsis; height: 28px; }
+        th { background: #f0f0f0; font-weight: bold; height: 30px; }
+        .nome { text-align: left; font-weight: bold; width: 180px; padding-left: 8px; white-space: nowrap; font-size: 12px; }
         .quarto-col { width: 25px; font-size: 10px; }
         .leito-col { width: 25px; font-size: 10px; }
-        .dia-col {
-            width: 22px;
-            min-width: 22px;
-            font-size: 10px;
-        }
-        /* ZEBRA - LINHAS INTERCALADAS */
+        .dia-col { width: 22px; min-width: 22px; font-size: 10px; }
+        
         tbody tr:nth-child(odd) { background: #ffffff; }
         tbody tr:nth-child(even) { background: #f5f5f5; }
-
-        /* SÁBADO E DOMINGO AMARELO CLARO */
         .fim-de-semana { background: #fff9c4!important; }
-
-        /* CORES DOS STATUS */
+        
         .status-p { background: #d4edda !important; color: #155724; font-weight: bold; }
         .status-f { background: #f8d7da !important; color: #721c24; font-weight: bold; }
         .status-a { background: #fff3cd !important; color: #856404; font-weight: bold; }
         .status-h { background: #d1ecf1 !important; color: #0c5460; font-weight: bold; }
 
-        .assinatura {
-            margin-top: 30px;
-            page-break-inside: avoid;
-        }
-        .assinatura h3 {
-            text-align: center;
-            margin: 20px 0 10px 0;
-            border-bottom: 2px solid #333;
-            padding-bottom: 5px;
-        }
-        .dias-container {
-            display: flex;
-            gap: 20px;
-        }
+        /* LINHAS EM BRANCO - 25 LINHAS */
+        .linha-vazia td { border: 1px solid #999; height: 28px; }
+        .linha-vazia:nth-child(odd) { background: #ffffff; }
+        .linha-vazia:nth-child(even) { background: #f5f5f5; }
+
+        /* ÁREA DE ASSINATURA CORRIGIDA */
+        .assinatura { margin-top: 30px; page-break-inside: avoid; }
+        .dias-container { display: flex; gap: 40px; }
         .dias-coluna { flex: 1; }
-        .dia-linha {
-            display: flex;
-            border-bottom: 1px solid #ccc;
-            padding: 8px 0;
+        .dias-coluna h3 { 
+            text-align: center; 
+            margin: 0 0 15px 0; 
+            border-bottom: 2px solid #333; 
+            padding-bottom: 5px;
+            font-size: 16px;
+        }
+        .dia-linha { 
+            display: flex; 
+            border-bottom: 1px solid #ccc; 
+            padding: 8px 0; 
             min-height: 35px;
+            align-items: center;
         }
         .dia-numero {
             width: 40px;
@@ -131,24 +92,15 @@
             background: #333;
             color: white;
             text-align: center;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin-right: 15px;
+            padding: 5px 0;
+            border-radius: 3px;
         }
-        .dia-campos { flex: 1; display: flex; gap: 20px; }
-        .campo {
-            flex: 1;
-            border-bottom: 1px solid #999;
-            padding-bottom: 3px;
-        }
+        .dia-campos { flex: 1; display: flex; gap: 30px; }
+        .campo { flex: 1; border-bottom: 1px solid #999; padding-bottom: 3px; font-size: 12px; }
 
         @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .navbar, .header-nav, .controles, .btn-imprimir { display: none; }
             body { padding: 0; }
             table { font-size: 9px; }
@@ -177,7 +129,6 @@
     </style>
 </head>
 <body>
-    <!-- BARRA VERDE PADRÃO -->
     <div class="navbar">
         <div class="logo-img">
             <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
@@ -241,9 +192,24 @@
                     {% endfor %}
                 </tr>
                 {% endfor %}
+                
+                <!-- 25 LINHAS EM BRANCO -->
+                {% for i in range(25) %}
+                <tr class="linha-vazia">
+                    <td class="nome">&nbsp;</td>
+                    <td class="quarto-col">&nbsp;</td>
+                    <td class="leito-col">&nbsp;</td>
+                    {% for dia in range(1, 32) %}
+                        {% if dia <= dias_impares[-1] or dia <= dias_pares[-1] %}
+                        <td class="dia-col {% if dia in fins_de_semana %}fim-de-semana{% endif %}">&nbsp;</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
 
+        <!-- ÁREA DE ASSINATURA CORRIGIDA -->
         <div class="assinatura">
             <div class="dias-container">
                 <div class="dias-coluna">
@@ -255,6 +221,7 @@
                             <div class="campo">Resp:</div>
                             <div class="campo">Ass:</div>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
                 <div class="dias-coluna">
