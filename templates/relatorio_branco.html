@@ -7,6 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: white; padding: 20px; }
+        
         .navbar {
             background: #2e7d32;
             color: white;
@@ -29,6 +30,7 @@
         .logo-img img { width: 35px; height: 35px; object-fit: contain; }
         .navbar-info h2 { font-size: 22px; margin: 0; }
         .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
         .header-nav {
             background: white;
             padding: 15px 20px;
@@ -42,6 +44,7 @@
         .subtitulo { text-align: center; margin-bottom: 20px; color: #666; font-size: 18px; }
         .controles { text-align: center; margin-bottom: 20px; }
         .controles select, .controles button { padding: 8px 15px; font-size: 14px; margin: 0 5px; }
+        
         table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
         th, td { border: 1px solid #999; padding: 3px 1px; text-align: center; overflow: hidden; text-overflow: ellipsis; height: 28px; }
         th { background: #f0f0f0; font-weight: bold; height: 30px; }
@@ -49,30 +52,45 @@
         .quarto-col { width: 25px; font-size: 10px; }
         .leito-col { width: 25px; font-size: 10px; }
         .dia-col { width: 22px; min-width: 22px; font-size: 10px; }
+        
         tbody tr:nth-child(odd) { background: #ffffff; }
         tbody tr:nth-child(even) { background: #f5f5f5; }
         .fim-de-semana { background: #fff9c4!important; }
+        
         .linha-vazia td { border: 1px solid #999; height: 28px; }
         .linha-vazia:nth-child(odd) { background: #ffffff; }
         .linha-vazia:nth-child(even) { background: #f5f5f5; }
+
         .assinatura { margin-top: 30px; page-break-inside: avoid; }
-        .assinatura h3 { text-align: center; margin: 20px 0 10px 0; border-bottom: 2px solid #333; padding-bottom: 5px; }
-        .dias-container { display: flex; gap: 20px; }
+        .dias-container { display: flex; gap: 40px; }
         .dias-coluna { flex: 1; }
-        .dia-linha { display: flex; border-bottom: 1px solid #ccc; padding: 8px 0; min-height: 35px; }
+        .dias-coluna h3 { 
+            text-align: center; 
+            margin: 0 0 15px 0; 
+            border-bottom: 2px solid #333; 
+            padding-bottom: 5px;
+            font-size: 16px;
+        }
+        .dia-linha { 
+            display: flex; 
+            border-bottom: 1px solid #ccc; 
+            padding: 8px 0; 
+            min-height: 35px;
+            align-items: center;
+        }
         .dia-numero {
             width: 40px;
             font-weight: bold;
             background: #333;
             color: white;
             text-align: center;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin-right: 15px;
+            padding: 5px 0;
+            border-radius: 3px;
         }
-        .dia-campos { flex: 1; display: flex; gap: 20px; }
-        .campo { flex: 1; border-bottom: 1px solid #999; padding-bottom: 3px; }
+        .dia-campos { flex: 1; display: flex; gap: 30px; }
+        .campo { flex: 1; border-bottom: 1px solid #999; padding-bottom: 3px; font-size: 12px; }
+
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .navbar, .header-nav, .controles, .btn-imprimir { display: none; }
@@ -163,6 +181,8 @@
                     {% endfor %}
                 </tr>
                 {% endfor %}
+                
+                <!-- 25 LINHAS EM BRANCO -->
                 {% for i in range(25) %}
                 <tr class="linha-vazia">
                     <td class="nome">&nbsp;</td>
@@ -178,6 +198,7 @@
             </tbody>
         </table>
 
+        <!-- ÁREA DE ASSINATURA CORRIGIDA -->
         <div class="assinatura">
             <div class="dias-container">
                 <div class="dias-coluna">
