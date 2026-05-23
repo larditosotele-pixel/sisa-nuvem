@@ -120,12 +120,19 @@
             padding-bottom: 3px;
         }
 
+        /* FORÇA IMPRESSÃO COLORIDA - AQUI ESTÁ O SEGREDO */
         @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
             .header, .controles, .btn-imprimir { display: none; }
             body { padding: 0; }
             table { font-size: 9px; }
             .nome { font-size: 10px; }
             .dia-col { width: 18px; }
+            @page { size: landscape; margin: 1cm; }
         }
         .btn-imprimir {
             position: fixed;
