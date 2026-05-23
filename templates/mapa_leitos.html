@@ -1,39 +1,282 @@
-<!-- COLA LOGO DEPOIS DO <body> -->
-<div class="navbar">
-    <div class="logo-img">
-        <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
-    </div>
-    <div class="navbar-info">
-        <h2>SISA</h2>
-        <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
-    </div>
-</div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Leitos - SISA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
 
-<!-- COLA DENTRO DO <style> -->
-.navbar {
-    background: #2e7d32;
-    color: white;
-    padding: 15px 30px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-.logo-img {
-    width: 45px;
-    height: 45px;
-    background: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    overflow: hidden;
-}
-.logo-img img { width: 35px; height: 35px; object-fit: contain; }
-.navbar-info h2 { font-size: 22px; margin: 0; }
-.navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
-@media (max-width: 600px) {
-    .navbar { padding: 12px 15px; }
-    .navbar-info h2 { font-size: 18px; }
-    .navbar-info p { font-size: 10px; }
-}
+        /* BARRA VERDE PADRÃO */
+        .navbar {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+        .navbar-info h2 { font-size: 22px; margin: 0; }
+        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
+        .header-nav {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header-nav a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
+        h1 { text-align: center; margin-bottom: 20px; color: #333; }
+
+        .btn-add-quarto {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .quarto-bloco {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .quarto-titulo {
+            background: #2e7d32;
+            color: white;
+            padding: 12px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-add-leito {
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .leitos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+        .leito-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            background: #fafafa;
+            cursor: pointer;
+        }
+        .leito-card.ocupado { border-color: #28a745; background: #e8f5e9; }
+        .leito-card.vazio { border-color: #ccc; }
+        .leito-numero {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .foto-convivente {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 8px;
+        }
+        .foto-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #999;
+            margin: 0 auto 8px;
+        }
+        .convivente-nome {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            word-wrap: break-word;
+        }
+        .convivente-idade { font-size: 11px; color: #666; }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-content h2 { margin-bottom: 15px; }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .modal-botoes {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .modal-botoes button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-salvar { background: #28a745; color: white; }
+        .btn-desocupar { background: #dc3545; color: white; }
+        .btn-cancelar { background: #6c757d; color: white; }
+
+        @media (max-width: 600px) {
+            .navbar { padding: 12px 15px; }
+            .navbar-info h2 { font-size: 18px; }
+            .navbar-info p { font-size: 10px; }
+            .leitos-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- BARRA VERDE PADRÃO -->
+    <div class="navbar">
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+        </div>
+        <div class="navbar-info">
+            <h2>SISA</h2>
+            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header-nav">
+            <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+        </div>
+
+        <h1>Mapa de Leitos</h1>
+
+        <form method="POST" action="{{ url_for('adicionar_quarto_mapa') }}">
+            <button type="submit" class="btn-add-quarto">+ Adicionar Quarto</button>
+        </form>
+
+        {% for quarto in quartos %}
+        <div class="quarto-bloco" id="quarto-{{ quarto.numero }}">
+            <div class="quarto-titulo">
+                <span>QUARTO {{ quarto.numero }}</span>
+                <form method="POST" action="{{ url_for('adicionar_leito_mapa', quarto_id=quarto.id) }}" style="display: inline;">
+                    <button type="submit" class="btn-add-leito">+ Leito</button>
+                </form>
+            </div>
+            <div class="leitos-grid">
+                {% for leito in quarto.leitos %}
+                <div class="leito-card {% if leito.ocupado %}ocupado{% else %}vazio{% endif %}" 
+                     onclick="{% if leito.ocupado %}abrirModalEditar({{ leito.convivente_id }}, '{{ leito.convivente_nome }}', '{{ leito.data_nascimento }}'){% else %}window.location.href='{{ url_for('cadastrar_convivente') }}?leito_id={{ leito.leito_id }}'{% endif %}">
+                    <div class="leito-numero">Leito {{ leito.numero_leito }}</div>
+                    {% if leito.ocupado %}
+                        {% if leito.foto_base64 %}
+                            <img src="{{ leito.foto_base64 }}" class="foto-convivente" alt="{{ leito.convivente_nome }}">
+                        {% else %}
+                            <div class="foto-placeholder">👤</div>
+                        {% endif %}
+                        <div class="convivente-nome">{{ leito.convivente_nome }}</div>
+                        <div class="convivente-idade">{{ leito.data_nascimento }}</div>
+                    {% else %}
+                        <div class="foto-placeholder">+</div>
+                        <div class="convivente-nome" style="color: #999;">Vazio</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div id="modalEditar" class="modal">
+        <div class="modal-content">
+            <h2>Editar Convivente</h2>
+            <form method="POST" id="formEditar">
+                <input type="hidden" name="acao" id="acao" value="salvar">
+                <input type="text" name="nome" id="editNome" placeholder="Nome" required>
+                <input type="date" name="data_nascimento" id="editData" required>
+                <div class="modal-botoes">
+                    <button type="submit" class="btn-salvar" onclick="document.getElementById('acao').value='salvar'">Salvar</button>
+                    <button type="submit" class="btn-desocupar" onclick="document.getElementById('acao').value='desocupar'">Desocupar Leito</button>
+                    <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalEditar(id, nome, data) {
+            document.getElementById('formEditar').action = '/editar_convivente/' + id;
+            document.getElementById('editNome').value = nome;
+            document.getElementById('editData').value = data;
+            document.getElementById('modalEditar').style.display = 'block';
+        }
+        function fecharModal() {
+            document.getElementById('modalEditar').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('modalEditar')) {
+                fecharModal();
+            }
+        }
+    </script>
+</body>
+</html>
