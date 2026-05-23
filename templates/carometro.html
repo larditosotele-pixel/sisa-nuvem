@@ -7,8 +7,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-
-        /* BARRA VERDE PADRÃO */
         .navbar {
             background: #2e7d32;
             color: white;
@@ -28,14 +26,9 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-        .logo-img img {
-            width: 35px;
-            height: 35px;
-            object-fit: contain;
-        }
+        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
         .navbar-info h2 { font-size: 22px; margin: 0; }
         .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
-
         .header-nav {
             background: white;
             padding: 15px 20px;
@@ -43,18 +36,10 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .header-nav a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-        }
+        .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
         .container { max-width: 1400px; margin: 0 auto; }
         h1 { text-align: center; margin-bottom: 20px; color: #333; }
-        .controles {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .controles { text-align: center; margin-bottom: 30px; }
         .controles a {
             padding: 10px 20px;
             margin: 0 10px;
@@ -65,7 +50,6 @@
             font-weight: bold;
         }
         .controles a.ativo { background: #28a745; }
-
         .quarto-bloco {
             background: white;
             border-radius: 8px;
@@ -114,16 +98,8 @@
             color: #999;
             margin-bottom: 6px;
         }
-        .foto-card .nome {
-            font-weight: bold;
-            font-size: 13px;
-            margin-bottom: 3px;
-            line-height: 1.2;
-        }
-        .foto-card .info {
-            font-size: 11px;
-            color: #666;
-        }
+        .foto-card .nome { font-weight: bold; font-size: 13px; margin-bottom: 3px; line-height: 1.2; }
+        .foto-card .info { font-size: 11px; color: #666; }
         .btn-imprimir {
             position: fixed;
             bottom: 20px;
@@ -137,46 +113,29 @@
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-
-        /* CONTROLE DE IMPRESSÃO EM 3 FOLHAS */
         @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .navbar, .header-nav, .controles, .btn-imprimir { display: none; }
             body { background: white; padding: 0; }
-            
-            /* FORÇA 3 FOLHAS - QUEBRA A CADA 15 FOTOS APROX */
             .foto-card:nth-child(15n) { page-break-after: always; }
-            
-            .quarto-bloco { 
-                box-shadow: none; 
-                border: 1px solid #ccc;
-                margin-bottom: 15px;
-            }
-            .fotos-grid { 
-                grid-template-columns: repeat(5, 1fr);
-                gap: 10px;
-                padding: 15px;
-            }
+            .quarto-bloco { box-shadow: none; border: 1px solid #ccc; margin-bottom: 15px; }
+            .fotos-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 15px; }
             .foto-card img, .foto-card .sem-foto { height: 120px; }
             .foto-card .nome { font-size: 11px; }
             .foto-card .info { font-size: 10px; }
-            
-            /* VERTICAL: 3 colunas | HORIZONTAL: 5 colunas */
-            @page { 
-                size: auto; 
-                margin: 1cm; 
-            }
+            @page { size: auto; margin: 1cm; }
+        }
+        @media (max-width: 600px) {
+            .navbar { padding: 12px 15px; }
+            .navbar-info h2 { font-size: 18px; }
+            .navbar-info p { font-size: 10px; }
         }
     </style>
 </head>
 <body>
-    <!-- BARRA VERDE PADRÃO -->
     <div class="navbar">
         <div class="logo-img">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Lar Ditoso">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
         </div>
         <div class="navbar-info">
             <h2>SISA</h2>
@@ -227,6 +186,7 @@
                     </div>
                     {% endfor %}
                 </div>
+            </div>
             {% endfor %}
         {% endif %}
     </div>
