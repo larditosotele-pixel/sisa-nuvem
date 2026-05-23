@@ -55,14 +55,21 @@
         .convivente-quarto { color: #666; font-size: 14px; }
         .status-opcoes {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         .status-opcoes label {
-            padding: 8px 15px;
+            width: 45px;
+            height: 45px;
             border: 2px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.2s;
         }
         .status-opcoes input[type="radio"] { display: none; }
         .status-opcoes input[type="radio"]:checked + label {
@@ -70,6 +77,7 @@
             color: white;
             border-color: #007bff;
         }
+        .status-opcoes label:hover { border-color: #007bff; }
         .btn-salvar {
             width: 100%;
             padding: 15px;
@@ -118,13 +126,16 @@
 
                 <div class="status-opcoes">
                     <input type="radio" name="status_{{ c.id }}" id="p{{ c.id }}" value="P" {% if c.status_hoje == 'P' %}checked{% endif %}>
-                    <label for="p{{ c.id }}">Presente</label>
+                    <label for="p{{ c.id }}" title="Presente">P</label>
 
                     <input type="radio" name="status_{{ c.id }}" id="f{{ c.id }}" value="F" {% if c.status_hoje == 'F' %}checked{% endif %}>
-                    <label for="f{{ c.id }}">Falta</label>
+                    <label for="f{{ c.id }}" title="Falta">F</label>
 
                     <input type="radio" name="status_{{ c.id }}" id="a{{ c.id }}" value="A" {% if c.status_hoje == 'A' %}checked{% endif %}>
-                    <label for="a{{ c.id }}">Atestado</label>
+                    <label for="a{{ c.id }}" title="Autorizado">A</label>
+
+                    <input type="radio" name="status_{{ c.id }}" id="h{{ c.id }}" value="H" {% if c.status_hoje == 'H' %}checked{% endif %}>
+                    <label for="h{{ c.id }}" title="Hospitalizado">H</label>
                 </div>
             </div>
             {% endfor %}
