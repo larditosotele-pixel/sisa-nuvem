@@ -64,10 +64,8 @@
         {% endwith %}
         
         <div class="menu">
-            <a href="{{ url_for('mapa_leitos') }}" class="btn">📍 Mapa de Leitos</a>
-            <a href="{{ url_for('chamada') }}" class="btn">📋 Chamada Diária</a>
-            <a href="{{ url_for('cadastrar_convivente') }}" class="btn">➕ Cadastrar Convivente</a>
-        </div>
-    </div>
-</body>
-</html>
+    <a href="{{ url_for('mapa_leitos') }}" class="btn">📍 Mapa de Leitos</a>
+    <a href="{{ url_for('chamada') }}" class="btn">📋 Chamada Diária</a>
+    <a href="{{ url_for('cadastrar_convivente') }}" class="btn">➕ Cadastrar Convivente</a>
+    <a href="{{ url_for('relatorio') }}" class="btn">📊 Relatório Mensal</a>
+</div>
