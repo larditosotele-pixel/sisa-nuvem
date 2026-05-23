@@ -7,17 +7,15 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; }
-
-        /* CABEÇALHO VERDE PADRÃO - IGUAL EM TODAS AS TELAS */
         .navbar {
             background: #2e7d32;
             color: white;
-            padding: 15px 20px;
+            padding: 15px 30px;
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        .logo-casa {
+        .logo-img {
             width: 45px;
             height: 45px;
             background: white;
@@ -25,19 +23,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
             flex-shrink: 0;
+            overflow: hidden;
         }
-        .navbar-info h2 {
-            font-size: 22px;
-            margin: 0;
-        }
-        .navbar-info p {
-            font-size: 11px;
-            margin: 0;
-            opacity: 0.9;
-        }
-
+        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+        .navbar-info h2 { font-size: 22px; margin: 0; }
+        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
         .header-nav {
             background: white;
             padding: 15px 20px;
@@ -45,16 +36,10 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .header-nav a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-        }
+        .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
         .container { max-width: 900px; margin: 0 auto; padding: 15px; }
         h1 { text-align: center; margin-bottom: 5px; color: #333; font-size: 24px; }
         .data-hoje { text-align: center; margin-bottom: 20px; color: #666; font-size: 16px; }
-
         .card-convivente {
             background: white;
             border-radius: 10px;
@@ -65,13 +50,7 @@
             align-items: center;
             gap: 12px;
         }
-        .foto-convivente {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
+        .foto-convivente { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .foto-placeholder {
             width: 60px;
             height: 60px;
@@ -84,25 +63,10 @@
             color: #999;
             flex-shrink: 0;
         }
-        .info-convivente {
-            flex: 1;
-            min-width: 0;
-        }
-        .info-convivente h3 {
-            font-size: 15px;
-            margin-bottom: 3px;
-            color: #333;
-            word-wrap: break-word;
-        }
-        .info-convivente p {
-            font-size: 12px;
-            color: #666;
-        }
-        .botoes-status {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
+        .info-convivente { flex: 1; min-width: 0; }
+        .info-convivente h3 { font-size: 15px; margin-bottom: 3px; color: #333; word-wrap: break-word; }
+        .info-convivente p { font-size: 12px; color: #666; }
+        .botoes-status { display: flex; gap: 6px; flex-wrap: wrap; }
         .btn-status {
             width: 40px;
             height: 40px;
@@ -119,7 +83,6 @@
         .btn-status[data-status="F"].ativo { background: #dc3545; }
         .btn-status[data-status="A"].ativo { background: #ffc107; color: #333; }
         .btn-status[data-status="H"].ativo { background: #17a2b8; }
-
         .btn-salvar-fixo {
             position: fixed;
             bottom: 20px;
@@ -135,8 +98,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             z-index: 100;
         }
-
-        /* MOBILE - AJUSTE DOS BOTÕES */
         @media (max-width: 600px) {
             .navbar { padding: 12px 15px; }
             .navbar-info h2 { font-size: 18px; }
@@ -151,9 +112,10 @@
     </style>
 </head>
 <body>
-    <!-- CABEÇALHO VERDE PADRÃO -->
     <div class="navbar">
-        <div class="logo-casa">🏠</div>
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+        </div>
         <div class="navbar-info">
             <h2>SISA</h2>
             <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
@@ -176,12 +138,10 @@
                 {% else %}
                     <div class="foto-placeholder">👤</div>
                 {% endif %}
-                
                 <div class="info-convivente">
                     <h3>{{ c.nome }}</h3>
                     <p>Quarto {{ c.quarto_numero or '-' }} - Leito {{ c.numero_leito or '-' }}</p>
                 </div>
-
                 <div class="botoes-status">
                     <button type="button" class="btn-status {% if c.status_hoje == 'P' %}ativo{% endif %}" data-status="P" data-id="{{ c.id }}">P</button>
                     <button type="button" class="btn-status {% if c.status_hoje == 'F' %}ativo{% endif %}" data-status="F" data-id="{{ c.id }}">F</button>
@@ -201,7 +161,6 @@
                 const id = this.dataset.id;
                 const status = this.dataset.status;
                 const container = this.parentElement;
-                
                 container.querySelectorAll('.btn-status').forEach(b => b.classList.remove('ativo'));
                 this.classList.add('ativo');
                 document.getElementById(`status_${id}`).value = status;
