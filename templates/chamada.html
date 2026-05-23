@@ -57,7 +57,7 @@
             display: flex;
             gap: 8px;
         }
-        .status-opcoes label {
+        .status-btn {
             width: 45px;
             height: 45px;
             border: 2px solid #ddd;
@@ -71,13 +71,11 @@
             font-size: 18px;
             transition: all 0.2s;
         }
-        .status-opcoes input[type="radio"] { display: none; }
-        .status-opcoes input[type="radio"]:checked + label {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-        .status-opcoes label:hover { border-color: #007bff; }
+        .status-btn:hover { transform: scale(1.05); }
+        .status-btn.active-p { background: #28a745; color: white; border-color: #28a745; }
+        .status-btn.active-f { background: #dc3545; color: white; border-color: #dc3545; }
+        .status-btn.active-a { background: #ffc107; color: #333; border-color: #ffc107; }
+        .status-btn.active-h { background: #007bff; color: white; border-color: #007bff; }
         .btn-salvar {
             width: 100%;
             padding: 15px;
@@ -110,7 +108,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST">
+        <form method="POST" id="formChamada">
             {% for c in conviventes %}
             <div class="convivente">
                 {% if c.foto_base64 %}
@@ -124,18 +122,20 @@
                     <div class="convivente-quarto">Quarto {{ c.quarto_numero }} - Leito {{ c.numero_leito }}</div>
                 </div>
 
-                <div class="status-opcoes">
-                    <input type="radio" name="status_{{ c.id }}" id="p{{ c.id }}" value="P" {% if c.status_hoje == 'P' %}checked{% endif %}>
-                    <label for="p{{ c.id }}" title="Presente">P</label>
-
-                    <input type="radio" name="status_{{ c.id }}" id="f{{ c.id }}" value="F" {% if c.status_hoje == 'F' %}checked{% endif %}>
-                    <label for="f{{ c.id }}" title="Falta">F</label>
-
-                    <input type="radio" name="status_{{ c.id }}" id="a{{ c.id }}" value="A" {% if c.status_hoje == 'A' %}checked{% endif %}>
-                    <label for="a{{ c.id }}" title="Autorizado">A</label>
-
-                    <input type="radio" name="status_{{ c.id }}" id="h{{ c.id }}" value="H" {% if c.status_hoje == 'H' %}checked{% endif %}>
-                    <label for="h{{ c.id }}" title="Hospitalizado">H</label>
+                <div class="status-opcoes" data-convivente="{{ c.id }}">
+                    <input type="hidden" name="status_{{ c.id }}" id="input_{{ c.id }}" value="{{ c.status_hoje or '' }}">
+                    
+                    <div class="status-btn {% if c.status_hoje == 'P' %}active-p{% endif %}" 
+                         onclick="toggleStatus({{ c.id }}, 'P', this)" title="Presente">P</div>
+                    
+                    <div class="status-btn {% if c.status_hoje == 'F' %}active-f{% endif %}" 
+                         onclick="toggleStatus({{ c.id }}, 'F', this)" title="Falta">F</div>
+                    
+                    <div class="status-btn {% if c.status_hoje == 'A' %}active-a{% endif %}" 
+                         onclick="toggleStatus({{ c.id }}, 'A', this)" title="Autorizado">A</div>
+                    
+                    <div class="status-btn {% if c.status_hoje == 'H' %}active-h{% endif %}" 
+                         onclick="toggleStatus({{ c.id }}, 'H', this)" title="Hospitalizado">H</div>
                 </div>
             </div>
             {% endfor %}
@@ -143,5 +143,28 @@
             <button type="submit" class="btn-salvar">💾 Salvar Chamada</button>
         </form>
     </div>
+
+    <script>
+    function toggleStatus(conviventeId, status, btnElement) {
+        const input = document.getElementById('input_' + conviventeId);
+        const container = btnElement.parentElement;
+        const todosBotoes = container.querySelectorAll('.status-btn');
+        
+        // Se clicou no mesmo botão que já tá ativo, desmarca
+        if (input.value === status) {
+            input.value = '';
+            todosBotoes.forEach(btn => {
+                btn.classList.remove('active-p', 'active-f', 'active-a', 'active-h');
+            });
+        } else {
+            // Marca o novo status
+            input.value = status;
+            todosBotoes.forEach(btn => {
+                btn.classList.remove('active-p', 'active-f', 'active-a', 'active-h');
+            });
+            btnElement.classList.add('active-' + status.toLowerCase());
+        }
+    }
+    </script>
 </body>
 </html>
