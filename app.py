@@ -15,6 +15,10 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
+    
+    # CORREÇÃO: Adiciona coluna status se não existir
+    cur.execute('ALTER TABLE chamadas ADD COLUMN IF NOT EXISTS status VARCHAR(1);')
+    
     cur.execute('''
         CREATE TABLE IF NOT EXISTS quartos (
             id SERIAL PRIMARY KEY,
