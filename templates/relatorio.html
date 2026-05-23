@@ -7,27 +7,27 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: white; padding: 20px; }
-        .header {
+       .header {
             background: white;
             padding: 15px 20px;
             margin-bottom: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .header a {
+       .header a {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
             font-size: 16px;
         }
-        .container { max-width: 100%; margin: 0 auto; overflow-x: auto; }
+       .container { max-width: 100%; margin: 0 auto; overflow-x: auto; }
         h1 { text-align: center; margin-bottom: 5px; color: #333; }
-        .subtitulo { text-align: center; margin-bottom: 20px; color: #666; font-size: 18px; }
-        .controles {
+       .subtitulo { text-align: center; margin-bottom: 20px; color: #666; font-size: 18px; }
+       .controles {
             text-align: center;
             margin-bottom: 20px;
         }
-        .controles select, .controles button {
+       .controles select,.controles button {
             padding: 8px 15px;
             font-size: 14px;
             margin: 0 5px;
@@ -44,70 +44,90 @@
             text-align: center;
             overflow: hidden;
             text-overflow: ellipsis;
+            height: 25px;
         }
-        th { 
-            background: #f0f0f0; 
+        th {
+            background: #f0f0f0;
             font-weight: bold;
             height: 30px;
         }
-        .nome { 
-            text-align: left; 
-            font-weight: bold; 
+       .nome {
+            text-align: left;
+            font-weight: bold;
             width: 150px;
             padding-left: 5px;
             white-space: nowrap;
         }
-        .quarto-col { 
-            width: 25px;
-            font-size: 9px;
-        }
-        .leito-col { 
-            width: 25px;
-            font-size: 9px;
-        }
-        .dia-col {
+       .quarto-col { width: 25px; font-size: 9px; }
+       .leito-col { width: 25px; font-size: 9px; }
+       .dia-col {
             width: 22px;
             min-width: 22px;
         }
-        .coluna-amarela { background: #ffeb3b!important; }
-        .assinatura {
+        /* ZEBRA - LINHAS INTERCALADAS */
+        tbody tr:nth-child(odd) { background: #ffffff; }
+        tbody tr:nth-child(even) { background: #f5f5f5; }
+
+        /* SÁBADO E DOMINGO AMARELO CLARO */
+       .fim-de-semana { background: #fff9c4!important; }
+
+        /* COLUNAS 7, 14, 21, 28 AMARELO FORTE */
+       .coluna-amarela { background: #ffeb3b!important; }
+
+        /* LINHAS EM BRANCO */
+       .linha-vazia td {
+            border: 1px solid #999;
+            height: 25px;
+        }
+       .linha-vazia:nth-child(odd) { background: #ffffff; }
+       .linha-vazia:nth-child(even) { background: #f5f5f5; }
+
+       .assinatura {
             margin-top: 30px;
             page-break-inside: avoid;
         }
-        .assinatura h3 {
+       .assinatura h3 {
             text-align: center;
             margin: 20px 0 10px 0;
             border-bottom: 2px solid #333;
             padding-bottom: 5px;
         }
-        .dias-container {
+       .dias-container {
             display: flex;
             gap: 20px;
         }
-        .dias-coluna { flex: 1; }
-        .dia-linha {
+       .dias-coluna { flex: 1; }
+       .dia-linha {
             display: flex;
             border-bottom: 1px solid #ccc;
             padding: 8px 0;
+            min-height: 35px;
         }
-        .dia-numero {
+       .dia-numero {
             width: 40px;
             font-weight: bold;
             background: #333;
             color: white;
             text-align: center;
             margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .dia-campos { flex: 1; display: flex; gap: 20px; }
-        .campo { flex: 1; border-bottom: 1px solid #999; }
+       .dia-campos { flex: 1; display: flex; gap: 20px; }
+       .campo {
+            flex: 1;
+            border-bottom: 1px solid #999;
+            padding-bottom: 3px;
+        }
 
         @media print {
-            .header, .controles, .btn-imprimir { display: none; }
+           .header,.controles,.btn-imprimir { display: none; }
             body { padding: 0; }
             table { font-size: 8px; }
-            .dia-col { width: 18px; }
+           .dia-col { width: 18px; }
         }
-        .btn-imprimir {
+       .btn-imprimir {
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -155,7 +175,7 @@
                     <th class="leito-col">L</th>
                     {% for dia in range(1, 32) %}
                         {% if dia <= dias_impares[-1] or dia <= dias_pares[-1] %}
-                        <th class="dia-col {% if dia == 7 or dia == 14 or dia == 21 or dia == 28 %}coluna-amarela{% endif %}">{{ dia }}</th>
+                        <th class="dia-col {% if dia in fins_de_semana %}fim-de-semana{% elif dia == 7 or dia == 14 or dia == 21 or dia == 28 %}coluna-amarela{% endif %}">{{ dia }}</th>
                         {% endif %}
                     {% endfor %}
                 </tr>
@@ -168,9 +188,23 @@
                     <td class="leito-col">{{ c.numero_leito or '' }}</td>
                     {% for dia in range(1, 32) %}
                         {% if dia <= dias_impares[-1] or dia <= dias_pares[-1] %}
-                        <td class="dia-col {% if dia == 7 or dia == 14 or dia == 21 or dia == 28 %}coluna-amarela{% endif %}">
+                        <td class="dia-col {% if dia in fins_de_semana %}fim-de-semana{% elif dia == 7 or dia == 14 or dia == 21 or dia == 28 %}coluna-amarela{% endif %}">
                             {{ chamadas.get(c.id, {}).get(dia, '') }}
                         </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+
+                <!-- 25 LINHAS EM BRANCO -->
+                {% for i in range(25) %}
+                <tr class="linha-vazia">
+                    <td class="nome">&nbsp;</td>
+                    <td class="quarto-col">&nbsp;</td>
+                    <td class="leito-col">&nbsp;</td>
+                    {% for dia in range(1, 32) %}
+                        {% if dia <= dias_impares[-1] or dia <= dias_pares[-1] %}
+                        <td class="dia-col {% if dia in fins_de_semana %}fim-de-semana{% elif dia == 7 or dia == 14 or dia == 21 or dia == 28 %}coluna-amarela{% endif %}">&nbsp;</td>
                         {% endif %}
                     {% endfor %}
                 </tr>
@@ -201,6 +235,7 @@
                             <div class="campo">Resp:</div>
                             <div class="campo">Ass:</div>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
