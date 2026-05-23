@@ -174,11 +174,10 @@ def relatorio():
     dias_impares = [d for d in dias_mes if d % 2!= 0]
     dias_pares = [d for d in dias_mes if d % 2 == 0]
 
-    # Descobre quais dias são sábado e domingo
     fins_de_semana = []
     for dia in dias_mes:
         data = datetime(ano, mes, dia)
-        if data.weekday() >= 5: # 5=sábado, 6=domingo
+        if data.weekday() >= 5:
             fins_de_semana.append(dia)
 
     conn = get_db_connection()
@@ -224,6 +223,99 @@ def relatorio():
                          mes=mes,
                          ano=ano,
                          mes_nome=meses_nomes[mes])
+
+# ROTA NOVA 1: RELATÓRIO EM BRANCO PRA IMPRESSÃO
+@app.route('/relatorio_branco')
+def relatorio_branco():
+    from datetime import datetime
+    import calendar
+
+    hoje = datetime.now()
+    mes = request.args.get('mes', default=hoje.month, type=int)
+    ano = request.args.get('ano', default=hoje.year, type=int)
+
+    ultimo_dia = calendar.monthrange(ano, mes)[1]
+    dias_mes = list(range(1, ultimo_dia + 1))
+    dias_impares = [d for d in dias_mes if d % 2!= 0]
+    dias_pares = [d for d in dias_mes if d % 2 == 0]
+
+    fins_de_semana = []
+    for dia in dias_mes:
+        data = datetime(ano, mes, dia)
+        if data.weekday() >= 5:
+            fins_de_semana.append(dia)
+
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute('''
+        SELECT c.id, c.nome, q.numero as quarto_numero, l.numero_leito
+        FROM conviventes c
+        LEFT JOIN leitos l ON c.leito_id = l.id
+        LEFT JOIN quartos q ON l.quarto_id = q.id
+        WHERE c.ativo = TRUE
+        ORDER BY c.nome ASC
+    ''')
+    conviventes = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    meses_nomes = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+
+    return render_template('relatorio_branco.html',
+                         conviventes=conviventes,
+                         dias_impares=dias_impares,
+                         dias_pares=dias_pares,
+                         fins_de_semana=fins_de_semana,
+                         mes=mes,
+                         ano=ano,
+                         mes_nome=meses_nomes[mes])
+
+# ROTA NOVA 2: CARÔMETRO
+@app.route('/carometro')
+def carometro():
+    ordem = request.args.get('ordem', default='quarto')
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    if ordem == 'alfabetica':
+        cur.execute('''
+            SELECT c.nome, c.foto_base64, q.numero as quarto_numero, l.numero_leito
+            FROM conviventes c
+            LEFT JOIN leitos l ON c.leito_id = l.id
+            LEFT JOIN quartos q ON l.quarto_id = q.id
+            WHERE c.ativo = TRUE
+            ORDER BY c.nome ASC
+        ''')
+        conviventes = cur.fetchall()
+        quartos_agrupados = None
+    else:
+        cur.execute('''
+            SELECT c.nome, c.foto_base64, q.numero as quarto_numero, l.numero_leito
+            FROM conviventes c
+            LEFT JOIN leitos l ON c.leito_id = l.id
+            LEFT JOIN quartos q ON l.quarto_id = q.id
+            WHERE c.ativo = TRUE
+            ORDER BY q.numero,
+                     CASE WHEN l.numero_leito ~ '^[0-9]+$'
+                          THEN CAST(l.numero_leito AS INTEGER)
+                          ELSE 999 END
+        ''')
+        todos = cur.fetchall()
+        quartos_agrupados = {}
+        for c in todos:
+            q_num = c['quarto_numero'] or 'Sem Quarto'
+            if q_num not in quartos_agrupados:
+                quartos_agrupados[q_num] = []
+            quartos_agrupados[q_num].append(c)
+        conviventes = None
+
+    cur.close()
+    conn.close()
+    return render_template('carometro.html',
+                         conviventes=conviventes,
+                         quartos_agrupados=quartos_agrupados,
+                         ordem=ordem)
 
 if __name__ == '__main__':
     app.run(debug=True)
