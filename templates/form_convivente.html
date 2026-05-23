@@ -1,140 +1,162 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Convivente - SISA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
 
-{% block title %}SISA - Cadastrar Convivente{% endblock %}
+       .navbar {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+       .logo-img {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+       .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+       .navbar-info h2 { font-size: 22px; margin: 0; }
+       .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
 
-{% block content %}
-<a href="{{ url_for('mapa_leitos') }}" class="btn btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Mapa</a>
+       .header-nav {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+       .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
+       .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        h1 { text-align: center; margin-bottom: 20px; color: #333; }
 
-<h2><i class="fas fa-user-plus"></i> Cadastrar Novo Convivente</h2>
+       .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+       .form-group { margin-bottom: 20px; }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], input[type="date"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+       .btn-salvar {
+            width: 100%;
+            padding: 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+       .btn-salvar:hover { background: #218838; }
 
-<form method="POST" enctype="multipart/form-data" id="formConvivente">
-    <div style="margin-bottom: 16px;">
-        <label><strong>Foto do Convivente:</strong></label><br>
-        <input type="file" id="foto" name="foto" accept="image/*" onchange="previewImage(event)">
-        <input type="hidden" name="foto_base64" id="foto_base64">
-        <div id="preview" style="margin-top: 10px;"></div>
-        <small id="tamanhoFoto" style="color: #666;"></small>
+       .info-leito {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #28a745;
+        }
+       .info-leito p { margin: 0; font-weight: bold; color: #2e7d32; font-size: 16px; }
+       .info-leito span { font-size: 12px; color: #666; display: block; margin-top: 5px; }
+
+        @media (max-width: 600px) {
+           .navbar { padding: 12px 15px; }
+           .navbar-info h2 { font-size: 18px; }
+           .navbar-info p { font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+        </div>
+        <div class="navbar-info">
+            <h2>SISA</h2>
+            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
+        </div>
     </div>
 
-    <div style="margin-bottom: 16px;">
-        <label><strong>Nome Completo:</strong></label><br>
-        <input type="text" name="nome" id="nome" required style="width: 100%; padding: 8px;">
+    <div class="container">
+        <div class="header-nav">
+            <a href="{{ url_for('mapa_leitos') }}">← Voltar ao Mapa de Leitos</a>
+        </div>
+
+        <h1>Cadastrar Novo Convivente</h1>
+
+        <div class="form-card">
+            <form method="POST" enctype="multipart/form-data">
+
+                {% if leito_info %}
+                <!-- VEIO DO MAPA: JÁ MOSTRA TRAVADO -->
+                <div class="info-leito">
+                    <p>📍 Quarto {{ leito_info['quarto_numero'] }} - Leito {{ leito_info['numero_leito'] }}</p>
+                    <span>Localização definida pelo mapa de leitos</span>
+                </div>
+                {% else %}
+                <!-- ENTROU DIRETO PELO MENU: MOSTRA SELECT -->
+                <div class="form-group">
+                    <label for="leito_id">Selecione o Leito:</label>
+                    <select name="leito_id" id="leito_id" required>
+                        <option value="">Escolha um leito vazio</option>
+                        {% for leito in leitos_vazios %}
+                        <option value="{{ leito['id'] }}">Quarto {{ leito['quarto_numero'] }} - Leito {{ leito['numero_leito'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="nome">Nome Completo:</label>
+                    <input type="text" name="nome" id="nome" required placeholder="Digite o nome do convivente">
+                </div>
+
+                <div class="form-group">
+                    <label for="data_nascimento">Data de Nascimento:</label>
+                    <input type="date" name="data_nascimento" id="data_nascimento" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="foto">Foto do Convivente:</label>
+                    <input type="file" name="foto" id="foto" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="btn-salvar">💾 Salvar Convivente</button>
+            </form>
+        </div>
     </div>
-
-    <div style="margin-bottom: 16px;">
-        <label><strong>Data de Nascimento:</strong></label><br>
-        <input type="date" name="data_nascimento" style="padding: 8px;">
-    </div>
-
-    <div style="margin-bottom: 16px;">
-        <label><strong>Quarto:</strong></label><br>
-        <select name="quarto_id" id="quarto" required onchange="carregarLeitos()" style="width: 100%; padding: 8px;">
-            <option value="">Selecione o Quarto</option>
-            {% for quarto in quartos %}
-                <option value="{{ quarto.id }}"
-                    {% if quarto_pre_selecionado and quarto_pre_selecionado == quarto.id %}selected{% endif %}>
-                    Quarto {{ quarto.numero }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div style="margin-bottom: 16px;">
-        <label><strong>Leito:</strong></label><br>
-        <select name="leito_id" id="leito" required style="width: 100%; padding: 8px;">
-            {% if leito_pre_selecionado %}
-                <option value="{{ leito_pre_selecionado.id }}" selected>Leito {{ leito_pre_selecionado.numero_leito }}</option>
-            {% else %}
-                <option value="">Selecione o Quarto Primeiro</option>
-            {% endif %}
-        </select>
-    </div>
-
-    <button type="submit" class="btn" id="btnSalvar"><i class="fas fa-save"></i> Salvar Convivente</button>
-</form>
-
-<script>
-// Comprime a imagem antes de enviar
-function previewImage(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    let fileName = file.name.replace(/\.[^/.]+$/, "");
-    fileName = fileName.replace(/_/g, " ").replace(/-/g, " ");
-    document.getElementById('nome').value = fileName;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            let width = img.width;
-            let height = img.height;
-            const maxSize = 800;
-
-            if (width > height) {
-                if (width > maxSize) {
-                    height *= maxSize / width;
-                    width = maxSize;
-                }
-            } else {
-                if (height > maxSize) {
-                    width *= maxSize / height;
-                    height = maxSize;
-                }
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // Comprime com 70% de qualidade
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-            document.getElementById('preview').innerHTML = '<img src="' + compressedBase64 + '" style="max-width: 200px; border-radius: 8px;">';
-            document.getElementById('foto_base64').value = compressedBase64;
-
-            const sizeKB = Math.round(compressedBase64.length * 0.75 / 1024);
-            document.getElementById('tamanhoFoto').innerText = `Foto comprimida: ${sizeKB}KB`;
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-function carregarLeitos() {
-    const quartoId = document.getElementById('quarto').value;
-    const leitoSelect = document.getElementById('leito');
-
-    if({{ 'true' if leito_pre_selecionado else 'false' }} && leitoSelect.options.length > 1) {
-        return;
-    }
-
-    leitoSelect.innerHTML = '<option value="">Carregando...</option>';
-
-    if (quartoId) {
-        fetch('/api/leitos_vagos/' + quartoId)
-    .then(response => response.json())
-    .then(data => {
-                leitoSelect.innerHTML = '<option value="">Selecione o Leito</option>';
-                data.forEach(leito => {
-                    leitoSelect.innerHTML += '<option value="' + leito.id + '">Leito ' + leito.numero_leito + '</option>';
-                });
-            });
-    } else {
-        leitoSelect.innerHTML = '<option value="">Selecione o Quarto Primeiro</option>';
-    }
-}
-
-window.onload = function() {
-    {% if not leito_pre_selecionado %}
-    if(document.getElementById('quarto').value) carregarLeitos();
-    {% endif %}
-}
-
-document.getElementById('formConvivente').onsubmit = function() {
-    document.getElementById('btnSalvar').disabled = true;
-    document.getElementById('btnSalvar').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-};
-</script>
-{% endblock %}
+</body>
+</html>
