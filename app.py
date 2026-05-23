@@ -3,7 +3,7 @@ import psycopg2
 import psycopg2.extras
 import base64
 from datetime import date
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'uma_chave_secreta_muito_segura_e_dificil')
@@ -19,23 +19,8 @@ def get_db_connection():
 def index():
     return render_template('index.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        # Mantém seu código de login atual aqui
-        pass
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
 @app.route('/mapa_leitos')
 def mapa_leitos():
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('SELECT * FROM quartos ORDER BY numero')
@@ -74,9 +59,6 @@ def mapa_leitos():
 
 @app.route('/adicionar_quarto_mapa', methods=['POST'])
 def adicionar_quarto_mapa():
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT MAX(numero) FROM quartos')
@@ -91,9 +73,6 @@ def adicionar_quarto_mapa():
 
 @app.route('/adicionar_leito_mapa/<int:quarto_id>', methods=['POST'])
 def adicionar_leito_mapa(quarto_id):
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT MAX(CAST(numero_leito AS INTEGER)) FROM leitos WHERE quarto_id = %s AND numero_leito ~ \'^[0-9]+$\'', (quarto_id,))
@@ -110,9 +89,6 @@ def adicionar_leito_mapa(quarto_id):
 
 @app.route('/chamada', methods=['GET', 'POST'])
 def chamada():
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     if request.method == 'POST':
@@ -149,16 +125,12 @@ def chamada():
     conn.close()
     return render_template('chamada.html', conviventes=conviventes, data_hoje=hoje.strftime('%d/%m/%Y'))
 
-# ROTA ATUALIZADA - TRAVA QUARTO/LEITO AUTOMÁTICO
+# ROTA CADASTRO COM QUARTO/LEITO TRAVADO AUTOMÁTICO
 @app.route('/cadastrar_convivente', methods=['GET', 'POST'])
 def cadastrar_convivente():
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     leito_id = request.args.get('leito_id', type=int)
     leito_info = None
 
-    # Se veio do mapa, busca info do leito pra mostrar travado
     if leito_id:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -176,8 +148,6 @@ def cadastrar_convivente():
         nome = request.form['nome']
         data_nascimento = request.form['data_nascimento']
         foto = request.files['foto']
-
-        # Se veio do mapa, usa o leito_id da URL. Se não, pega do form
         leito_id_form = leito_id or request.form.get('leito_id')
 
         if not leito_id_form:
@@ -194,8 +164,6 @@ def cadastrar_convivente():
         cur = conn.cursor()
         cur.execute('INSERT INTO conviventes (nome, data_nascimento, foto_base64, leito_id) VALUES (%s, %s, %s, %s)',
                     (nome, data_nascimento, foto_base64, leito_id_form))
-
-        # Marca o leito como ocupado
         cur.execute('UPDATE leitos SET ocupado = TRUE WHERE id = %s', (leito_id_form,))
         conn.commit()
         cur.close()
@@ -203,7 +171,6 @@ def cadastrar_convivente():
         flash(f'{nome} cadastrado com sucesso!')
         return redirect(url_for('mapa_leitos'))
 
-    # Pega todos os leitos vazios pra caso entre direto pelo menu
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('''
@@ -224,9 +191,6 @@ def cadastrar_convivente():
 
 @app.route('/editar_convivente/<int:id>', methods=['POST'])
 def editar_convivente(id):
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     acao = request.form['acao']
     conn = get_db_connection()
     cur = conn.cursor()
@@ -236,7 +200,6 @@ def editar_convivente(id):
         cur.execute('UPDATE conviventes SET nome = %s, data_nascimento = %s WHERE id = %s', (nome, data_nascimento, id))
         flash('Convivente atualizado!')
     elif acao == 'desocupar':
-        # Desocupa o leito também
         cur.execute('SELECT leito_id FROM conviventes WHERE id = %s', (id,))
         leito_id = cur.fetchone()[0]
         cur.execute('UPDATE conviventes SET ativo = FALSE, leito_id = NULL WHERE id = %s', (id,))
@@ -250,9 +213,6 @@ def editar_convivente(id):
 
 @app.route('/relatorio')
 def relatorio():
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     from datetime import datetime
     import calendar
 
@@ -317,9 +277,6 @@ def relatorio():
 
 @app.route('/relatorio_branco')
 def relatorio_branco():
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     from datetime import datetime
     import calendar
 
@@ -366,9 +323,6 @@ def relatorio_branco():
 
 @app.route('/carometro')
 def carometro():
-    if 'usuario_logado' not in session:
-        return redirect(url_for('login'))
-
     ordem = request.args.get('ordem', default='quarto')
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
