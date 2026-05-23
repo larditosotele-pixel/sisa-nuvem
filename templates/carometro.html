@@ -1,169 +1,166 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Relação Nominal com Fotos - SISA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carômetro - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        @page { size: A4; margin: 5mm; }
-        {% if orientacao == 'paisagem' %}
-        @page { size: A4 landscape; margin: 5mm; }
-        {% endif %}
-
-        body { font-family: Arial, sans-serif; background: #f0f0f0; }
-
-       .pagina {
-            width: 200mm;
-            background: white;
-            margin: 0 auto 5mm auto;
-            page-break-after: always;
-            break-inside: avoid;
-        }
-        {% if orientacao == 'paisagem' %}
-       .pagina { width: 287mm; height: 200mm; }
-        {% endif %}
-       .pagina:last-child { page-break-after: auto; margin-bottom: 0; }
-
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
        .header {
-            background: #1b5e20;
-            color: white;
-            padding: 2mm 3mm;
-            display: flex;
-            align-items: center;
-            gap: 3mm;
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-       .header img { height: 7mm; width: 7mm; }
-       .header-text h1 { margin: 0; font-size: 10pt; }
-       .header-text span { font-size: 7pt; }
-
-       .titulo {
-            margin: 1mm 3mm;
-            border-bottom: 0.5mm solid #000;
-            padding-bottom: 1mm;
+       .header a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
         }
-       .titulo h2 { margin: 0; font-size: 10pt; font-weight: bold; text-transform: uppercase; }
-
-       .controles { margin: 2mm; display: flex; gap: 3mm; flex-wrap: wrap; }
-       .btn { background: #43a047; color: white; text-decoration: none; padding: 3mm 5mm; border-radius: 1mm; font-size: 10pt; border: none; cursor: pointer; font-weight: bold; }
-       .voltar { background: #95a5a6; }
-       .paisagem { background: #1976d2; }
-       .btn.ativo { background: #000; box-shadow: inset 0 0 0 0.5mm yellow; }
-
-       .grid {
-            display: grid;
-            gap: 1mm;
-            padding: 1mm 3mm 3mm 3mm;
-        }
-
-        {% if orientacao == 'paisagem' %}
-    @page { size: A4 landscape; margin: 4mm; }
-   .pagina { width: 289mm; } 
-   .grid { 
-        grid-template-columns: repeat(8, 1fr); 
-        grid-template-rows: repeat(5, 1fr);
-        gap: 0.8mm;
-        height: 178mm;
-    }
-   .card { 
-        display: flex; 
-        flex-direction: column; 
-        justify-content: space-between;
-    }
-   .card img { width: 19mm; height: 19mm; }
-   .card-nome { font-size: 6.5pt; min-height: 6mm; }
-   .card-quarto { font-size: 6.5pt; padding: 0.8mm 0; }
-    {% set por_pagina = 40 %}
-{% else %}
-   .grid { grid-template-columns: repeat(6, 1fr); }
-   .card img { width: 26mm; height: 26mm; }
-    {% set por_pagina = 36 %}
-{% endif %}
-
-       .card {
-            border: 0.3mm solid #000;
-            background: #fff;
-            padding: 0.5mm;
+       .container { max-width: 1400px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 20px; color: #333; }
+       .controles {
             text-align: center;
-            break-inside: avoid;
+            margin-bottom: 30px;
+        }
+       .controles a {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+       .controles a.ativo { background: #28a745; }
+
+       .quarto-bloco {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-       .card-quarto {
-            background: #0066cc;
+       .quarto-titulo {
+            background: #2e7d32;
             color: white;
+            padding: 12px 20px;
+            font-size: 18px;
             font-weight: bold;
-            font-size: 7pt;
-            padding: 1mm 0;
         }
-       .card img {
+       .fotos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+       .foto-card {
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: #fafafa;
+        }
+       .foto-card img {
+            width: 100%;
+            height: 150px;
             object-fit: cover;
-            border-radius: 50%;
-            border: 0.3mm solid #333;
-            margin: 1mm auto;
-            display: block;
-            background: #eee;
+            border-radius: 5px;
+            margin-bottom: 8px;
         }
-       .card-nome {
+       .foto-card.sem-foto {
+            width: 100%;
+            height: 150px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+       .foto-card.nome {
             font-weight: bold;
-            font-size: 7pt;
-            line-height: 0.95;
-            word-break: break-word;
-            padding: 0 0.5mm;
-            min-height: 7mm;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+       .foto-card.info {
+            font-size: 12px;
+            color: #666;
+        }
+       .btn-imprimir {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         @media print {
-            body { background: white; }
-           .controles { display: none!important; }
-           .header,.card-quarto { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-           .pagina { margin: 0; box-shadow: none; }
+           .header,.controles,.btn-imprimir { display: none; }
+            body { background: white; padding: 0; }
+           .quarto-bloco { page-break-inside: avoid; }
         }
     </style>
 </head>
 <body>
-    <div class="controles">
-        <a href="{{ url_for('index') }}" class="btn voltar">Voltar</a>
-        <button onclick="window.print()" class="btn">Imprimir</button>
+    <div class="header">
+        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+    </div>
 
-        {% if orientacao == 'paisagem' %}
-            <a href="{{ url_for('carometro', sort=ordem) }}" class="btn">Ir para Vertical 6x6</a>
-            <a href="{{ url_for('carometro_paisagem', sort='quarto') }}" class="btn {% if ordem == 'quarto' %}ativo{% endif %}">Ordem Quarto</a>
-            <a href="{{ url_for('carometro_paisagem', sort='nome') }}" class="btn {% if ordem == 'nome' %}ativo{% endif %}">Ordem Nome</a>
+    <div class="container">
+        <h1>📸 Carômetro - Lar Ditoso</h1>
+
+        <div class="controles">
+            <a href="{{ url_for('carometro', ordem='quarto') }}" class="{% if ordem == 'quarto' %}ativo{% endif %}">Por Quarto/Leito</a>
+            <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="{% if ordem == 'alfabetica' %}ativo{% endif %}">Ordem Alfabética</a>
+        </div>
+
+        {% if ordem == 'alfabetica' %}
+            <div class="fotos-grid">
+                {% for c in conviventes %}
+                <div class="foto-card">
+                    {% if c.foto_base64 %}
+                        <img src="{{ c.foto_base64 }}" alt="{{ c.nome }}">
+                    {% else %}
+                        <div class="sem-foto">👤</div>
+                    {% endif %}
+                    <div class="nome">{{ c.nome }}</div>
+                    <div class="info">Q{{ c.quarto_numero or '-' }} / L{{ c.numero_leito or '-' }}</div>
+                </div>
+                {% endfor %}
+            </div>
         {% else %}
-            <a href="{{ url_for('carometro_paisagem', sort=ordem) }}" class="btn paisagem">Ir para Horizontal 8x5</a>
-            <a href="{{ url_for('carometro', sort='quarto') }}" class="btn {% if ordem == 'quarto' %}ativo{% endif %}">Ordem Quarto</a>
-            <a href="{{ url_for('carometro', sort='nome') }}" class="btn {% if ordem == 'nome' %}ativo{% endif %}">Ordem Nome</a>
+            {% for quarto_num, conviventes_quarto in quartos_agrupados.items() %}
+            <div class="quarto-bloco">
+                <div class="quarto-titulo">QUARTO {{ quarto_num }}</div>
+                <div class="fotos-grid">
+                    {% for c in conviventes_quarto %}
+                    <div class="foto-card">
+                        {% if c.foto_base64 %}
+                            <img src="{{ c.foto_base64 }}" alt="{{ c.nome }}">
+                        {% else %}
+                            <div class="sem-foto">👤</div>
+                        {% endif %}
+                        <div class="nome">{{ c.nome }}</div>
+                        <div class="info">Leito {{ c.numero_leito or '-' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
         {% endif %}
     </div>
 
-    {% for page in conviventes|batch(por_pagina) %}
-    <div class="pagina">
-        <div class="header">
-    <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo">
-    <div class="header-text">
-        <h1>SISA</h1>
-        <span>CAE Idoso Lar Ditoso</span>
-    </div>
-</div>
-
-        <div class="titulo">
-            <h2>RELAÇÃO NOMINAL - ORDEM: {{ 'ALFABÉTICA' if ordem == 'nome' else 'QUARTO/LEITO' }}</h2>
-        </div>
-
-        <div class="grid">
-            {% for c in page %}
-            <div class="card">
-                <div class="card-quarto">Q{{ c.quarto }} L{{ c.leito }}</div>
-                {% if c.foto %}
-                    <img src="{{ url_for('static', filename=c.foto) }}" 
-                         onerror="this.src='{{ url_for('static', filename='sem-foto.jpg') }}'"
-                         alt="{{ c.nome }}">
-                {% else %}
-                    <img src="{{ url_for('static', filename='sem-foto.jpg') }}" alt="Sem foto">
-                {% endif %}
-                <div class="card-nome">{{ c.nome }}</div>
-            </div>
-            {% endfor %}
-        </div>
-    {% endfor %}
+    <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
 </body>
 </html>
