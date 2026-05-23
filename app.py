@@ -329,5 +329,70 @@ def chamada():
     conn.close()
     return render_template('chamada.html', conviventes=conviventes, data_hoje=datetime.now().strftime('%d/%m/%Y'))
 
+@app.route('/relatorio')
+def relatorio():
+    from datetime import datetime, timedelta
+    import calendar
+
+    # Pega mês e ano atual ou da URL
+    hoje = datetime.now()
+    mes = request.args.get('mes', default=hoje.month, type=int)
+    ano = request.args.get('ano', default=hoje.year, type=int)
+
+    # Calcula dias do mês
+    ultimo_dia = calendar.monthrange(ano, mes)[1]
+    dias_mes = list(range(1, ultimo_dia + 1))
+    dias_impares = [d for d in dias_mes if d % 2!= 0]
+    dias_pares = [d for d in dias_mes if d % 2 == 0]
+
+    # Busca conviventes ativos
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT c.id, c.nome, q.numero as quarto_numero, l.numero_leito
+        FROM conviventes c
+        LEFT JOIN leitos l ON c.leito_id = l.id
+        LEFT JOIN quartos q ON l.quarto_id = q.id
+        WHERE c.ativo = TRUE
+        ORDER BY q.numero,
+                 CASE WHEN l.numero_leito ~ '^[0-9]+$'
+                      THEN CAST(l.numero_leito AS INTEGER)
+                      ELSE 999 END
+    ''')
+    conviventes = cur.fetchall()
+
+    # Busca chamadas do mês
+    primeiro_dia = f'{ano}-{mes:02d}-01'
+    ultimo_dia_str = f'{ano}-{mes:02d}-{ultimo_dia:02d}'
+    cur.execute('''
+        SELECT convivente_id, EXTRACT(DAY FROM data_chamada) as dia, status
+        FROM chamadas
+        WHERE data_chamada BETWEEN %s AND %s
+    ''', (primeiro_dia, ultimo_dia_str))
+
+    # Organiza as chamadas por convivente e dia
+    chamadas = {}
+    for row in cur.fetchall():
+        conv_id = row['convivente_id']
+        dia = int(row['dia'])
+        if conv_id not in chamadas:
+            chamadas[conv_id] = {}
+        chamadas[conv_id][dia] = row['status']
+
+    cur.close()
+    conn.close()
+
+    meses_nomes = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+
+    return render_template('relatorio.html',
+                         conviventes=conviventes,
+                         chamadas=chamadas,
+                         dias_impares=dias_impares,
+                         dias_pares=dias_pares,
+                         mes=mes,
+                         ano=ano,
+                         mes_nome=meses_nomes[mes])
+
 if __name__ == '__main__':
     app.run(debug=True)
