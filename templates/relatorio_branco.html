@@ -7,8 +7,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: white; padding: 20px; }
-        
-        /* BARRA VERDE PADRÃO */
         .navbar {
             background: #2e7d32;
             color: white;
@@ -28,14 +26,9 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-        .logo-img img {
-            width: 35px;
-            height: 35px;
-            object-fit: contain;
-        }
+        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
         .navbar-info h2 { font-size: 22px; margin: 0; }
         .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
-
         .header-nav {
             background: white;
             padding: 15px 20px;
@@ -43,94 +36,30 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .header-nav a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-        }
+        .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
         .container { max-width: 100%; margin: 0 auto; overflow-x: auto; }
         h1 { text-align: center; margin-bottom: 5px; color: #333; }
         .subtitulo { text-align: center; margin-bottom: 20px; color: #666; font-size: 18px; }
-        .controles {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .controles select, .controles button {
-            padding: 8px 15px;
-            font-size: 14px;
-            margin: 0 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-            table-layout: fixed;
-        }
-        th, td {
-            border: 1px solid #999;
-            padding: 3px 1px;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 28px;
-        }
-        th {
-            background: #f0f0f0;
-            font-weight: bold;
-            height: 30px;
-        }
-        .nome {
-            text-align: left;
-            font-weight: bold;
-            width: 180px;
-            padding-left: 8px;
-            white-space: nowrap;
-            font-size: 12px;
-        }
+        .controles { text-align: center; margin-bottom: 20px; }
+        .controles select, .controles button { padding: 8px 15px; font-size: 14px; margin: 0 5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
+        th, td { border: 1px solid #999; padding: 3px 1px; text-align: center; overflow: hidden; text-overflow: ellipsis; height: 28px; }
+        th { background: #f0f0f0; font-weight: bold; height: 30px; }
+        .nome { text-align: left; font-weight: bold; width: 180px; padding-left: 8px; white-space: nowrap; font-size: 12px; }
         .quarto-col { width: 25px; font-size: 10px; }
         .leito-col { width: 25px; font-size: 10px; }
-        .dia-col {
-            width: 22px;
-            min-width: 22px;
-            font-size: 10px;
-        }
-        /* ZEBRA - LINHAS INTERCALADAS */
+        .dia-col { width: 22px; min-width: 22px; font-size: 10px; }
         tbody tr:nth-child(odd) { background: #ffffff; }
         tbody tr:nth-child(even) { background: #f5f5f5; }
-
-        /* SÁBADO E DOMINGO AMARELO CLARO */
         .fim-de-semana { background: #fff9c4!important; }
-
-        /* LINHAS EM BRANCO */
-        .linha-vazia td {
-            border: 1px solid #999;
-            height: 28px;
-        }
+        .linha-vazia td { border: 1px solid #999; height: 28px; }
         .linha-vazia:nth-child(odd) { background: #ffffff; }
         .linha-vazia:nth-child(even) { background: #f5f5f5; }
-
-        .assinatura {
-            margin-top: 30px;
-            page-break-inside: avoid;
-        }
-        .assinatura h3 {
-            text-align: center;
-            margin: 20px 0 10px 0;
-            border-bottom: 2px solid #333;
-            padding-bottom: 5px;
-        }
-        .dias-container {
-            display: flex;
-            gap: 20px;
-        }
+        .assinatura { margin-top: 30px; page-break-inside: avoid; }
+        .assinatura h3 { text-align: center; margin: 20px 0 10px 0; border-bottom: 2px solid #333; padding-bottom: 5px; }
+        .dias-container { display: flex; gap: 20px; }
         .dias-coluna { flex: 1; }
-        .dia-linha {
-            display: flex;
-            border-bottom: 1px solid #ccc;
-            padding: 8px 0;
-            min-height: 35px;
-        }
+        .dia-linha { display: flex; border-bottom: 1px solid #ccc; padding: 8px 0; min-height: 35px; }
         .dia-numero {
             width: 40px;
             font-weight: bold;
@@ -143,18 +72,9 @@
             justify-content: center;
         }
         .dia-campos { flex: 1; display: flex; gap: 20px; }
-        .campo {
-            flex: 1;
-            border-bottom: 1px solid #999;
-            padding-bottom: 3px;
-        }
-
+        .campo { flex: 1; border-bottom: 1px solid #999; padding-bottom: 3px; }
         @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .navbar, .header-nav, .controles, .btn-imprimir { display: none; }
             body { padding: 0; }
             table { font-size: 9px; }
@@ -175,13 +95,17 @@
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
+        @media (max-width: 600px) {
+            .navbar { padding: 12px 15px; }
+            .navbar-info h2 { font-size: 18px; }
+            .navbar-info p { font-size: 10px; }
+        }
     </style>
 </head>
 <body>
-    <!-- BARRA VERDE PADRÃO -->
     <div class="navbar">
         <div class="logo-img">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Lar Ditoso">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
         </div>
         <div class="navbar-info">
             <h2>SISA</h2>
@@ -239,8 +163,6 @@
                     {% endfor %}
                 </tr>
                 {% endfor %}
-
-                <!-- 25 LINHAS EM BRANCO - AGORA SIM -->
                 {% for i in range(25) %}
                 <tr class="linha-vazia">
                     <td class="nome">&nbsp;</td>
