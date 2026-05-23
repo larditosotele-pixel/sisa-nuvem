@@ -125,7 +125,7 @@ def chamada():
     conn.close()
     return render_template('chamada.html', conviventes=conviventes, data_hoje=hoje.strftime('%d/%m/%Y'))
 
-# ROTA CADASTRO COM QUARTO/LEITO TRAVADO AUTOMÁTICO
+# DATA DE NASCIMENTO OPCIONAL
 @app.route('/cadastrar_convivente', methods=['GET', 'POST'])
 def cadastrar_convivente():
     leito_id = request.args.get('leito_id', type=int)
@@ -146,7 +146,7 @@ def cadastrar_convivente():
 
     if request.method == 'POST':
         nome = request.form['nome']
-        data_nascimento = request.form['data_nascimento']
+        data_nascimento = request.form.get('data_nascimento') or None
         foto = request.files['foto']
         leito_id_form = leito_id or request.form.get('leito_id')
 
@@ -196,7 +196,7 @@ def editar_convivente(id):
     cur = conn.cursor()
     if acao == 'salvar':
         nome = request.form['nome']
-        data_nascimento = request.form['data_nascimento']
+        data_nascimento = request.form.get('data_nascimento') or None
         cur.execute('UPDATE conviventes SET nome = %s, data_nascimento = %s WHERE id = %s', (nome, data_nascimento, id))
         flash('Convivente atualizado!')
     elif acao == 'desocupar':
