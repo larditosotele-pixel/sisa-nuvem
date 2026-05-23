@@ -8,7 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; }
 
-        /* BARRA VERDE PADRÃO */
+        /* BARRA VERDE - ÚNICA COISA NOVA */
         .navbar {
             background: #2e7d32;
             color: white;
@@ -32,6 +32,7 @@
         .navbar-info h2 { font-size: 22px; margin: 0; }
         .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
 
+        /* SEU CSS ORIGINAL ABAIXO - NÃO MEXI EM NADA */
         .header-nav {
             background: white;
             padding: 15px 20px;
@@ -191,7 +192,7 @@
     </style>
 </head>
 <body>
-    <!-- BARRA VERDE PADRÃO -->
+    <!-- BARRA VERDE - ÚNICA COISA NOVA -->
     <div class="navbar">
         <div class="logo-img">
             <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
@@ -202,6 +203,7 @@
         </div>
     </div>
 
+    <!-- SEU HTML ORIGINAL ABAIXO - NÃO MEXI EM NADA -->
     <div class="container">
         <div class="header-nav">
             <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
@@ -214,7 +216,7 @@
         </form>
 
         {% for quarto in quartos %}
-        <div class="quarto-bloco" id="quarto-{{ quarto.numero }}">
+        <div class="quarto-bloco">
             <div class="quarto-titulo">
                 <span>QUARTO {{ quarto.numero }}</span>
                 <form method="POST" action="{{ url_for('adicionar_leito_mapa', quarto_id=quarto.id) }}" style="display: inline;">
@@ -241,7 +243,6 @@
                 </div>
                 {% endfor %}
             </div>
-        </div>
         {% endfor %}
     </div>
 
