@@ -7,26 +7,55 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-       .header {
+
+        /* BARRA VERDE PADRÃO */
+        .navbar {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .logo-img img {
+            width: 35px;
+            height: 35px;
+            object-fit: contain;
+        }
+        .navbar-info h2 { font-size: 22px; margin: 0; }
+        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
+        .header-nav {
             background: white;
             padding: 15px 20px;
             margin-bottom: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-       .header a {
+        .header-nav a {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
             font-size: 16px;
         }
-       .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; }
         h1 { text-align: center; margin-bottom: 20px; color: #333; }
-       .controles {
+        .controles {
             text-align: center;
             margin-bottom: 30px;
         }
-       .controles a {
+        .controles a {
             padding: 10px 20px;
             margin: 0 10px;
             background: #007bff;
@@ -35,64 +64,67 @@
             border-radius: 5px;
             font-weight: bold;
         }
-       .controles a.ativo { background: #28a745; }
+        .controles a.ativo { background: #28a745; }
 
-       .quarto-bloco {
+        .quarto-bloco {
             background: white;
             border-radius: 8px;
             margin-bottom: 25px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             overflow: hidden;
+            page-break-inside: avoid;
         }
-       .quarto-titulo {
+        .quarto-titulo {
             background: #2e7d32;
             color: white;
             padding: 12px 20px;
             font-size: 18px;
             font-weight: bold;
         }
-       .fotos-grid {
+        .fotos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
             padding: 20px;
         }
-       .foto-card {
+        .foto-card {
             text-align: center;
             border: 2px solid #ddd;
             border-radius: 8px;
-            padding: 10px;
+            padding: 8px;
             background: #fafafa;
+            page-break-inside: avoid;
         }
-       .foto-card img {
+        .foto-card img {
             width: 100%;
-            height: 150px;
+            height: 140px;
             object-fit: cover;
             border-radius: 5px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
-       .foto-card.sem-foto {
+        .foto-card .sem-foto {
             width: 100%;
-            height: 150px;
+            height: 140px;
             background: #e0e0e0;
             border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
+            font-size: 45px;
             color: #999;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
-       .foto-card.nome {
+        .foto-card .nome {
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 3px;
+            line-height: 1.2;
         }
-       .foto-card.info {
-            font-size: 12px;
+        .foto-card .info {
+            font-size: 11px;
             color: #666;
         }
-       .btn-imprimir {
+        .btn-imprimir {
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -106,19 +138,57 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
+        /* CONTROLE DE IMPRESSÃO EM 3 FOLHAS */
         @media print {
-           .header,.controles,.btn-imprimir { display: none; }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .navbar, .header-nav, .controles, .btn-imprimir { display: none; }
             body { background: white; padding: 0; }
-           .quarto-bloco { page-break-inside: avoid; }
+            
+            /* FORÇA 3 FOLHAS - QUEBRA A CADA 15 FOTOS APROX */
+            .foto-card:nth-child(15n) { page-break-after: always; }
+            
+            .quarto-bloco { 
+                box-shadow: none; 
+                border: 1px solid #ccc;
+                margin-bottom: 15px;
+            }
+            .fotos-grid { 
+                grid-template-columns: repeat(5, 1fr);
+                gap: 10px;
+                padding: 15px;
+            }
+            .foto-card img, .foto-card .sem-foto { height: 120px; }
+            .foto-card .nome { font-size: 11px; }
+            .foto-card .info { font-size: 10px; }
+            
+            /* VERTICAL: 3 colunas | HORIZONTAL: 5 colunas */
+            @page { 
+                size: auto; 
+                margin: 1cm; 
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+    <!-- BARRA VERDE PADRÃO -->
+    <div class="navbar">
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Lar Ditoso">
+        </div>
+        <div class="navbar-info">
+            <h2>SISA</h2>
+            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
+        </div>
     </div>
 
     <div class="container">
+        <div class="header-nav">
+            <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+        </div>
+
         <h1>📸 Carômetro - Lar Ditoso</h1>
 
         <div class="controles">
