@@ -1,216 +1,136 @@
-{% extends "base.html" %}
-
-{% block title %}SISA - Chamada Diária{% endblock %}
-
-{% block content %}
-<style>
-    .chamada-container {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    .chamada-header {
-        background: #f5f5f5;
-        padding: 16px;
-        border-radius: 8px 8px 0 0;
-        border-bottom: 2px solid #ddd;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    .chamada-header h2 { 
-        color: #1b5e20; 
-        margin: 0; 
-        font-size: 22px;
-    }
-    .data-chamada {
-        font-size: 16px;
-        background: white;
-        padding: 8px 16px;
-        border-radius: 6px;
-        color: #1b5e20;
-        font-weight: bold;
-        border: 1px solid #ddd;
-    }
-    .lista-conviventes {
-        background: white;
-        border: 1px solid #ddd;
-        border-top: none;
-    }
-    .item-convivente {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-bottom: 1px solid #eee;
-        gap: 12px;
-    }
-    .item-convivente:last-child { border-bottom: none; }
-    .item-convivente:hover { background: #fafafa; }
-    
-    .foto-convivente {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-        background: #e0e0e0;
-    }
-    .foto-placeholder {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: #e0e0e0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        color: #999;
-        flex-shrink: 0;
-    }
-    .info-convivente {
-        flex-grow: 1;
-        min-width: 0;
-    }
-    .info-convivente h3 {
-        margin: 0;
-        font-size: 16px;
-        color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .info-convivente p {
-        margin: 2px 0 0 0;
-        color: #666;
-        font-size: 13px;
-    }
-    .botoes-chamada {
-        display: flex;
-        gap: 4px;
-        flex-shrink: 0;
-    }
-    .btn-status {
-        width: 38px;
-        height: 38px;
-        border: 2px solid #ddd;
-        background: #f5f5f5;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.15s;
-        color: #555;
-    }
-    .btn-status:active { transform: scale(0.95); }
-    .btn-status.ativo-P { background: #4caf50; color: white; border-color: #4caf50; }
-    .btn-status.ativo-F { background: #f44336; color: white; border-color: #f44336; }
-    .btn-status.ativo-A { background: #ffc107; color: #333; border-color: #ffc107; }
-    .btn-status.ativo-H { background: #2196f3; color: white; border-color: #2196f3; }
-    
-    .barra-salvar {
-        background: #1b5e20;
-        padding: 0;
-        position: sticky;
-        bottom: 0;
-        border-radius: 0 0 8px 8px;
-    }
-    .btn-salvar {
-        width: 100%;
-        background: #1b5e20;
-        color: white;
-        padding: 16px;
-        border: none;
-        font-size: 18px;
-        cursor: pointer;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
-    .btn-salvar:hover { background: #2e7d32; }
-    .btn-salvar:active { background: #1b5e20; }
-
-    /* MOBILE - iPhone e Android */
-    @media (max-width: 600px) {
-        .container { padding: 10px; }
-        .chamada-container { margin: 0; }
-        .item-convivente { padding: 10px 12px; }
-        .foto-convivente, .foto-placeholder { width: 45px; height: 45px; }
-        .info-convivente h3 { font-size: 15px; }
-        .info-convivente p { font-size: 12px; }
-        .btn-status { width: 36px; height: 36px; font-size: 15px; }
-        .btn-salvar { font-size: 16px; padding: 14px; }
-    }
-</style>
-
-<div class="chamada-container">
-    <div class="chamada-header">
-        <h2><i class="fas fa-clipboard-check"></i> Chamada Diária</h2>
-        <div class="data-chamada">
-            <i class="fas fa-calendar"></i> {{ data_hoje }}
-        </div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chamada Diária - SISA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .header {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 10px; color: #333; }
+        .data { text-align: center; margin-bottom: 20px; color: #666; font-size: 18px; }
+        .flash { 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 5px; 
+            background: #d4edda; 
+            color: #155724;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .convivente {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+        .convivente:last-child { border-bottom: none; }
+        .convivente img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .convivente-info { flex: 1; }
+        .convivente-nome { font-weight: bold; font-size: 16px; }
+        .convivente-quarto { color: #666; font-size: 14px; }
+        .status-opcoes {
+            display: flex;
+            gap: 10px;
+        }
+        .status-opcoes label {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            background: white;
+        }
+        .status-opcoes input[type="radio"] { display: none; }
+        .status-opcoes input[type="radio"]:checked + label {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .btn-salvar {
+            width: 100%;
+            padding: 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn-salvar:hover { background: #218838; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
     </div>
 
-    <form method="POST" id="form-chamada">
-        <div class="lista-conviventes">
+    <div class="container">
+        <h1>Chamada Diária</h1>
+        <div class="data">{{ data_hoje }}</div>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
             {% for c in conviventes %}
-            <div class="item-convivente" data-id="{{ c.id }}">
+            <div class="convivente">
                 {% if c.foto_base64 %}
-                    <img src="{{ c.foto_base64 }}" class="foto-convivente" alt="{{ c.nome }}">
+                    <img src="{{ c.foto_base64 }}" alt="{{ c.nome }}">
                 {% else %}
-                    <div class="foto-placeholder"><i class="fas fa-user"></i></div>
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: #ddd;"></div>
                 {% endif %}
                 
-                <div class="info-convivente">
-                    <h3>{{ c.nome }}</h3>
-                    <p>Q{{ c.quarto_numero }} - L{{ c.numero_leito }}</p>
+                <div class="convivente-info">
+                    <div class="convivente-nome">{{ c.nome }}</div>
+                    <div class="convivente-quarto">Quarto {{ c.quarto_numero }} - Leito {{ c.numero_leito }}</div>
                 </div>
 
-                <input type="hidden" name="status_{{ c.id }}" id="status_{{ c.id }}" value="{{ c.status_hoje or '' }}">
-                
-                <div class="botoes-chamada">
-                    <button type="button" class="btn-status {% if c.status_hoje == 'P' %}ativo-P{% endif %}" 
-                            onclick="selecionarStatus({{ c.id }}, 'P', this)">P</button>
-                    <button type="button" class="btn-status {% if c.status_hoje == 'F' %}ativo-F{% endif %}" 
-                            onclick="selecionarStatus({{ c.id }}, 'F', this)">F</button>
-                    <button type="button" class="btn-status {% if c.status_hoje == 'A' %}ativo-A{% endif %}" 
-                            onclick="selecionarStatus({{ c.id }}, 'A', this)">A</button>
-                    <button type="button" class="btn-status {% if c.status_hoje == 'H' %}ativo-H{% endif %}" 
-                            onclick="selecionarStatus({{ c.id }}, 'H', this)">H</button>
+                <div class="status-opcoes">
+                    <input type="radio" name="status_{{ c.id }}" id="p{{ c.id }}" value="P" {% if c.status_hoje == 'P' %}checked{% endif %}>
+                    <label for="p{{ c.id }}">Presente</label>
+
+                    <input type="radio" name="status_{{ c.id }}" id="f{{ c.id }}" value="F" {% if c.status_hoje == 'F' %}checked{% endif %}>
+                    <label for="f{{ c.id }}">Falta</label>
+
+                    <input type="radio" name="status_{{ c.id }}" id="a{{ c.id }}" value="A" {% if c.status_hoje == 'A' %}checked{% endif %}>
+                    <label for="a{{ c.id }}">Atestado</label>
                 </div>
             </div>
             {% endfor %}
-        </div>
 
-        <div class="barra-salvar">
-            <button type="submit" class="btn-salvar">
-                <i class="fas fa-save"></i> Salvar Chamada
-            </button>
-        </div>
-    </form>
-</div>
-
-<script>
-function selecionarStatus(conviventeId, status, btn) {
-    const input = document.getElementById('status_' + conviventeId);
-    const item = btn.closest('.item-convivente');
-    const botoes = item.querySelectorAll('.btn-status');
-    
-    // Clica no mesmo = desmarca
-    if (input.value === status) {
-        input.value = '';
-        botoes.forEach(b => b.className = 'btn-status');
-    } else {
-        input.value = status;
-        botoes.forEach(b => b.className = 'btn-status');
-        btn.className = 'btn-status ativo-' + status;
-    }
-}
-
-// Vibração no celular ao clicar
-document.querySelectorAll('.btn-status').forEach(btn => {
-    btn.addEventListener('click', () => {
-        if (navigator.vibrate) navigator.vibrate(30);
-    });
-});
-</script>
-{% endblock %}
+            <button type="submit" class="btn-salvar">💾 Salvar Chamada</button>
+        </form>
+    </div>
+</body>
+</html>
