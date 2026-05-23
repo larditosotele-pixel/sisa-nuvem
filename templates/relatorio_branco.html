@@ -61,35 +61,43 @@
         .linha-vazia:nth-child(odd) { background: #ffffff; }
         .linha-vazia:nth-child(even) { background: #f5f5f5; }
 
-        .assinatura { margin-top: 30px; page-break-inside: avoid; }
-        .dias-container { display: flex; gap: 40px; }
-        .dias-coluna { flex: 1; }
+        .assinatura { 
+            margin-top: 20px; 
+            page-break-inside: avoid;
+        }
+        .dias-container { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px;
+        }
         .dias-coluna h3 { 
             text-align: center; 
-            margin: 0 0 15px 0; 
+            margin: 0 0 8px 0; 
             border-bottom: 2px solid #333; 
-            padding-bottom: 5px;
-            font-size: 16px;
+            padding-bottom: 4px;
+            font-size: 14px;
         }
         .dia-linha { 
             display: flex; 
             border-bottom: 1px solid #ccc; 
-            padding: 8px 0; 
-            min-height: 35px;
+            padding: 3px 0; 
+            min-height: 24px;
             align-items: center;
+            page-break-inside: avoid;
         }
         .dia-numero {
-            width: 40px;
+            width: 28px;
             font-weight: bold;
             background: #333;
             color: white;
             text-align: center;
-            margin-right: 15px;
-            padding: 5px 0;
+            margin-right: 10px;
+            padding: 2px 0;
             border-radius: 3px;
+            font-size: 11px;
         }
-        .dia-campos { flex: 1; display: flex; gap: 30px; }
-        .campo { flex: 1; border-bottom: 1px solid #999; padding-bottom: 3px; font-size: 12px; }
+        .dia-campos { flex: 1; display: flex; gap: 15px; }
+        .campo { flex: 1; border-bottom: 1px solid #999; padding-bottom: 2px; font-size: 10px; }
 
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -98,6 +106,9 @@
             table { font-size: 9px; }
             .nome { font-size: 10px; }
             .dia-col { width: 18px; }
+            .dia-linha { min-height: 22px; padding: 2px 0; }
+            .dia-numero { font-size: 10px; padding: 1px 0; }
+            .campo { font-size: 9px; }
             @page { size: landscape; margin: 1cm; }
         }
         .btn-imprimir {
@@ -182,7 +193,6 @@
                 </tr>
                 {% endfor %}
                 
-                <!-- 25 LINHAS EM BRANCO -->
                 {% for i in range(25) %}
                 <tr class="linha-vazia">
                     <td class="nome">&nbsp;</td>
@@ -198,7 +208,6 @@
             </tbody>
         </table>
 
-        <!-- ÁREA DE ASSINATURA CORRIGIDA -->
         <div class="assinatura">
             <div class="dias-container">
                 <div class="dias-coluna">
