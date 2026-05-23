@@ -1,29 +1,186 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Relatório - SISA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório Mensal - SISA</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
-        .header { background: #1b5e20; color: white; padding: 10px 30px; display: flex; align-items: center; gap: 15px; }
-        .header img { height: 50px; width: 50px; }
-        .header-text h1 { margin: 0; font-size: 22px; line-height: 1.1; }
-        .header-text span { font-size: 14px; opacity: 0.9; }
-        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; text-align: center; }
-        .voltar { background: #95a5a6; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block; margin-top: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: white; padding: 20px; }
+       .header {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+       .header a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+       .container { max-width: 100%; margin: 0 auto; overflow-x: auto; }
+        h1 { text-align: center; margin-bottom: 5px; color: #333; }
+       .subtitulo { text-align: center; margin-bottom: 20px; color: #666; font-size: 18px; }
+       .controles {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+       .controles select,.controles button {
+            padding: 8px 15px;
+            font-size: 14px;
+            margin: 0 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 4px;
+            text-align: center;
+        }
+        th { background: #f0f0f0; font-weight: bold; }
+       .nome { text-align: left; font-weight: bold; min-width: 200px; }
+       .quarto-leito { font-size: 10px; color: #666; }
+       .coluna-amarela { background: #ffeb3b!important; }
+       .assinatura {
+            margin-top: 30px;
+            page-break-inside: avoid;
+        }
+       .assinatura h3 {
+            text-align: center;
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+       .dias-container {
+            display: flex;
+            gap: 20px;
+        }
+       .dias-coluna { flex: 1; }
+       .dia-linha {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            padding: 8px 0;
+        }
+       .dia-numero {
+            width: 40px;
+            font-weight: bold;
+            background: #333;
+            color: white;
+            text-align: center;
+            margin-right: 10px;
+        }
+       .dia-campos { flex: 1; display: flex; gap: 20px; }
+       .campo { flex: 1; border-bottom: 1px solid #999; }
+
+        @media print {
+           .header,.controles,.btn-imprimir { display: none; }
+            body { padding: 0; }
+       .btn-imprimir {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="/static/logo_ki.png" alt="Logo CAE Idoso Lar Ditoso">
-        <div class="header-text">
-            <h1>SISA</h1>
-            <span>CAE Idoso Lar Ditoso</span>
-        </div>
-    <div class="container">
-        <h2>Página de Relatório</h2>
-        <p>Em construção. Me fala o que você precisa nesse relatório.</p>
-        <a href="/" class="voltar">Voltar</a>
+        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
     </div>
+
+    <div class="container">
+        <h1>Relatório de Chamada Mensal</h1>
+        <div class="subtitulo">{{ mes_nome }} / {{ ano }}</div>
+
+        <div class="controles">
+            <form method="GET" style="display: inline;">
+                <select name="mes">
+                    {% for i in range(1, 13) %}
+                    <option value="{{ i }}" {% if i == mes %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <select name="ano">
+                    {% for i in range(2024, 2030) %}
+                    <option value="{{ i }}" {% if i == ano %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Filtrar</button>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" class="nome">CONVIVENTE</th>
+                    <th rowspan="2">Q</th>
+                    <th rowspan="2">L</th>
+                    {% for dia in range(1, 32) %}
+                        {% if dia <= dias_impares[-1] or dia <= dias_pares[-1] %}
+                        <th {% if dia == 7 or dia == 14 or dia == 21 or dia == 28 %}class="coluna-amarela"{% endif %}>{{ dia }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in conviventes %}
+                <tr>
+                    <td class="nome">{{ c.nome }}</td>
+                    <td>{{ c.quarto_numero or '' }}</td>
+                    <td>{{ c.numero_leito or '' }}</td>
+                    {% for dia in range(1, 32) %}
+                        {% if dia <= dias_impares[-1] or dia <= dias_pares[-1] %}
+                        <td {% if dia == 7 or dia == 14 or dia == 21 or dia == 28 %}class="coluna-amarela"{% endif %}>
+                            {{ chamadas.get(c.id, {}).get(dia, '') }}
+                        </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="assinatura">
+            <div class="dias-container">
+                <div class="dias-coluna">
+                    <h3>DIAS ÍMPARES</h3>
+                    {% for dia in dias_impares %}
+                    <div class="dia-linha">
+                        <div class="dia-numero">{{ '%02d' % dia }}</div>
+                        <div class="dia-campos">
+                            <div class="campo">Resp:</div>
+                            <div class="campo">Ass:</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="dias-coluna">
+                    <h3>DIAS PARES</h3>
+                    {% for dia in dias_pares %}
+                    <div class="dia-linha">
+                        <div class="dia-numero">{{ '%02d' % dia }}</div>
+                        <div class="dia-campos">
+                            <div class="campo">Resp:</div>
+                            <div class="campo">Ass:</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
 </body>
 </html>
