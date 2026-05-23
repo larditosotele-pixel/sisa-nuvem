@@ -6,13 +6,9 @@
     <title>Mapa de Leitos - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: Arial, sans-serif; 
-            background: #f8f9fa; 
-            padding: 0;
-        }
-        
-        /* CABEÇALHO VERDE */
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+
+        /* CABEÇALHO VERDE - LOGO CORRIGIDO */
         .navbar {
             background: #2e7d32;
             color: white;
@@ -21,12 +17,15 @@
             align-items: center;
             gap: 15px;
         }
-        .navbar img {
-            width: 40px;
-            height: 40px;
+        .logo-casa {
+            width: 45px;
+            height: 45px;
             background: white;
             border-radius: 50%;
-            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
         }
         .navbar-info h2 {
             font-size: 24px;
@@ -37,280 +36,362 @@
             margin: 0;
             opacity: 0.9;
         }
-        
-        /* BOTÃO VOLTAR */
-        .voltar-bar {
-            background: white;
-            padding: 15px 30px;
-            border-bottom: 1px solid #ddd;
-        }
-        .voltar-bar a {
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header-nav { margin-bottom: 20px; }
+        .header-nav a {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
-            font-size: 16px;
         }
-        
-        .container { 
-            max-width: 1400px; 
-            margin: 0 auto; 
-            padding: 20px 30px;
-        }
-        
-        .titulo-pagina {
+        .titulo-mapa {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-        .titulo-pagina h1 {
-            color: #333;
-            font-size: 22px;
-        }
+        .titulo-mapa h1 { color: #333; }
         .btn-criar-quarto {
-            padding: 10px 20px;
             background: #28a745;
             color: white;
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
             font-weight: bold;
-            text-decoration: none;
+            cursor: pointer;
         }
-        .btn-criar-quarto:hover { background: #218838; }
-        
-        .flash { 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            border-radius: 5px; 
-            background: #d4edda; 
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        /* CARD DO QUARTO */
+
         .quarto {
             background: white;
-            padding: 20px;
-            margin-bottom: 20px;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid #e0e0e0;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        .quarto-header { 
+        .quarto-header {
+            background: #fafafa;
+            padding: 12px 20px;
+            border-bottom: 2px solid #2e7d32;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #2e7d32;
         }
-        .quarto-header h2 {
+        .quarto-header h3 {
             color: #2e7d32;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
+            font-size: 18px;
+            margin: 0;
         }
         .btn-add-leito {
-            padding: 6px 15px;
             background: #007bff;
             color: white;
+            padding: 6px 15px;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
+            font-size: 14px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
         }
-        .btn-add-leito:hover { background: #0056b3; }
-        
-        /* GRID DE LEITOS */
-        .leitos {
+
+        .leitos-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
+            padding: 20px;
         }
-        
-        /* CARD DO CONVIVENTE - ESTILO ORIGINAL */
-        .card-convivente {
-            width: 120px;
-            border: 2px solid #d32f2f;
+        .leito-card {
+            width: 140px;
+            border: 2px solid #ddd;
             border-radius: 8px;
-            background: white;
+            text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
+            background: white;
+            transition: all 0.2s;
         }
-        .card-convivente:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(211, 47, 47, 0.4);
-            z-index: 10;
+        .leito-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
         }
-        
-        /* TAG DO LEITO - L1, L2, etc */
+        .leito-card.ocupado { border-color: #ff6b35; }
         .leito-tag {
             position: absolute;
             top: 5px;
             left: 5px;
-            background: #2196f3;
+            background: #007bff;
             color: white;
+            font-size: 10px;
+            font-weight: bold;
             padding: 2px 6px;
             border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
-            z-index: 2;
         }
-        
-        .card-foto {
+        .leito-card.ocupado .leito-tag { background: #ff6b35; }
+        .foto-convivente {
             width: 100%;
             height: 110px;
             object-fit: cover;
-            display: block;
+            border-radius: 6px 6px 0 0;
         }
-        .card-foto-sem {
-            width: 100%;
+        .leito-vazio {
             height: 110px;
-            background: #e0e0e0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            background: #f8f9fa;
             color: #999;
+            font-size: 40px;
+            border-radius: 6px 6px 0 0;
         }
-        
-        .card-nome {
+        .nome-convivente {
             padding: 8px 5px;
-            text-align: center;
-            font-size: 11px;
-            font-weight: bold;
-            color: #333;
-            line-height: 1.2;
-            min-height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* CARD LEITO LIVRE */
-        .card-leito-livre {
-            width: 120px;
-            height: 155px;
-            border: 2px dashed #28a745;
-            border-radius: 8px;
-            background: #f8fff9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: #28a745;
-        }
-        .card-leito-livre:hover {
-            background: #d4edda;
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-        }
-        .card-leito-livre .icone {
-            font-size: 30px;
-            margin-bottom: 5px;
-        }
-        .card-leito-livre .texto {
             font-size: 12px;
             font-weight: bold;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+        }
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .close { font-size: 28px; cursor: pointer; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .camera-area {
+            text-align: center;
+            margin: 15px 0;
+        }
+        #video, #canvas, #foto-preview {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+        #canvas, #foto-preview { display: none; }
+        .btn-camera {
+            background: #17a2b8;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .btn-salvar {
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-desocupar {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <!-- CABEÇALHO VERDE -->
     <div class="navbar">
-        <div style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">🏠</div>
+        <div class="logo-casa">🏠</div>
         <div class="navbar-info">
             <h2>SISA</h2>
             <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
         </div>
     </div>
 
-    <!-- BOTÃO VOLTAR -->
-    <div class="voltar-bar">
-        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
-    </div>
-
     <div class="container">
-        <div class="titulo-pagina">
+        <div class="header-nav">
+            <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+        </div>
+
+        <div class="titulo-mapa">
             <h1>📊 Mapa de Leitos - Lar Ditoso</h1>
-            <form action="{{ url_for('adicionar_quarto_mapa') }}" method="POST" style="display: inline;">
+            <form method="POST" action="{{ url_for('adicionar_quarto_mapa') }}" style="display: inline;">
                 <button type="submit" class="btn-criar-quarto">+ Criar Quarto</button>
             </form>
         </div>
-        
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="flash">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
 
         {% for quarto in quartos %}
         <div class="quarto" id="quarto-{{ quarto.numero }}">
             <div class="quarto-header">
-                <h2>QUARTO {{ quarto.numero }}</h2>
-                <form action="{{ url_for('adicionar_leito_mapa', quarto_id=quarto.id) }}" method="POST" style="display: inline;">
+                <h3>QUARTO {{ quarto.numero }}</h3>
+                <form method="POST" action="{{ url_for('adicionar_leito_mapa', quarto_id=quarto.id) }}" style="display: inline;">
                     <button type="submit" class="btn-add-leito">+ Leito</button>
                 </form>
             </div>
-            
-            <div class="leitos">
+            <div class="leitos-grid">
                 {% for leito in quarto.leitos %}
+                <div class="leito-card {% if leito.ocupado %}ocupado{% endif %}"
+                     onclick="abrirModal({{ leito.leito_id }}, {{ leito.convivente_id or 'null' }}, '{{ leito.numero_leito }}', '{{ leito.convivente_nome or '' }}', '{{ leito.data_nascimento or '' }}', '{{ leito.foto_base64 or '' }}')">
+                    <div class="leito-tag">L{{ leito.numero_leito }}</div>
                     {% if leito.ocupado %}
-                    <!-- CARD CONVIVENTE OCUPADO -->
-                    <div class="card-convivente" onclick="editarConvivente({{ leito.convivente_id }}, '{{ leito.convivente_nome }}', '{{ leito.data_nascimento or '' }}')">
-                        <div class="leito-tag">L{{ leito.numero_leito }}</div>
                         {% if leito.foto_base64 %}
-                            <img src="{{ leito.foto_base64 }}" alt="{{ leito.convivente_nome }}" class="card-foto">
+                            <img src="{{ leito.foto_base64 }}" class="foto-convivente" alt="{{ leito.convivente_nome }}">
                         {% else %}
-                            <div class="card-foto-sem">👤</div>
+                            <div class="leito-vazio">👤</div>
                         {% endif %}
-                        <div class="card-nome">{{ leito.convivente_nome }}</div>
-                    </div>
+                        <div class="nome-convivente">{{ leito.convivente_nome }}</div>
                     {% else %}
-                    <!-- CARD LEITO LIVRE -->
-                    <a href="{{ url_for('cadastrar_convivente', leito_id=leito.leito_id) }}" class="card-leito-livre">
-                        <div class="leito-tag">L{{ leito.numero_leito }}</div>
-                        <div class="icone">➕</div>
-                        <div class="texto">Cadastrar</div>
-                    </a>
+                        <div class="leito-vazio">➕</div>
+                        <div class="nome-convivente">Leito Vago</div>
                     {% endif %}
+                </div>
                 {% endfor %}
             </div>
         </div>
         {% endfor %}
     </div>
 
+    <!-- MODAL CADASTRAR/EDITAR -->
+    <div id="modal-convivente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-titulo">Cadastrar Convivente</h3>
+                <span class="close" onclick="fecharModal()">&times;</span>
+            </div>
+            <form id="form-convivente" method="POST">
+                <input type="hidden" id="leito_id" name="leito_id">
+                <input type="hidden" id="acao" name="acao" value="salvar">
+                <input type="hidden" id="foto_base64" name="foto_base64">
+
+                <div class="form-group">
+                    <label>Nome Completo:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label>Data de Nascimento:</label>
+                    <input type="date" id="data_nascimento" name="data_nascimento" required>
+                </div>
+
+                <div class="camera-area">
+                    <video id="video" autoplay playsinline style="display:none;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <img id="foto-preview" style="display:none;">
+                    <div>
+                        <button type="button" class="btn-camera" onclick="abrirCamera()">📷 Tirar Foto</button>
+                        <button type="button" class="btn-camera" onclick="capturarFoto()" id="btn-capturar" style="display:none;">Capturar</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-salvar">Salvar</button>
+                <button type="button" class="btn-desocupar" id="btn-desocupar" style="display:none;" onclick="desocuparLeito()">Desocupar Leito</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-    function editarConvivente(id, nome, dataNasc) {
-        let novoNome = prompt('Nome:', nome);
-        if (novoNome === null) return;
-        
-        let novaData = prompt('Data Nascimento YYYY-MM-DD:', dataNasc);
-        if (novaData === null) return;
-        
-        let acao = confirm('Clique OK para SALVAR alterações\nClique Cancelar para DESOCUPAR o leito');
-        
-        let form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/editar_convivente/' + id;
-        form.innerHTML = `
-            <input name="nome" value="${novoNome}">
-            <input name="data_nascimento" value="${novaData}">
-            <input name="acao" value="${acao ? 'salvar' : 'desocupar'}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
-    }
+        let stream = null;
+        let conviventeIdAtual = null;
+
+        function abrirModal(leitoId, conviventeId, numeroLeito, nome, dataNasc, fotoBase64) {
+            document.getElementById('leito_id').value = leitoId;
+            document.getElementById('form-convivente').action = conviventeId ? `/editar_convivente/${conviventeId}` : '/cadastrar_convivente';
+            document.getElementById('modal-titulo').innerText = conviventeId ? `Editar - Leito ${numeroLeito}` : `Cadastrar - Leito ${numeroLeito}`;
+            document.getElementById('nome').value = nome || '';
+            document.getElementById('data_nascimento').value = dataNasc || '';
+            document.getElementById('foto_base64').value = fotoBase64 || '';
+
+            const fotoPreview = document.getElementById('foto-preview');
+            if (fotoBase64) {
+                fotoPreview.src = fotoBase64;
+                fotoPreview.style.display = 'block';
+            } else {
+                fotoPreview.style.display = 'none';
+            }
+
+            document.getElementById('btn-desocupar').style.display = conviventeId ? 'block' : 'none';
+            conviventeIdAtual = conviventeId;
+            document.getElementById('modal-convivente').style.display = 'block';
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-convivente').style.display = 'none';
+            pararCamera();
+        }
+
+        async function abrirCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                document.getElementById('video').srcObject = stream;
+                document.getElementById('video').style.display = 'block';
+                document.getElementById('btn-capturar').style.display = 'inline-block';
+                document.getElementById('foto-preview').style.display = 'none';
+            } catch (err) {
+                alert('Erro ao acessar câmera: ' + err.message);
+            }
+        }
+
+        function capturarFoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const fotoBase64 = canvas.toDataURL('image/jpeg');
+            document.getElementById('foto_base64').value = fotoBase64;
+            document.getElementById('foto-preview').src = fotoBase64;
+            document.getElementById('foto-preview').style.display = 'block';
+            pararCamera();
+        }
+
+        function pararCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            document.getElementById('video').style.display = 'none';
+            document.getElementById('btn-capturar').style.display = 'none';
+        }
+
+        function desocuparLeito() {
+            if (confirm('Tem certeza que deseja desocupar este leito?')) {
+                document.getElementById('acao').value = 'desocupar';
+                document.getElementById('form-convivente').submit();
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('modal-convivente')) {
+                fecharModal();
+            }
+        }
     </script>
 </body>
 </html>
