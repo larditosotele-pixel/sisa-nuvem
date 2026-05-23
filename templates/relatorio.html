@@ -7,14 +7,39 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: white; padding: 20px; }
-        .header {
+        
+        /* BARRA VERDE PADRÃO */
+        .navbar {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+        .navbar-info h2 { font-size: 22px; margin: 0; }
+        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
+        .header-nav {
             background: white;
             padding: 15px 20px;
             margin-bottom: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .header a {
+        .header-nav a {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
@@ -70,16 +95,14 @@
         tbody tr:nth-child(odd) { background: #ffffff; }
         tbody tr:nth-child(even) { background: #f5f5f5; }
 
-        /* SÁBADO E DOMINGO AMARELO CLARO - SÓ ESSES */
+        /* SÁBADO E DOMINGO AMARELO CLARO */
         .fim-de-semana { background: #fff9c4!important; }
 
-        /* LINHAS EM BRANCO */
-        .linha-vazia td {
-            border: 1px solid #999;
-            height: 28px;
-        }
-        .linha-vazia:nth-child(odd) { background: #ffffff; }
-        .linha-vazia:nth-child(even) { background: #f5f5f5; }
+        /* CORES DOS STATUS */
+        .status-p { background: #d4edda !important; color: #155724; font-weight: bold; }
+        .status-f { background: #f8d7da !important; color: #721c24; font-weight: bold; }
+        .status-a { background: #fff3cd !important; color: #856404; font-weight: bold; }
+        .status-h { background: #d1ecf1 !important; color: #0c5460; font-weight: bold; }
 
         .assinatura {
             margin-top: 30px;
@@ -120,14 +143,13 @@
             padding-bottom: 3px;
         }
 
-        /* FORÇA IMPRESSÃO COLORIDA */
         @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
             }
-            .header, .controles, .btn-imprimir { display: none; }
+            .navbar, .header-nav, .controles, .btn-imprimir { display: none; }
             body { padding: 0; }
             table { font-size: 9px; }
             .nome { font-size: 10px; }
@@ -147,14 +169,30 @@
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
+        @media (max-width: 600px) {
+            .navbar { padding: 12px 15px; }
+            .navbar-info h2 { font-size: 18px; }
+            .navbar-info p { font-size: 10px; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+    <!-- BARRA VERDE PADRÃO -->
+    <div class="navbar">
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+        </div>
+        <div class="navbar-info">
+            <h2>SISA</h2>
+            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
+        </div>
     </div>
 
     <div class="container">
+        <div class="header-nav">
+            <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+        </div>
+
         <h1>Relatório de Chamada Mensal</h1>
         <div class="subtitulo">{{ mes_nome }} / {{ ano }}</div>
 
@@ -195,23 +233,10 @@
                     <td class="leito-col">{{ c.numero_leito or '' }}</td>
                     {% for dia in range(1, 32) %}
                         {% if dia <= dias_impares[-1] or dia <= dias_pares[-1] %}
-                        <td class="dia-col {% if dia in fins_de_semana %}fim-de-semana{% endif %}">
-                            {{ chamadas.get(c.id, {}).get(dia, '') }}
+                        {% set status = chamadas.get(c.id, {}).get(dia, '') %}
+                        <td class="dia-col {% if dia in fins_de_semana %}fim-de-semana{% endif %} {% if status == 'P' %}status-p{% elif status == 'F' %}status-f{% elif status == 'A' %}status-a{% elif status == 'H' %}status-h{% endif %}">
+                            {{ status }}
                         </td>
-                        {% endif %}
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-
-                <!-- 25 LINHAS EM BRANCO -->
-                {% for i in range(25) %}
-                <tr class="linha-vazia">
-                    <td class="nome">&nbsp;</td>
-                    <td class="quarto-col">&nbsp;</td>
-                    <td class="leito-col">&nbsp;</td>
-                    {% for dia in range(1, 32) %}
-                        {% if dia <= dias_impares[-1] or dia <= dias_pares[-1] %}
-                        <td class="dia-col {% if dia in fins_de_semana %}fim-de-semana{% endif %}">&nbsp;</td>
                         {% endif %}
                     {% endfor %}
                 </tr>
@@ -230,7 +255,6 @@
                             <div class="campo">Resp:</div>
                             <div class="campo">Ass:</div>
                         </div>
-                    </div>
                     {% endfor %}
                 </div>
                 <div class="dias-coluna">
