@@ -71,6 +71,12 @@
             color: white;
         }
 
+  /* CORREÇÃO AQUI - GARANTE 1 CARD POR LINHA */
+  form {
+            display: block;
+            width: 100%;
+        }
+
   .card-convivente {
             background: white;
             border-radius: 8px;
@@ -80,6 +86,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            width: 100%;
         }
   .card-convivente img {
             width: 50px;
@@ -90,11 +97,13 @@
         }
   .info-convivente {
             flex: 1;
+            min-width: 0;
         }
   .info-convivente .nome {
             font-weight: bold;
             font-size: 15px;
             color: #333;
+            word-break: break-word;
         }
   .info-convivente .quarto {
             font-size: 13px;
@@ -103,6 +112,7 @@
   .botoes-chamada {
             display: flex;
             gap: 6px;
+            flex-shrink: 0;
         }
   .btn-chamada {
             width: 36px;
@@ -186,6 +196,7 @@
                     <button type="button" class="btn-chamada {% if c['status'] == 'H' %}ativo-h{% endif %}" data-status="H" data-id="{{ c['id'] }}">H</button>
                     <input type="hidden" name="status_{{ c['id'] }}" id="status_{{ c['id'] }}" value="{{ c['status'] or '' }}">
                 </div>
+            </div>
             {% endfor %}
             <button type="submit" class="btn-salvar">💾 Salvar Chamada</button>
         </form>
@@ -199,14 +210,12 @@
                 const input = document.getElementById('status_' + id);
                 const container = this.parentElement;
                 
-                // Se já tá ativo, desmarca tudo
                 if (this.classList.contains('ativo-' + status.toLowerCase())) {
                     container.querySelectorAll('.btn-chamada').forEach(b => {
                         b.classList.remove('ativo-p', 'ativo-f', 'ativo-a', 'ativo-h');
                     });
                     input.value = '';
                 } else {
-                    // Desmarca todos e marca só o clicado
                     container.querySelectorAll('.btn-chamada').forEach(b => {
                         b.classList.remove('ativo-p', 'ativo-f', 'ativo-a', 'ativo-h');
                     });
