@@ -6,8 +6,9 @@
     <title>Carômetro - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-        .navbar {
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+
+    .navbar {
             background: #2e7d32;
             color: white;
             padding: 15px 30px;
@@ -15,7 +16,7 @@
             align-items: center;
             gap: 15px;
         }
-        .logo-img {
+    .logo-img {
             width: 45px;
             height: 45px;
             background: white;
@@ -26,113 +27,130 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
-        .navbar-info h2 { font-size: 22px; margin: 0; }
-        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
-        .header-nav {
+   .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+   .navbar-info h2 { font-size: 22px; margin: 0; }
+   .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
+   .header-nav {
             background: white;
             padding: 15px 20px;
-            margin-bottom: 20px;
+            margin: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
-        .container { max-width: 1400px; margin: 0 auto; }
-        h1 { text-align: center; margin-bottom: 20px; color: #333; }
-        .controles { text-align: center; margin-bottom: 30px; }
-        .controles a {
-            padding: 10px 20px;
-            margin: 0 10px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+   .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
+
+   .controles {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
-        .controles a.ativo { background: #28a745; }
-        .quarto-bloco {
+   .btn-controle {
+            padding: 8px 15px;
+            border: 2px solid #2e7d32;
             background: white;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            overflow: hidden;
-            page-break-inside: avoid;
+            color: #2e7d32;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
         }
-        .quarto-titulo {
+   .btn-controle.ativo {
             background: #2e7d32;
             color: white;
-            padding: 12px 20px;
-            font-size: 18px;
-            font-weight: bold;
         }
-        .fotos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-            padding: 20px;
-        }
-        .foto-card {
-            text-align: center;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 8px;
-            background: #fafafa;
-            page-break-inside: avoid;
-        }
-        .foto-card img {
-            width: 100%;
-            height: 140px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-bottom: 6px;
-        }
-        .foto-card .sem-foto {
-            width: 100%;
-            height: 140px;
-            background: #e0e0e0;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 45px;
-            color: #999;
-            margin-bottom: 6px;
-        }
-        .foto-card .nome { font-weight: bold; font-size: 13px; margin-bottom: 3px; line-height: 1.2; }
-        .foto-card .info { font-size: 11px; color: #666; }
-        .btn-imprimir {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 25px;
+   .btn-imprimir {
+            padding: 8px 15px;
             background: #007bff;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 5px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-weight: bold;
         }
+
+   .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 15px; }
+        h1 { text-align: center; margin-bottom: 20px; color: #333; }
+
+   .grid-conviventes {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+   .quarto-bloco { margin-bottom: 25px; page-break-inside: avoid; }
+   .quarto-titulo {
+            background: #2e7d32;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+   .card-convivente {
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+   .card-convivente img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+   .card-convivente.nome {
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.2;
+            height: 28px;
+            overflow: hidden;
+        }
+   .card-convivente.leito {
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* HORIZONTAL - 7 colunas */
+        body.horizontal.grid-conviventes {
+            grid-template-columns: repeat(7, 1fr);
+        }
+        body.horizontal.card-convivente img {
+            height: 95px;
+        }
+
         @media print {
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .navbar, .header-nav, .controles, .btn-imprimir { display: none; }
-            body { background: white; padding: 0; }
-            .foto-card:nth-child(15n) { page-break-after: always; }
-            .quarto-bloco { box-shadow: none; border: 1px solid #ccc; margin-bottom: 15px; }
-            .fotos-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 15px; }
-            .foto-card img, .foto-card .sem-foto { height: 120px; }
-            .foto-card .nome { font-size: 11px; }
-            .foto-card .info { font-size: 10px; }
-            @page { size: auto; margin: 1cm; }
+        .navbar,.header-nav { display: none!important; }
+            body { background: white; }
+        .container { padding: 0; max-width: 100%; }
+        .grid-conviventes { gap: 8px; }
+        .card-convivente { border: 1px solid #ddd; }
+
+            @page {
+                size: A4 {{ 'landscape' if orientacao == 'horizontal' else 'portrait' }};
+                margin: 1cm;
+            }
         }
-        @media (max-width: 600px) {
-            .navbar { padding: 12px 15px; }
-            .navbar-info h2 { font-size: 18px; }
-            .navbar-info p { font-size: 10px; }
+
+        @media (max-width: 768px) {
+        .grid-conviventes { grid-template-columns: repeat(3, 1fr); }
+        .controles { width: 100%; justify-content: center; }
         }
     </style>
 </head>
-<body>
+<body class="{{ orientacao }}">
     <div class="navbar">
         <div class="logo-img">
             <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
@@ -143,46 +161,48 @@
         </div>
     </div>
 
-    <div class="container">
-        <div class="header-nav">
-            <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
-        </div>
-
-        <h1>📸 Carômetro - Lar Ditoso</h1>
-
+    <div class="header-nav">
+        <a href="{{ url_for('mapa_leitos') }}">← Voltar ao Mapa de Leitos</a>
         <div class="controles">
-            <a href="{{ url_for('carometro', ordem='quarto') }}" class="{% if ordem == 'quarto' %}ativo{% endif %}">Por Quarto/Leito</a>
-            <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="{% if ordem == 'alfabetica' %}ativo{% endif %}">Ordem Alfabética</a>
+            <a href="{{ url_for('carometro', ordem='alfabetica', orientacao=orientacao) }}" class="btn-controle {% if ordem == 'alfabetica' %}ativo{% endif %}">A-Z</a>
+            <a href="{{ url_for('carometro', ordem='quarto', orientacao=orientacao) }}" class="btn-controle {% if ordem == 'quarto' %}ativo{% endif %}">Quarto/Leito</a>
+            <a href="{{ url_for('carometro', ordem=ordem, orientacao='vertical') }}" class="btn-controle {% if orientacao == 'vertical' %}ativo{% endif %}">Vertical</a>
+            <a href="{{ url_for('carometro', ordem=ordem, orientacao='horizontal') }}" class="btn-controle {% if orientacao == 'horizontal' %}ativo{% endif %}">Horizontal</a>
+            <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
         </div>
+    </div>
+
+    <div class="container">
+        <h1>Carômetro - Conviventes</h1>
 
         {% if ordem == 'alfabetica' %}
-            <div class="fotos-grid">
-                {% for c in conviventes %}
-                <div class="foto-card">
-                    {% if c.foto_base64 %}
-                        <img src="{{ c.foto_base64 }}" alt="{{ c.nome }}">
-                    {% else %}
-                        <div class="sem-foto">👤</div>
-                    {% endif %}
-                    <div class="nome">{{ c.nome }}</div>
-                    <div class="info">Q{{ c.quarto_numero or '-' }} / L{{ c.numero_leito or '-' }}</div>
-                </div>
-                {% endfor %}
+        <div class="grid-conviventes">
+            {% for c in conviventes %}
+            <div class="card-convivente">
+                {% if c['foto_base64'] %}
+                <img src="{{ c['foto_base64'] }}" alt="{{ c['nome'] }}">
+                {% else %}
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3C/svg%3E" alt="Sem foto">
+                {% endif %}
+                <div class="nome">{{ c['nome'] }}</div>
+                <div class="leito">Q{{ c['quarto_numero'] }} - L{{ c['numero_leito'] }}</div>
             </div>
+            {% endfor %}
+        </div>
         {% else %}
-            {% for quarto_num, conviventes_quarto in quartos_agrupados.items() %}
+            {% for num_quarto, conviventes_quarto in quartos_agrupados.items() %}
             <div class="quarto-bloco">
-                <div class="quarto-titulo">QUARTO {{ quarto_num }}</div>
-                <div class="fotos-grid">
+                <div class="quarto-titulo">QUARTO {{ num_quarto }}</div>
+                <div class="grid-conviventes">
                     {% for c in conviventes_quarto %}
-                    <div class="foto-card">
-                        {% if c.foto_base64 %}
-                            <img src="{{ c.foto_base64 }}" alt="{{ c.nome }}">
+                    <div class="card-convivente">
+                        {% if c['foto_base64'] %}
+                        <img src="{{ c['foto_base64'] }}" alt="{{ c['nome'] }}">
                         {% else %}
-                            <div class="sem-foto">👤</div>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3C/svg%3E" alt="Sem foto">
                         {% endif %}
-                        <div class="nome">{{ c.nome }}</div>
-                        <div class="info">Leito {{ c.numero_leito or '-' }}</div>
+                        <div class="nome">{{ c['nome'] }}</div>
+                        <div class="leito">Leito {{ c['numero_leito'] }}</div>
                     </div>
                     {% endfor %}
                 </div>
@@ -190,7 +210,5 @@
             {% endfor %}
         {% endif %}
     </div>
-
-    <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
 </body>
 </html>
