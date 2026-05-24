@@ -42,14 +42,14 @@
             border-radius: 8px;
         }
         
-        /* GRID VERTICAL - 3 colunas */
+        /* GRID VERTICAL - 3 colunas na tela */
         .grid-vertical {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
         
-        /* GRID HORIZONTAL - 4 colunas */
+        /* GRID HORIZONTAL - 4 colunas na tela */
         .grid-horizontal {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -63,16 +63,18 @@
             text-align: center;
             page-break-inside: avoid;
         }
+        /* MUDEI AQUI: Foto menor na tela + rosto inteiro */
         .card img {
             width: 100%;
-            height: 120px;
-            object-fit: cover;
+            height: 100px; /* Era 120px, diminui pra não cortar */
+            object-fit: contain; /* Era 'cover', agora mostra o rosto todo */
+            background: #f8f9fa; /* Fundo pra foto que não preenche tudo */
             border-radius: 5px;
             margin-bottom: 8px;
         }
         .card .sem-foto {
             width: 100%;
-            height: 120px;
+            height: 100px;
             background: #e9ecef;
             border-radius: 5px;
             margin-bottom: 8px;
@@ -94,30 +96,49 @@
             border-bottom: 2px solid #007bff;
         }
 
-        /* IMPRESSÃO - FORÇA 3 PÁGINAS */
+        /* CELULAR: 2 colunas pra não ficar gigante */
+        @media (max-width: 768px) {
+            .grid-vertical, .grid-horizontal {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* IMPRESSÃO - 3 PÁGINAS COM ROSTO INTEIRO */
         @media print {
+            @page { margin: 1cm; } /* Margem pra não cortar na impressora */
             body { background: white; padding: 0; }
             .header { display: none; }
             .container { padding: 0; }
             
-            /* Vertical: 3 col x 7 linhas = 21 por página. 63 total = 3 páginas */
+            /* Vertical: 3 col x 7 linhas = 21 por página = 63 em 3 folhas */
             .grid-vertical {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-            }
-            .grid-vertical .card { height: 140px; }
-            
-            /* Horizontal: 4 col x 5 linhas = 20 por página. 60 total = 3 páginas */
-            .grid-horizontal {
-                grid-template-columns: repeat(4, 1fr);
                 gap: 8px;
             }
-            .grid-horizontal .card { height: 130px; }
+            .grid-vertical .card { 
+                height: 125px; /* Ajustado pra caber 7 linhas */
+                padding: 5px;
+            }
             
-            .card img, .card .sem-foto { height: 90px; }
-            .card h3 { font-size: 11px; }
-            .card p { font-size: 10px; }
-            .titulo-quarto { font-size: 14px; margin: 10px 0 5px 0; }
+            /* Horizontal: 4 col x 5 linhas = 20 por página = 60 em 3 folhas */
+            .grid-horizontal {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+            .grid-horizontal .card { 
+                height: 135px; /* Ajustado pra caber 5 linhas */
+                padding: 5px;
+            }
+            
+            /* MUDEI AQUI: Foto na impressão também com rosto inteiro */
+            .card img, .card .sem-foto { 
+                height: 85px; 
+                object-fit: contain; /* Rosto não corta */
+                background: white;
+            }
+            .card h3 { font-size: 10px; margin-bottom: 2px; }
+            .card p { font-size: 9px; }
+            .titulo-quarto { font-size: 13px; margin: 8px 0 4px 0; }
         }
     </style>
 </head>
