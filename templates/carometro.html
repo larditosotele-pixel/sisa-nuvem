@@ -78,29 +78,29 @@
   .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 15px; }
         h1 { text-align: center; margin-bottom: 12px; color: #333; font-size: 18px; }
 
-  /* VERTICAL: 7 COLUNAS - CORRIGIDO PRA 3 PÁGINAS */
+  /* VERTICAL: 7 COLUNAS - AJUSTADO PRA PREENCHER A PÁGINA */
   .grid-conviventes {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 7px;
+            gap: 6px;
         }
 
-  .quarto-bloco { margin-bottom: 12px; page-break-inside: avoid; }
+  .quarto-bloco { margin-bottom: 10px; page-break-inside: avoid; }
   .quarto-titulo {
             background: #2e7d32;
             color: white;
-            padding: 4px;
+            padding: 3px;
             text-align: center;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
         }
 
   .card-convivente {
             background: white;
             border-radius: 4px;
-            padding: 3px;
+            padding: 2px;
             text-align: center;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             page-break-inside: avoid;
@@ -110,22 +110,22 @@
             aspect-ratio: 1/1;
             object-fit: cover;
             border-radius: 3px;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
   .card-convivente .nome {
-            font-size: 8px;
+            font-size: 7px;
             font-weight: bold;
             color: #333;
             line-height: 1;
-            height: 16px;
+            height: 14px;
             overflow: hidden;
         }
   .card-convivente .leito {
-            font-size: 7px;
+            font-size: 6px;
             color: #666;
         }
 
-        /* HORIZONTAL: 9 COLUNAS - NÃO MEXI, TÁ PERFEITO */
+        /* HORIZONTAL: 9 COLUNAS - NÃO MEXI */
         body.horizontal .grid-conviventes {
             grid-template-columns: repeat(9, 1fr);
             gap: 6px;
@@ -135,20 +135,19 @@
        .navbar,.header-nav { display: none!important; }
             body { background: white; }
        .container { padding: 0; max-width: 100%; }
-            h1 { font-size: 14px; margin-bottom: 6px; margin-top: 0; }
-       .grid-conviventes { gap: 4px; }
-       .card-convivente { border: 1px solid #999; padding: 2px; }
-       .quarto-titulo { font-size: 10px; padding: 2px; margin-bottom: 3px; }
-       .card-convivente .nome { font-size: 7px; height: 14px; }
-       .card-convivente .leito { font-size: 6px; }
+            h1 { font-size: 13px; margin-bottom: 4px; margin-top: 0; }
+       .grid-conviventes { gap: 3px; }
+       .card-convivente { border: 1px solid #999; padding: 1px; }
+       .quarto-titulo { font-size: 9px; padding: 2px; margin-bottom: 2px; }
+       .card-convivente .nome { font-size: 6px; height: 12px; }
+       .card-convivente .leito { font-size: 5px; }
 
             @page {
                 size: A4 {{ 'landscape' if orientacao == 'horizontal' else 'portrait' }};
-                margin: 0.5cm;
+                margin: 0.4cm;
             }
         }
 
-        /* MOBILE: SÓ PRA TELA, NÃO AFETA IMPRESSÃO */
         @media screen and (max-width: 768px) {
        .grid-conviventes { grid-template-columns: repeat(3, 1fr); }
        .controles { width: 100%; justify-content: center; }
