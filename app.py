@@ -333,55 +333,48 @@ def relatorio_branco():
 @app.route('/carometro')
 def carometro():
     try:
-        ordem = request.args.get('ordem', default='quarto')
-        orientacao = request.args.get('orientacao', default='vertical')
-        conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        ordem = request.args.get('ordem', 'quarto')
+        orientacao = request.args.get('orientacao', 'vertical')
 
-        if ordem == 'alfabetica':
-            cur.execute('''
-                SELECT c.nome, c.foto_base64, q.numero as quarto_numero, l.numero_leito
-                FROM conviventes c
-                LEFT JOIN leitos l ON c.leito_id = l.id
-                LEFT JOIN quartos q ON l.quarto_id = q.id
-                WHERE c.ativo = TRUE
-                ORDER BY c.nome ASC
-            ''')
-            conviventes = cur.fetchall()
-            quartos_agrupados = None
-        else:
-            cur.execute('''
-                SELECT c.nome, c.foto_base64, q.numero as quarto_numero, l.numero_leito
-                FROM conviventes c
-                LEFT JOIN leitos l ON c.leito_id = l.id
-                LEFT JOIN quartos q ON l.quarto_id = q.id
-                WHERE c.ativo = TRUE
-                ORDER BY q.numero,
-                         CASE WHEN l.numero_leito ~ '^[0-9]+$'
-                              THEN CAST(l.numero_leito AS INTEGER)
-                              ELSE 999 END
-            ''')
-            todos = cur.fetchall()
-            quartos_agrupados = {}
-            for c in todos:
-                q_num = c['quarto_numero'] or 'Sem Quarto'
-                if q_num not in quartos_agrupados:
-                    quartos_agrupados[q_num] = []
-                quartos_agrupados[q_num].append(c)
-            conviventes = None
+        conviventes = Convivente.query.order_by(Convivente.nome).all()
 
-        cur.close()
-        conn.close()
+        # Processa fotos com proteção contra erro
+        conviventes_processados = []
+        for c in conviventes:
+            try:
+                foto_b64 = None
+                if c.foto:
+                    foto_b64 = f"data:image/jpeg;base64,{base64.b64encode(c.foto).decode('utf-8')}"
+            except:
+                foto_b64 = None # Se der erro na foto, só deixa sem foto
+
+            conviventes_processados.append({
+                'nome': c.nome,
+                'quarto_numero': c.quarto_numero,
+                'numero_leito': c.numero_leito,
+                'foto_base64': foto_b64
+            })
+
+        quartos_agrupados = {}
+        if ordem == 'quarto':
+            for conv in conviventes_processados:
+                quarto = conv['quarto_numero']
+                if quarto not in quartos_agrupados:
+                    quartos_agrupados[quarto] = []
+                quartos_agrupados[quarto].append(conv)
+            quartos_agrupados = dict(sorted(quartos_agrupados.items()))
+
         return render_template('carometro.html',
-                             conviventes=conviventes,
+                             conviventes=conviventes_processados,
                              quartos_agrupados=quartos_agrupados,
                              ordem=ordem,
-                             orientacao=orientacao)
+                             orientacao=orientacao,
+                             erro=None)
     except Exception as e:
-        print(f"Erro no carometro: {e}")
+        # Se der erro 500, mostra na tela em vez de quebrar
         return render_template('carometro.html',
                              conviventes=[],
-                             quartos_agrupados=None,
+                             quartos_agrupados={},
                              ordem='quarto',
                              orientacao='vertical',
                              erro=str(e))
