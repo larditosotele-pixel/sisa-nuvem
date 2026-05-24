@@ -31,7 +31,7 @@ def mapa_leitos():
             SELECT
                 l.id as leito_id, l.numero_leito,
                 c.id as convivente_id, c.nome as convivente_nome,
-                c.data_nascimento, c.foto_base64
+                c.foto_base64
             FROM leitos l
             LEFT JOIN conviventes c ON l.id = c.leito_id AND c.ativo = TRUE
             WHERE l.quarto_id = %s
@@ -49,7 +49,6 @@ def mapa_leitos():
                 'ocupado': leito['convivente_id'] is not None,
                 'convivente_id': leito['convivente_id'],
                 'convivente_nome': leito['convivente_nome'],
-                'data_nascimento': leito['data_nascimento'],
                 'foto_base64': leito['foto_base64']
             })
         quartos.append({'id': quarto['id'], 'numero': quarto['numero'], 'leitos': leitos_data})
@@ -158,7 +157,6 @@ def cadastrar_convivente():
 
     if request.method == 'POST':
         nome = request.form['nome']
-        data_nascimento = request.form.get('data_nascimento') or None
         foto = request.files['foto']
         leito_id_form = leito_id or request.form.get('leito_id')
 
@@ -174,8 +172,8 @@ def cadastrar_convivente():
 
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('INSERT INTO conviventes (nome, data_nascimento, foto_base64, leito_id) VALUES (%s, %s, %s, %s)',
-                    (nome, data_nascimento, foto_base64, leito_id_form))
+        cur.execute('INSERT INTO conviventes (nome, foto_base64, leito_id) VALUES (%s, %s, %s)',
+                    (nome, foto_base64, leito_id_form))
         cur.execute('UPDATE leitos SET ocupado = TRUE WHERE id = %s', (leito_id_form,))
         conn.commit()
         cur.close()
@@ -208,8 +206,7 @@ def editar_convivente(id):
     cur = conn.cursor()
     if acao == 'salvar':
         nome = request.form['nome']
-        data_nascimento = request.form.get('data_nascimento') or None
-        cur.execute('UPDATE conviventes SET nome = %s, data_nascimento = %s WHERE id = %s', (nome, data_nascimento, id))
+        cur.execute('UPDATE conviventes SET nome = %s WHERE id = %s', (nome, id))
         flash('Convivente atualizado!')
     elif acao == 'desocupar':
         cur.execute('SELECT leito_id FROM conviventes WHERE id = %s', (id,))
