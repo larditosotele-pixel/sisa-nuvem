@@ -166,7 +166,7 @@
             <a href="{{ url_for('chamada', ordem='alfabetica') }}" class="btn-ordem {% if ordem == 'alfabetica' %}ativo{% endif %}">A-Z</a>
         </div>
 
-        <form method="POST" action="{{ url_for('salvar_chamada') }}">
+        <form method="POST" action="{{ url_for('chamada') }}">
             {% for c in conviventes %}
             <div class="card-convivente">
                 {% if c['foto_base64'] %}
