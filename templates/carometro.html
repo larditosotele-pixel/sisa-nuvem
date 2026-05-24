@@ -44,120 +44,100 @@
             gap: 10px;
         }
   .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
-
-  .controles {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-  .btn-controle {
-            padding: 8px 15px;
-            border: 2px solid #2e7d32;
-            background: white;
-            color: #2e7d32;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 14px;
-        }
-  .btn-controle.ativo {
+  .btn-imprimir {
             background: #2e7d32;
             color: white;
-        }
-  .btn-imprimir {
-            padding: 8px 15px;
-            background: #007bff;
-            color: white;
+            padding: 8px 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
         }
 
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 15px; }
-        h1 { text-align: center; margin-bottom: 12px; color: #333; font-size: 18px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 30px; }
+        h1 { text-align: center; margin-bottom: 15px; color: #333; font-size: 24px; }
 
-  /* VERTICAL: 7 COLUNAS - JÁ TÁ OK */
-  .grid-conviventes {
+  .grid-carometro {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-        }
-
-  .quarto-bloco { margin-bottom: 8px; }
-  .quarto-titulo {
-            background: #2e7d32;
-            color: white;
-            padding: 3px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 3px;
-            border-radius: 4px;
-            font-size: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
         }
 
   .card-convivente {
             background: white;
-            border-radius: 4px;
-            padding: 2px;
+            border-radius: 8px;
+            padding: 10px;
             text-align: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            page-break-inside: avoid;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            break-inside: avoid;
         }
   .card-convivente img {
             width: 100%;
-            aspect-ratio: 1/1;
+            height: 150px;
+            border-radius: 6px;
             object-fit: cover;
-            border-radius: 3px;
-            margin-bottom: 1px;
+            margin-bottom: 8px;
         }
   .card-convivente .nome {
-            font-size: 7px;
             font-weight: bold;
+            font-size: 13px;
             color: #333;
-            line-height: 1;
-            height: 14px;
-            overflow: hidden;
-        }
-  .card-convivente .leito {
-            font-size: 6px;
-            color: #666;
+            line-height: 1.2;
+            word-break: break-word;
         }
 
-        /* HORIZONTAL: 10 COLUNAS - CORRIGIDO PRA 3 PÁGINAS */
-        body.horizontal .grid-conviventes {
-            grid-template-columns: repeat(10, 1fr);
-            gap: 5px;
-        }
-
+        /* CORREÇÃO PRA IMPRESSÃO A4 */
         @media print {
-       .navbar,.header-nav { display: none!important; }
-            body { background: white; }
-       .container { padding: 0; max-width: 100%; }
-            h1 { font-size: 12px; margin-bottom: 3px; margin-top: 0; }
-       .grid-conviventes { gap: 2px; }
-       .card-convivente { border: 1px solid #999; padding: 1px; }
-       .quarto-titulo { font-size: 8px; padding: 1px; margin-bottom: 2px; }
-       .card-convivente .nome { font-size: 6px; height: 11px; }
-       .card-convivente .leito { font-size: 5px; }
-
-            /* IMPORTANTE: LIBERA QUEBRA DENTRO DO BLOCO DE QUARTO */
-       .quarto-bloco { margin-bottom: 4px; page-break-inside: auto!important; }
-
             @page {
-                size: A4 {{ 'landscape' if orientacao == 'horizontal' else 'portrait' }};
-                margin: 0.3cm;
+                size: A4 portrait;
+                margin: 1cm;
             }
-        }
-
-        @media screen and (max-width: 768px) {
-       .grid-conviventes { grid-template-columns: repeat(3, 1fr); }
-       .controles { width: 100%; justify-content: center; }
+            
+       .navbar,.header-nav,.btn-imprimir { 
+                display: none !important; 
+            }
+            
+            body { 
+                background: white; 
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+       .container { 
+                max-width: 100%; 
+                padding: 0; 
+            }
+            
+            h1 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            
+       .grid-carometro {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 8px;
+            }
+            
+       .card-convivente {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                padding: 5px;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+       .card-convivente img {
+                height: 120px;
+                margin-bottom: 4px;
+            }
+            
+       .card-convivente .nome {
+                font-size: 10px;
+            }
         }
     </style>
 </head>
-<body class="{{ orientacao }}">
+<body>
     <div class="navbar">
         <div class="logo-img">
             <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
@@ -169,53 +149,25 @@
     </div>
 
     <div class="header-nav">
-        <a href="{{ url_for('mapa_leitos') }}">← Voltar ao Mapa de Leitos</a>
-        <div class="controles">
-            <a href="{{ url_for('carometro', ordem='alfabetica', orientacao=orientacao) }}" class="btn-controle {% if ordem == 'alfabetica' %}ativo{% endif %}">A-Z</a>
-            <a href="{{ url_for('carometro', ordem='quarto', orientacao=orientacao) }}" class="btn-controle {% if ordem == 'quarto' %}ativo{% endif %}">Quarto/Leito</a>
-            <a href="{{ url_for('carometro', ordem=ordem, orientacao='vertical') }}" class="btn-controle {% if orientacao == 'vertical' %}ativo{% endif %}">Vertical</a>
-            <a href="{{ url_for('carometro', ordem=ordem, orientacao='horizontal') }}" class="btn-controle {% if orientacao == 'horizontal' %}ativo{% endif %}">Horizontal</a>
-            <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
-        </div>
+        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+        <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
     </div>
 
     <div class="container">
         <h1>Carômetro - Conviventes</h1>
-
-        {% if ordem == 'alfabetica' %}
-        <div class="grid-conviventes">
+        
+        <div class="grid-carometro">
             {% for c in conviventes %}
             <div class="card-convivente">
                 {% if c['foto_base64'] %}
                 <img src="{{ c['foto_base64'] }}" alt="{{ c['nome'] }}">
                 {% else %}
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3C/svg%3E" alt="Sem foto">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ESem foto%3C/text%3E%3C/svg%3E" alt="Sem foto">
                 {% endif %}
                 <div class="nome">{{ c['nome'] }}</div>
-                <div class="leito">Q{{ c['quarto_numero'] }} - L{{ c['numero_leito'] }}</div>
             </div>
             {% endfor %}
         </div>
-        {% else %}
-            {% for num_quarto, conviventes_quarto in quartos_agrupados.items() %}
-            <div class="quarto-bloco">
-                <div class="quarto-titulo">QUARTO {{ num_quarto }}</div>
-                <div class="grid-conviventes">
-                    {% for c in conviventes_quarto %}
-                    <div class="card-convivente">
-                        {% if c['foto_base64'] %}
-                        <img src="{{ c['foto_base64'] }}" alt="{{ c['nome'] }}">
-                        {% else %}
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3C/svg%3E" alt="Sem foto">
-                        {% endif %}
-                        <div class="nome">{{ c['nome'] }}</div>
-                        <div class="leito">Leito {{ c['numero_leito'] }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endfor %}
-        {% endif %}
     </div>
 </body>
 </html>
