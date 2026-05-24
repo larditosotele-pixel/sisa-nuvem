@@ -42,15 +42,15 @@
             border-radius: 6px;
         }
         
-        /* TELA: Cards estreitos, sem buraco */
+        /* TELA: 6 colunas fixas no PC */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(6, 1fr);
             gap: 5px;
         }
         
         .card {
-            border: 1px solid #aaa;
+            border: 1px solid #999;
             border-radius: 4px;
             padding: 3px;
             text-align: center;
@@ -90,45 +90,46 @@
             margin: 8px 0 3px 0;
             padding-bottom: 2px;
             border-bottom: 1px solid #007bff;
-            page-break-after: avoid; /* MUDEI: Não quebra depois do título */
+            page-break-after: avoid;
         }
 
-        /* IMPRESSÃO - 3 FOLHAS CRAVADO PRA TODOS OS 4 MODOS */
+        /* Celular: 3 colunas */
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+            .card img, .card .sem-foto { height: 70px; }
+        }
+
+        /* IMPRESSÃO - 3 FOLHAS NOS 4 MODOS */
         @media print {
             {% if orientacao == 'horizontal' %}
             @page { 
                 size: A4 landscape;
-                margin: 0.7cm; /* Margem segura */
+                margin: 0.7cm;
             }
+            /* HORIZONTAL: 5 colunas x 5 linhas = 25 por folha = 75 em 3 folhas */
+            .grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 4px;
+            }
+            .card { height: 120px; }
             {% else %}
             @page { 
                 size: A4 portrait;
-                margin: 0.8cm; /* Margem segura */
+                margin: 0.8cm;
             }
+            /* VERTICAL: 4 colunas x 6 linhas = 24 por folha = 72 em 3 folhas */
+            .grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 4px;
+            }
+            .card { height: 130px; }
             {% endif %}
             
             body { background: white; padding: 0; }
             .header { display: none; }
             .container { padding: 0; }
             
-            /* VERTICAL: 4 col x 6 linhas = 24 por folha = 72 em 3 folhas */
-            .grid-vertical {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 4px;
-                grid-auto-rows: 130px; /* MUDEI: Altura fixa pra não dar buraco */
-            }
-            
-            /* HORIZONTAL: 5 col x 5 linhas = 25 por folha = 75 em 3 folhas */
-            .grid-horizontal {
-                display: grid;
-                grid-template-columns: repeat(5, 1fr);
-                gap: 4px;
-                grid-auto-rows: 120px; /* MUDEI: Altura fixa pra não dar buraco */
-            }
-            
             .card { 
-                height: 100%;
                 padding: 2px;
                 border: 0.5px solid #777;
                 display: flex;
@@ -141,18 +142,12 @@
                 background: white;
                 flex-shrink: 0;
             }
-            .card h3 { 
-                font-size: 8.5px; 
-                margin-top: 2px;
-            }
-            .card p { 
-                font-size: 8px;
-            }
+            .card h3 { font-size: 8.5px; margin-top: 2px; }
+            .card p { font-size: 8px; }
             .titulo-quarto { 
                 font-size: 9px; 
                 margin: 4px 0 2px 0;
                 page-break-after: avoid;
-                page-break-inside: avoid;
             }
         }
     </style>
@@ -179,7 +174,7 @@
             <p style="color: red; text-align: center;">Erro: {{ erro }}</p>
         {% endif %}
 
-        <div class="{% if orientacao == 'horizontal' %}grid-horizontal{% else %}grid-vertical{% endif %}">
+        <div class="grid">
             {% if ordem == 'alfabetica' %}
                 {% for conv in conviventes %}
                     <div class="card">
