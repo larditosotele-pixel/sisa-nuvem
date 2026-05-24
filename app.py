@@ -336,22 +336,45 @@ def carometro():
         ordem = request.args.get('ordem', 'quarto')
         orientacao = request.args.get('orientacao', 'vertical')
 
-        conviventes = Convivente.query.order_by(Convivente.nome).all()
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        # Processa fotos com proteção contra erro
+        # MUDEI: Query SQL direto igual suas outras rotas
+        if ordem == 'alfabetica':
+            order_by = 'c.nome ASC'
+        else:
+            order_by = '''q.numero,
+                         CASE WHEN l.numero_leito ~ '^[0-9]+$'
+                              THEN CAST(l.numero_leito AS INTEGER)
+                              ELSE 999 END'''
+
+        cur.execute(f'''
+            SELECT
+                c.id, c.nome, c.foto_base64,
+                q.numero as quarto_numero, l.numero_leito
+            FROM conviventes c
+            LEFT JOIN leitos l ON c.leito_id = l.id
+            LEFT JOIN quartos q ON l.quarto_id = q.id
+            WHERE c.ativo = TRUE
+            ORDER BY {order_by}
+        ''')
+
+        conviventes_db = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        # Processa as fotos - já vem em base64 do banco
         conviventes_processados = []
-        for c in conviventes:
-            try:
-                foto_b64 = None
-                if c.foto:
-                    foto_b64 = f"data:image/jpeg;base64,{base64.b64encode(c.foto).decode('utf-8')}"
-            except:
-                foto_b64 = None # Se der erro na foto, só deixa sem foto
+        for c in conviventes_db:
+            foto_b64 = c['foto_base64']
+            # Se não começar com data:, adiciona o prefixo
+            if foto_b64 and not foto_b64.startswith('data:'):
+                foto_b64 = f"data:image/jpeg;base64,{foto_b64}"
 
             conviventes_processados.append({
-                'nome': c.nome,
-                'quarto_numero': c.quarto_numero,
-                'numero_leito': c.numero_leito,
+                'nome': c['nome'],
+                'quarto_numero': c['quarto_numero'],
+                'numero_leito': c['numero_leito'],
                 'foto_base64': foto_b64
             })
 
@@ -371,7 +394,6 @@ def carometro():
                              orientacao=orientacao,
                              erro=None)
     except Exception as e:
-        # Se der erro 500, mostra na tela em vez de quebrar
         return render_template('carometro.html',
                              conviventes=[],
                              quartos_agrupados={},
