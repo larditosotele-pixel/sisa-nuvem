@@ -6,10 +6,9 @@
     <title>Mapa de Leitos - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #fff9f0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
 
-        /* BARRA VERDE - ÚNICA COISA NOVA */
-        .navbar {
+ .navbar {
             background: #2e7d32;
             color: white;
             padding: 15px 30px;
@@ -17,7 +16,7 @@
             align-items: center;
             gap: 15px;
         }
-        .logo-img {
+ .logo-img {
             width: 45px;
             height: 45px;
             background: white;
@@ -25,118 +24,60 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
             overflow: hidden;
         }
-        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
-        .navbar-info h2 { font-size: 22px; margin: 0; }
-        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+.logo-img img { width: 35px; height: 35px; object-fit: contain; }
+.navbar-info h2 { font-size: 22px; margin: 0; }
+.navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
 
-        /* SEU CSS ORIGINAL - COM EFEITO HOVER E BORDA LARANJA */
-        .header-nav {
+.header-nav {
             background: white;
             padding: 15px 20px;
-            margin-bottom: 15px;
+            margin: 15px;
+            border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .header-nav a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
-        
-        .titulo-pagina {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .titulo-pagina h1 {
-            font-size: 24px;
-            color: #333;
-            display: flex;
             align-items: center;
-            gap: 10px;
         }
-        .btn-criar-quarto {
-            padding: 10px 20px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-criar-quarto:hover { background: #218838; }
+.header-nav a { color: #007bff; text-decoration: none; font-weight: bold; }
 
-        .quarto-bloco {
+.container { max-width: 1200px; margin: 0 auto; padding: 0 15px 30px; }
+
+.quarto-bloco {
             background: white;
             border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .quarto-header {
-            padding: 12px 20px;
-            border-bottom: 2px solid #2e7d32;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .quarto-header h2 {
-            font-size: 18px;
-            color: #2e7d32;
-            margin: 0;
-            font-weight: bold;
-        }
-        .btn-add-leito {
-            padding: 6px 15px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-add-leito:hover { background: #0056b3; }
-
-        .leitos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
             padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
-        /* CARD COM BORDA LARANJA + HOVER PRA FRENTE */
-        .leito-card {
-            border: 2px solid #e67e22;
+.quarto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2e7d32;
+        }
+.quarto-header h3 { color: #2e7d32; font-size: 20px; }
+.btn-add { background: #2e7d32; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+.grid-leitos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+.card-leito {
+            border: 2px solid #ddd;
             border-radius: 8px;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
-            background: white;
-            cursor: pointer;
             position: relative;
-            transition: all 0.3s ease;
         }
-        .leito-card:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(230, 126, 34, 0.4);
-            z-index: 10;
-        }
-        .leito-card.vazio {
-            border-color: #ddd;
-            cursor: default;
-        }
-        .leito-card.vazio:hover {
-            transform: none;
-            box-shadow: none;
-        }
-        
-        /* TAG L1 AZUL NO CANTO */
-        .leito-numero {
+.card-leito.ocupado { border-color: #e67e22; background: #fff8f0; }
+.card-leito.vago { border-color: #95a5a6; background: #f8f9fa; cursor: pointer; }
+.card-leito.vago:hover { background: #e8f5e9; }
+.num-leito {
             position: absolute;
             top: 5px;
             left: 5px;
@@ -144,38 +85,21 @@
             color: white;
             padding: 2px 8px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
-            z-index: 2;
         }
-        .foto-convivente {
+.card-leito img {
             width: 100%;
             height: 140px;
+            border-radius: 6px;
             object-fit: cover;
-            border-radius: 5px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
-        .foto-placeholder {
-            width: 100%;
-            height: 140px;
-            background: #f0f0f0;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: #ccc;
-            margin-bottom: 6px;
-        }
-        .convivente-nome {
-            font-size: 13px;
-            font-weight: bold;
-            line-height: 1.2;
-            color: #333;
-        }
+.card-leito.nome { font-weight: bold; font-size: 13px; color: #333; margin-bottom: 8px; }
+.btn-editar { background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; width: 100%; }
 
         /* MODAL */
-        .modal {
+.modal {
             display: none;
             position: fixed;
             z-index: 1000;
@@ -183,56 +107,39 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
         }
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 8px;
+.modal.ativo { display: flex; }
+.modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
             width: 90%;
-            max-width: 500px;
+            max-width: 400px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .modal-content h2 { margin-bottom: 15px; }
-        .modal-content input {
+.modal-content h2 { margin-top: 0; color: #2e7d32; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; }
+.modal-content label { display: block; margin: 15px 0 5px 0; font-weight: bold; color: #34495e; }
+.modal-content input[type="text"] {
             width: 100%;
             padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
+            border: 1px solid #bdc3c7;
             border-radius: 5px;
-            font-size: 16px;
+            box-sizing: border-box;
         }
-        .modal-botoes {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .modal-botoes button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-salvar { background: #28a745; color: white; }
-        .btn-desocupar { background: #dc3545; color: white; }
-        .btn-cancelar { background: #6c757d; color: white; }
-
-        @media (max-width: 600px) {
-            .navbar { padding: 12px 15px; }
-            .navbar-info h2 { font-size: 18px; }
-            .navbar-info p { font-size: 10px; }
-            .leitos-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
-        }
+.modal-botoes { display: flex; gap: 10px; margin-top: 20px; }
+.btn-salvar { background: #2e7d32; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; }
+.btn-desocupar { background: #c0392b; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; }
+.btn-cancelar { background: #95a5a6; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; }
+.flash { padding: 15px; margin: 15px; border-radius: 5px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     </style>
 </head>
 <body>
-    <!-- BARRA VERDE - ÚNICA COISA NOVA -->
     <div class="navbar">
         <div class="logo-img">
-            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo">
         </div>
         <div class="navbar-info">
             <h2>SISA</h2>
@@ -240,61 +147,68 @@
         </div>
     </div>
 
-    <!-- SEU HTML ORIGINAL ABAIXO -->
+    <div class="header-nav">
+        <a href="{{ url_for('index') }}">← Voltar ao Menu</a>
+        <form action="{{ url_for('adicionar_quarto_mapa') }}" method="POST" style="display:inline;">
+            <button type="submit" class="btn-add">+ Quarto</button>
+        </form>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="flash">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <div class="container">
-        <div class="header-nav">
-            <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
-        </div>
-
-        <div class="titulo-pagina">
-            <h1>📋 Mapa de Leitos - Lar Ditoso</h1>
-            <form method="POST" action="{{ url_for('adicionar_quarto_mapa') }}" style="display: inline;">
-                <button type="submit" class="btn-criar-quarto">+ Criar Quarto</button>
-            </form>
-        </div>
-
         {% for quarto in quartos %}
-        <div class="quarto-bloco">
+        <div class="quarto-bloco" id="quarto-{{ quarto.numero }}">
             <div class="quarto-header">
-                <h2>QUARTO {{ quarto.numero }}</h2>
-                <form method="POST" action="{{ url_for('adicionar_leito_mapa', quarto_id=quarto.id) }}" style="display: inline;">
-                    <button type="submit" class="btn-add-leito">+ Leito</button>
+                <h3>QUARTO {{ quarto.numero }}</h3>
+                <form action="{{ url_for('adicionar_leito_mapa', quarto_id=quarto.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn-add">+ Leito</button>
                 </form>
             </div>
-            <div class="leitos-grid">
+            <div class="grid-leitos">
                 {% for leito in quarto.leitos %}
-                <div class="leito-card {% if not leito.ocupado %}vazio{% endif %}" 
-                     {% if leito.ocupado %}onclick="abrirModalEditar({{ leito.convivente_id }}, '{{ leito.convivente_nome }}', '{{ leito.data_nascimento }}')"{% else %}onclick="window.location.href='{{ url_for('cadastrar_convivente') }}?leito_id={{ leito.leito_id }}'"{% endif %}>
-                    <div class="leito-numero">L{{ leito.numero_leito }}</div>
+                <div class="card-leito {% if leito.ocupado %}ocupado{% else %}vago{% endif %}"
+                     {% if not leito.ocupado %}onclick="window.location='{{ url_for('cadastrar_convivente', leito_id=leito.leito_id) }}'"{% endif %}>
+                    <div class="num-leito">L{{ leito.numero_leito }}</div>
                     {% if leito.ocupado %}
                         {% if leito.foto_base64 %}
-                            <img src="{{ leito.foto_base64 }}" class="foto-convivente" alt="{{ leito.convivente_nome }}">
+                        <img src="{{ leito.foto_base64 }}" alt="{{ leito.convivente_nome }}">
                         {% else %}
-                            <div class="foto-placeholder">👤</div>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='140'%3E%3Crect width='180' height='140' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3ESem foto%3C/text%3E%3C/svg%3E" alt="Sem foto">
                         {% endif %}
-                        <div class="convivente-nome">{{ leito.convivente_nome }}</div>
+                        <div class="nome">{{ leito.convivente_nome }}</div>
+                        <button class="btn-editar" onclick="abrirModalEditar({{ leito.convivente_id }}, '{{ leito.convivente_nome }}')">Editar</button>
                     {% else %}
-                        <div class="foto-placeholder">+</div>
-                        <div class="convivente-nome" style="color: #999;">Vazio</div>
+                        <div style="height: 140px; display: flex; align-items: center; justify-content: center; color: #95a5a6;">
+                            <div>
+                                <div style="font-size: 40px;">+</div>
+                                <div style="font-size: 12px;">VAGO</div>
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
-        </div>
         {% endfor %}
     </div>
 
-    <!-- MODAL EDITAR -->
-    <div id="modalEditar" class="modal">
+    <!-- MODAL DE EDIÇÃO SEM DATA -->
+    <div class="modal" id="modalEditar">
         <div class="modal-content">
             <h2>Editar Convivente</h2>
-            <form method="POST" id="formEditar">
-                <input type="hidden" name="acao" id="acao" value="salvar">
-                <input type="text" name="nome" id="editNome" placeholder="Nome" required>
-                <input type="date" name="data_nascimento" id="editData" required>
+            <form id="formEditar" method="POST">
+                <input type="hidden" name="acao" value="salvar">
+                <label>Nome:</label>
+                <input type="text" name="nome" id="editNome" required>
                 <div class="modal-botoes">
-                    <button type="submit" class="btn-salvar" onclick="document.getElementById('acao').value='salvar'">Salvar</button>
-                    <button type="submit" class="btn-desocupar" onclick="document.getElementById('acao').value='desocupar'">Desocupar Leito</button>
+                    <button type="submit" class="btn-salvar">Salvar</button>
+                    <button type="button" class="btn-desocupar" onclick="desocuparLeito()">Desocupar Leito</button>
                     <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
                 </div>
             </form>
@@ -302,20 +216,30 @@
     </div>
 
     <script>
-        function abrirModalEditar(id, nome, data) {
-            document.getElementById('formEditar').action = '/editar_convivente/' + id;
+        let conviventeIdAtual = null;
+
+        function abrirModalEditar(id, nome) {
+            conviventeIdAtual = id;
             document.getElementById('editNome').value = nome;
-            document.getElementById('editData').value = data;
-            document.getElementById('modalEditar').style.display = 'block';
+            document.getElementById('formEditar').action = '/editar_convivente/' + id;
+            document.getElementById('modalEditar').classList.add('ativo');
         }
+
         function fecharModal() {
-            document.getElementById('modalEditar').style.display = 'none';
+            document.getElementById('modalEditar').classList.remove('ativo');
         }
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('modalEditar')) {
-                fecharModal();
+
+        function desocuparLeito() {
+            if (confirm('Tem certeza que deseja desocupar este leito?')) {
+                const form = document.getElementById('formEditar');
+                form.querySelector('input[name="acao"]').value = 'desocupar';
+                form.submit();
             }
         }
+
+        document.getElementById('modalEditar').addEventListener('click', function(e) {
+            if (e.target === this) fecharModal();
+        });
     </script>
 </body>
 </html>
