@@ -37,9 +37,11 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .barra-controles a { color: #007bff; text-decoration: none; font-weight: bold; }
-        .botoes-direita { display: flex; gap: 10px; align-items: center; }
+        .botoes-direita { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .btn-controle {
             background: white;
             border: 1px solid #ccc;
@@ -87,29 +89,70 @@
             border-radius: 6px;
             margin-bottom: 8px;
         }
-        .card-convivente .nome { font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+        .card-convivente .nome { font-weight: bold; font-size: 13px; margin-bottom: 4px; word-break: break-word; }
         .card-convivente .info { font-size: 11px; color: #666; }
 
-        /* IMPRESSÃO */
+        /* MOBILE */
+        @media (max-width: 600px) {
+            .grid-carometro {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            .card-convivente {
+                padding: 6px;
+            }
+            .card-convivente img {
+                aspect-ratio: 1/1;
+            }
+            .card-convivente .nome { font-size: 10px; }
+            .card-convivente .info { font-size: 9px; }
+            .barra-controles { padding: 10px 15px; }
+            .navbar-info p { display: none; }
+        }
+
+        /* IMPRESSÃO VERTICAL */
         @media print {
-            .navbar, .barra-controles { display: none; }
+            .navbar, .barra-controles { display: none !important; }
             body { background: white; }
-            .container { margin: 0; padding: 10px; max-width: 100%; }
-            .titulo-carometro { font-size: 18px; margin-bottom: 15px; }
-            .card-convivente { box-shadow: none; border: 1px solid #ddd; }
+            .container { margin: 0; padding: 5mm; max-width: 100%; }
+            .titulo-carometro { font-size: 16px; margin-bottom: 10px; }
+            .grid-carometro {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 5mm;
+            }
+            .card-convivente { 
+                box-shadow: none; 
+                border: 1px solid #ddd; 
+                padding: 3mm;
+            }
+            .card-convivente img {
+                aspect-ratio: 3/4;
+            }
+            .card-convivente .nome { font-size: 9pt; }
+            .card-convivente .info { font-size: 8pt; }
+            @page { size: A4 portrait; margin: 10mm; }
         }
         
-        /* LAYOUT HORIZONTAL PRA IMPRESSÃO */
+        /* IMPRESSÃO HORIZONTAL - CABE MAIS GENTE */
         body.paisagem .grid-carometro {
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4mm;
+        }
+        body.paisagem .card-convivente {
+            padding: 2mm;
         }
         body.paisagem .card-convivente img {
             aspect-ratio: 1/1;
         }
+        body.paisagem .card-convivente .nome { font-size: 8pt; }
+        body.paisagem .card-convivente .info { font-size: 7pt; }
+        
         @media print {
             body.paisagem {
-                size: landscape;
+                size: A4 landscape;
+            }
+            body.paisagem .grid-carometro {
+                grid-template-columns: repeat(6, 1fr);
             }
         }
     </style>
@@ -130,7 +173,7 @@
         <div class="botoes-direita">
             <button class="btn-controle" onclick="mudarOrdem('quarto')" id="btnQuarto">Por Quarto</button>
             <button class="btn-controle ativo" onclick="mudarOrdem('alfabetica')" id="btnAZ">A-Z</button>
-            <button class="btn-controle" onclick="mudarLayout('retrato')" id="btnRetrato">Vertical</button>
+            <button class="btn-controle ativo" onclick="mudarLayout('retrato')" id="btnRetrato">Vertical</button>
             <button class="btn-controle" onclick="mudarLayout('paisagem')" id="btnPaisagem">Horizontal</button>
             <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir / PDF</button>
         </div>
@@ -172,7 +215,6 @@
             }
         }
 
-        // Marca botão ativo baseado na URL
         const urlParams = new URLSearchParams(window.location.search);
         const ordem = urlParams.get('ordem');
         if(ordem === 'quarto') {
