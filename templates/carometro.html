@@ -124,19 +124,19 @@
             }
             .titulo-carometro { 
                 font-size: 14pt; 
-                margin: 5mm 0; 
+                margin: 3mm 0; 
             }
             .grid-carometro {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 3mm;
-                padding: 0 5mm;
+                gap: 2mm;
+                padding: 0 4mm;
             }
             .card-convivente { 
                 box-shadow: none; 
                 border: 0.5pt solid #999; 
-                padding: 2mm;
-                height: 33mm;
+                padding: 1.5mm;
+                height: 31mm;
                 page-break-inside: avoid;
                 display: flex;
                 flex-direction: column;
@@ -144,11 +144,11 @@
             }
             .card-convivente img {
                 aspect-ratio: 3/4;
-                max-height: 24mm;
+                max-height: 22mm;
                 margin-bottom: 1mm;
             }
             .card-convivente .nome { 
-                font-size: 7pt; 
+                font-size: 6.5pt; 
                 line-height: 1.1;
                 margin-bottom: 0.5mm;
             }
@@ -158,11 +158,11 @@
             }
             @page { 
                 size: A4 portrait; 
-                margin: 5mm; 
+                margin: 4mm; 
             }
         }
         
-        /* IMPRESSÃO HORIZONTAL - 30 POR FOLHA = 3 FOLHAS */
+        /* IMPRESSÃO HORIZONTAL - NÃO MEXI, TÁ PERFEITO */
         body.paisagem .grid-carometro {
             grid-template-columns: repeat(6, 1fr);
             gap: 3mm;
