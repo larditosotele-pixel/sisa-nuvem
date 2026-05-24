@@ -7,8 +7,8 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; }
-
-  .navbar {
+        
+        .navbar {
             background: #2e7d32;
             color: white;
             padding: 15px 30px;
@@ -16,7 +16,7 @@
             align-items: center;
             gap: 15px;
         }
-  .logo-img {
+        .logo-img {
             width: 45px;
             height: 45px;
             background: white;
@@ -24,154 +24,92 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
             overflow: hidden;
         }
- .logo-img img { width: 35px; height: 35px; object-fit: contain; }
- .navbar-info h2 { font-size: 22px; margin: 0; }
- .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+        .navbar-info h2 { font-size: 22px; margin: 0; }
+        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
 
- .header-nav {
+        .barra-controles {
             background: white;
-            padding: 15px 20px;
-            margin: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
- .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
- .controles {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
- .btn-ordem,.btn-imprimir {
-            padding: 8px 16px;
-            border: 2px solid #2e7d32;
+        .barra-controles a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .botoes-direita { display: flex; gap: 10px; align-items: center; }
+        .btn-controle {
             background: white;
-            color: #2e7d32;
+            border: 1px solid #ccc;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            text-decoration: none;
-            font-size: 14px;
         }
- .btn-ordem.ativo {
+        .btn-controle.ativo {
             background: #2e7d32;
             color: white;
+            border-color: #2e7d32;
         }
- .btn-imprimir {
+        .btn-imprimir {
             background: #2e7d32;
             color: white;
             border: none;
-        }
-
- .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 30px; }
-        h1 { text-align: center; margin-bottom: 15px; color: #333; font-size: 24px; }
-
- .titulo-quarto {
-            font-size: 18px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
             font-weight: bold;
-            color: #2e7d32;
-            margin: 20px 0 10px 0;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #2e7d32;
-            break-after: avoid;
         }
 
- .grid-carometro {
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .titulo-carometro { text-align: center; margin-bottom: 20px; font-size: 24px; }
+        
+        .grid-carometro {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
         }
-
- .card-convivente {
+        .card-convivente {
             background: white;
             border-radius: 8px;
             padding: 10px;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            break-inside: avoid;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
         }
- .card-convivente img {
+        .card-convivente img {
             width: 100%;
-            height: 150px;
+            aspect-ratio: 3/4;
+            object-fit: contain;
+            background: #f0f0f0;
             border-radius: 6px;
-            object-fit: cover;
             margin-bottom: 8px;
         }
- .card-convivente.nome {
-            font-weight: bold;
-            font-size: 13px;
-            color: #333;
-            line-height: 1.2;
-            word-break: break-word;
-        }
- .card-convivente.leito {
-            font-size: 11px;
-            color: #666;
-            margin-top: 2px;
-        }
+        .card-convivente .nome { font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+        .card-convivente .info { font-size: 11px; color: #666; }
 
+        /* IMPRESSÃO */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 1cm;
-            }
-
-      .navbar,.header-nav {
-                display: none!important;
-            }
-
-            body {
-                background: white;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-      .container {
-                max-width: 100%;
-                padding: 0;
-            }
-
-            h1 {
-                font-size: 18px;
-                margin-bottom: 10px;
-            }
-
-     .titulo-quarto {
-                font-size: 14px;
-                margin: 15px 0 8px 0;
-            }
-
-      .grid-carometro {
-                grid-template-columns: repeat(5, 1fr);
-                gap: 8px;
-            }
-
-      .card-convivente {
-                box-shadow: none;
-                border: 1px solid #ccc;
-                padding: 5px;
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-
-      .card-convivente img {
-                height: 120px;
-                margin-bottom: 4px;
-            }
-
-      .card-convivente.nome {
-                font-size: 10px;
-            }
-     .card-convivente.leito {
-                font-size: 9px;
+            .navbar, .barra-controles { display: none; }
+            body { background: white; }
+            .container { margin: 0; padding: 10px; max-width: 100%; }
+            .titulo-carometro { font-size: 18px; margin-bottom: 15px; }
+            .card-convivente { box-shadow: none; border: 1px solid #ddd; }
+        }
+        
+        /* LAYOUT HORIZONTAL PRA IMPRESSÃO */
+        body.paisagem .grid-carometro {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        body.paisagem .card-convivente img {
+            aspect-ratio: 1/1;
+        }
+        @media print {
+            body.paisagem {
+                size: landscape;
             }
         }
     </style>
@@ -179,7 +117,7 @@
 <body>
     <div class="navbar">
         <div class="logo-img">
-            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo">
         </div>
         <div class="navbar-info">
             <h2>SISA</h2>
@@ -187,50 +125,60 @@
         </div>
     </div>
 
-    <div class="header-nav">
+    <div class="barra-controles">
         <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
-        <div class="controles">
-            <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn-ordem {% if ordem == 'quarto' %}ativo{% endif %}">Por Quarto</a>
-            <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn-ordem {% if ordem == 'alfabetica' %}ativo{% endif %}">A-Z</a>
+        <div class="botoes-direita">
+            <button class="btn-controle" onclick="mudarOrdem('quarto')" id="btnQuarto">Por Quarto</button>
+            <button class="btn-controle ativo" onclick="mudarOrdem('alfabetica')" id="btnAZ">A-Z</button>
+            <button class="btn-controle" onclick="mudarLayout('retrato')" id="btnRetrato">Vertical</button>
+            <button class="btn-controle" onclick="mudarLayout('paisagem')" id="btnPaisagem">Horizontal</button>
             <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir / PDF</button>
         </div>
     </div>
 
     <div class="container">
-        <h1>Carômetro - Conviventes</h1>
-
-        {% if ordem == 'alfabetica' %}
-            <div class="grid-carometro">
-                {% for c in conviventes %}
-                <div class="card-convivente">
-                    {% if c['foto_base64'] %}
-                    <img src="{{ c['foto_base64'] }}" alt="{{ c['nome'] }}">
-                    {% else %}
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ESem foto%3C/text%3E%3C/svg%3E" alt="Sem foto">
-                    {% endif %}
-                    <div class="nome">{{ c['nome'] }}</div>
-                    <div class="leito">Q{{ c['quarto_numero'] }} - L{{ c['numero_leito'] }}</div>
-                </div>
-                {% endfor %}
+        <h1 class="titulo-carometro">Carômetro - Conviventes</h1>
+        <div class="grid-carometro">
+            {% for c in conviventes %}
+            <div class="card-convivente">
+                {% if c.foto_base64 %}
+                <img src="{{ c.foto_base64 }}" alt="{{ c.nome }}">
+                {% else %}
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='213'%3E%3Crect width='160' height='213' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3ESem foto%3C/text%3E%3C/svg%3E" alt="Sem foto">
+                {% endif %}
+                <div class="nome">{{ c.nome }}</div>
+                <div class="info">Q{{ c.quarto }} - L{{ c.leito }}</div>
             </div>
-        {% else %}
-            {% for quarto, conviventes_quarto in quartos_agrupados.items() %}
-                <div class="titulo-quarto">Quarto {{ quarto }}</div>
-                <div class="grid-carometro">
-                    {% for c in conviventes_quarto %}
-                    <div class="card-convivente">
-                        {% if c['foto_base64'] %}
-                        <img src="{{ c['foto_base64'] }}" alt="{{ c['nome'] }}">
-                        {% else %}
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ESem foto%3C/text%3E%3C/svg%3E" alt="Sem foto">
-                        {% endif %}
-                        <div class="nome">{{ c['nome'] }}</div>
-                        <div class="leito">Leito {{ c['numero_leito'] }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
             {% endfor %}
-        {% endif %}
+        </div>
     </div>
+
+    <script>
+        function mudarOrdem(tipo) {
+            window.location.href = "{{ url_for('carometro') }}?ordem=" + tipo;
+        }
+
+        function mudarLayout(tipo) {
+            document.body.classList.remove('retrato', 'paisagem');
+            document.body.classList.add(tipo);
+            
+            document.getElementById('btnRetrato').classList.remove('ativo');
+            document.getElementById('btnPaisagem').classList.remove('ativo');
+            
+            if(tipo === 'paisagem') {
+                document.getElementById('btnPaisagem').classList.add('ativo');
+            } else {
+                document.getElementById('btnRetrato').classList.add('ativo');
+            }
+        }
+
+        // Marca botão ativo baseado na URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const ordem = urlParams.get('ordem');
+        if(ordem === 'quarto') {
+            document.getElementById('btnQuarto').classList.add('ativo');
+            document.getElementById('btnAZ').classList.remove('ativo');
+        }
+    </script>
 </body>
 </html>
