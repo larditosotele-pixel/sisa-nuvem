@@ -78,21 +78,21 @@
   .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 15px; }
         h1 { text-align: center; margin-bottom: 12px; color: #333; font-size: 18px; }
 
-  /* VERTICAL: 7 COLUNAS - AJUSTADO PRA PREENCHER A PÁGINA */
+  /* VERTICAL: 7 COLUNAS - JÁ TÁ OK */
   .grid-conviventes {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 6px;
         }
 
-  .quarto-bloco { margin-bottom: 10px; page-break-inside: avoid; }
+  .quarto-bloco { margin-bottom: 8px; }
   .quarto-titulo {
             background: #2e7d32;
             color: white;
             padding: 3px;
             text-align: center;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             border-radius: 4px;
             font-size: 10px;
         }
@@ -125,26 +125,29 @@
             color: #666;
         }
 
-        /* HORIZONTAL: 9 COLUNAS - NÃO MEXI */
+        /* HORIZONTAL: 10 COLUNAS - CORRIGIDO PRA 3 PÁGINAS */
         body.horizontal .grid-conviventes {
-            grid-template-columns: repeat(9, 1fr);
-            gap: 6px;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
         }
 
         @media print {
        .navbar,.header-nav { display: none!important; }
             body { background: white; }
        .container { padding: 0; max-width: 100%; }
-            h1 { font-size: 13px; margin-bottom: 4px; margin-top: 0; }
-       .grid-conviventes { gap: 3px; }
+            h1 { font-size: 12px; margin-bottom: 3px; margin-top: 0; }
+       .grid-conviventes { gap: 2px; }
        .card-convivente { border: 1px solid #999; padding: 1px; }
-       .quarto-titulo { font-size: 9px; padding: 2px; margin-bottom: 2px; }
-       .card-convivente .nome { font-size: 6px; height: 12px; }
+       .quarto-titulo { font-size: 8px; padding: 1px; margin-bottom: 2px; }
+       .card-convivente .nome { font-size: 6px; height: 11px; }
        .card-convivente .leito { font-size: 5px; }
+
+            /* IMPORTANTE: LIBERA QUEBRA DENTRO DO BLOCO DE QUARTO */
+       .quarto-bloco { margin-bottom: 4px; page-break-inside: auto!important; }
 
             @page {
                 size: A4 {{ 'landscape' if orientacao == 'horizontal' else 'portrait' }};
-                margin: 0.4cm;
+                margin: 0.3cm;
             }
         }
 
