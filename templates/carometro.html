@@ -79,7 +79,6 @@
             padding: 10px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            page-break-inside: avoid;
         }
         .card-convivente img {
             width: 100%;
@@ -110,42 +109,74 @@
             .navbar-info p { display: none; }
         }
 
-        /* IMPRESSÃO VERTICAL */
+        /* IMPRESSÃO VERTICAL - 32 POR FOLHA = 3 FOLHAS */
         @media print {
             .navbar, .barra-controles { display: none !important; }
-            body { background: white; }
-            .container { margin: 0; padding: 5mm; max-width: 100%; }
-            .titulo-carometro { font-size: 16px; margin-bottom: 10px; }
+            html, body { 
+                background: white; 
+                width: 100%;
+                height: 100%;
+            }
+            .container { 
+                margin: 0; 
+                padding: 0; 
+                max-width: 100%; 
+            }
+            .titulo-carometro { 
+                font-size: 14pt; 
+                margin: 5mm 0; 
+            }
             .grid-carometro {
+                display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 5mm;
+                gap: 3mm;
+                padding: 0 5mm;
             }
             .card-convivente { 
                 box-shadow: none; 
-                border: 1px solid #ddd; 
-                padding: 3mm;
+                border: 0.5pt solid #999; 
+                padding: 2mm;
+                height: 33mm;
+                page-break-inside: avoid;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
             .card-convivente img {
                 aspect-ratio: 3/4;
+                max-height: 24mm;
+                margin-bottom: 1mm;
             }
-            .card-convivente .nome { font-size: 9pt; }
-            .card-convivente .info { font-size: 8pt; }
-            @page { size: A4 portrait; margin: 10mm; }
+            .card-convivente .nome { 
+                font-size: 7pt; 
+                line-height: 1.1;
+                margin-bottom: 0.5mm;
+            }
+            .card-convivente .info { 
+                font-size: 6pt; 
+                line-height: 1;
+            }
+            @page { 
+                size: A4 portrait; 
+                margin: 5mm; 
+            }
         }
         
-        /* IMPRESSÃO HORIZONTAL - CABE MAIS GENTE */
+        /* IMPRESSÃO HORIZONTAL - 30 POR FOLHA = 3 FOLHAS */
         body.paisagem .grid-carometro {
             grid-template-columns: repeat(6, 1fr);
-            gap: 4mm;
+            gap: 3mm;
         }
         body.paisagem .card-convivente {
             padding: 2mm;
+            height: 33mm;
         }
         body.paisagem .card-convivente img {
             aspect-ratio: 1/1;
+            max-height: 22mm;
         }
-        body.paisagem .card-convivente .nome { font-size: 8pt; }
-        body.paisagem .card-convivente .info { font-size: 7pt; }
+        body.paisagem .card-convivente .nome { font-size: 7pt; }
+        body.paisagem .card-convivente .info { font-size: 6pt; }
         
         @media print {
             body.paisagem {
