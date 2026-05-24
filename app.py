@@ -199,85 +199,25 @@ def cadastrar_convivente():
 
     return render_template('form_convivente.html', leitos_vazios=leitos_vazios, leito_info=leito_info)
 
-@app.route('/editar_convivente/<int:id>')
+@app.route('/editar_convivente/<int:id>', methods=['POST'])
 def editar_convivente(id):
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cur.execute('''
-        SELECT c.id, c.nome, c.foto_base64, l.numero_leito as leito, q.numero as quarto
-        FROM conviventes c
-        LEFT JOIN leitos l ON c.leito_id = l.id
-        LEFT JOIN quartos q ON l.quarto_id = q.id
-        WHERE c.id = %s
-    ''', (id,))
-    c = cur.fetchone()
-    cur.close()
-    conn.close()
-    return render_template('editar_convivente.html', c=c)
-
-@app.route('/atualizar_convivente/<int:id>', methods=['POST'])
-def atualizar_convivente(id):
-    nome = request.form['nome']
-    quarto = request.form['quarto']
-    leito = request.form['leito']
-    foto = request.files.get('foto_file')
-
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-    cur.execute('SELECT leito_id FROM conviventes WHERE id = %s', (id,))
-    leito_id_antigo = cur.fetchone()['leito_id']
-
-    cur.execute('''
-        SELECT l.id FROM leitos l
-        JOIN quartos q ON l.quarto_id = q.id
-        WHERE q.numero = %s AND l.numero_leito = %s
-    ''', (quarto, leito))
-    novo_leito = cur.fetchone()
-
-    if not novo_leito:
-        flash('Erro: Quarto/Leito não encontrado!')
-        cur.close()
-        conn.close()
-        return redirect(url_for('mapa_leitos'))
-
-    leito_id_novo = novo_leito['id']
-
-    if leito_id_antigo!= leito_id_novo:
-        if leito_id_antigo:
-            cur.execute('UPDATE leitos SET ocupado = FALSE WHERE id = %s', (leito_id_antigo,))
-        cur.execute('UPDATE leitos SET ocupado = TRUE WHERE id = %s', (leito_id_novo,))
-
-    if foto and foto.filename:
-        foto_base64 = base64.b64encode(foto.read()).decode('utf-8')
-        foto_base64 = f"data:image/jpeg;base64,{foto_base64}"
-        cur.execute('UPDATE conviventes SET nome = %s, foto_base64 = %s, leito_id = %s WHERE id = %s',
-                    (nome, foto_base64, leito_id_novo, id))
-    else:
-        cur.execute('UPDATE conviventes SET nome = %s, leito_id = %s WHERE id = %s',
-                    (nome, leito_id_novo, id))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-    flash(f'{nome} atualizado com sucesso!')
-    return redirect(url_for('mapa_leitos'))
-
-@app.route('/desocupar_leito/<int:id>', methods=['POST'])
-def desocupar_leito(id):
+    acao = request.form['acao']
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT leito_id, nome FROM conviventes WHERE id = %s', (id,))
-    result = cur.fetchone()
-    leito_id = result[0]
-    nome = result[1]
-    cur.execute('UPDATE conviventes SET ativo = FALSE, leito_id = NULL WHERE id = %s', (id,))
-    if leito_id:
-        cur.execute('UPDATE leitos SET ocupado = FALSE WHERE id = %s', (leito_id,))
+    if acao == 'salvar':
+        nome = request.form['nome']
+        cur.execute('UPDATE conviventes SET nome = %s WHERE id = %s', (nome, id))
+        flash('Convivente atualizado!')
+    elif acao == 'desocupar':
+        cur.execute('SELECT leito_id FROM conviventes WHERE id = %s', (id,))
+        leito_id = cur.fetchone()[0]
+        cur.execute('UPDATE conviventes SET ativo = FALSE, leito_id = NULL WHERE id = %s', (id,))
+        if leito_id:
+            cur.execute('UPDATE leitos SET ocupado = FALSE WHERE id = %s', (leito_id,))
+        flash('Leito desocupado!')
     conn.commit()
     cur.close()
     conn.close()
-    flash(f'{nome} desocupado e leito liberado!')
     return redirect(url_for('mapa_leitos'))
 
 @app.route('/relatorio')
