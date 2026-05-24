@@ -339,14 +339,15 @@ def carometro():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        # MUDEI: Query SQL direto igual suas outras rotas
+        # MUDEI: ORDENAÇÃO CORRIGIDA PRA NÃO DAR BAGUNÇA
         if ordem == 'alfabetica':
             order_by = 'c.nome ASC'
         else:
-            order_by = '''q.numero,
-                         CASE WHEN l.numero_leito ~ '^[0-9]+$'
-                              THEN CAST(l.numero_leito AS INTEGER)
-                              ELSE 999 END'''
+            # Ordena por número do quarto e depois número do leito - AMBOS COMO INTEIRO
+            order_by = '''CAST(q.numero AS INTEGER) ASC,
+                          CASE WHEN l.numero_leito ~ '^[0-9]+$'
+                               THEN CAST(l.numero_leito AS INTEGER)
+                               ELSE 999 END ASC'''
 
         cur.execute(f'''
             SELECT
@@ -363,11 +364,9 @@ def carometro():
         cur.close()
         conn.close()
 
-        # Processa as fotos - já vem em base64 do banco
         conviventes_processados = []
         for c in conviventes_db:
             foto_b64 = c['foto_base64']
-            # Se não começar com data:, adiciona o prefixo
             if foto_b64 and not foto_b64.startswith('data:'):
                 foto_b64 = f"data:image/jpeg;base64,{foto_b64}"
 
@@ -385,7 +384,8 @@ def carometro():
                 if quarto not in quartos_agrupados:
                     quartos_agrupados[quarto] = []
                 quartos_agrupados[quarto].append(conv)
-            quartos_agrupados = dict(sorted(quartos_agrupados.items()))
+            # MUDEI: Ordena os quartos como número, não texto
+            quartos_agrupados = dict(sorted(quartos_agrupados.items(), key=lambda x: int(x[0])))
 
         return render_template('carometro.html',
                              conviventes=conviventes_processados,
