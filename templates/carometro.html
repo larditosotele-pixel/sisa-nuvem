@@ -78,6 +78,7 @@
   .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 15px; }
         h1 { text-align: center; margin-bottom: 12px; color: #333; font-size: 18px; }
 
+  /* VERTICAL: 7 COLUNAS - CORRIGIDO PRA 3 PÁGINAS */
   .grid-conviventes {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -124,7 +125,7 @@
             color: #666;
         }
 
-        /* HORIZONTAL - 9 colunas */
+        /* HORIZONTAL: 9 COLUNAS - NÃO MEXI, TÁ PERFEITO */
         body.horizontal .grid-conviventes {
             grid-template-columns: repeat(9, 1fr);
             gap: 6px;
@@ -147,7 +148,8 @@
             }
         }
 
-        @media (max-width: 768px) {
+        /* MOBILE: SÓ PRA TELA, NÃO AFETA IMPRESSÃO */
+        @media screen and (max-width: 768px) {
        .grid-conviventes { grid-template-columns: repeat(3, 1fr); }
        .controles { width: 100%; justify-content: center; }
         }
