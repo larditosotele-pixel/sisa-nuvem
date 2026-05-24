@@ -114,6 +114,7 @@
             font-weight: bold;
             font-size: 14px;
             color: #666;
+            transition: all 0.2s;
         }
   .btn-chamada.ativo-p { background: #4caf50; color: white; border-color: #4caf50; }
   .btn-chamada.ativo-f { background: #f44336; color: white; border-color: #f44336; }
@@ -185,7 +186,6 @@
                     <button type="button" class="btn-chamada {% if c['status'] == 'H' %}ativo-h{% endif %}" data-status="H" data-id="{{ c['id'] }}">H</button>
                     <input type="hidden" name="status_{{ c['id'] }}" id="status_{{ c['id'] }}" value="{{ c['status'] or '' }}">
                 </div>
-            </div>
             {% endfor %}
             <button type="submit" class="btn-salvar">💾 Salvar Chamada</button>
         </form>
@@ -196,14 +196,23 @@
             btn.addEventListener('click', function() {
                 const id = this.dataset.id;
                 const status = this.dataset.status;
+                const input = document.getElementById('status_' + id);
                 const container = this.parentElement;
                 
-                container.querySelectorAll('.btn-chamada').forEach(b => {
-                    b.classList.remove('ativo-p', 'ativo-f', 'ativo-a', 'ativo-h');
-                });
-                
-                this.classList.add('ativo-' + status.toLowerCase());
-                document.getElementById('status_' + id).value = status;
+                // Se já tá ativo, desmarca tudo
+                if (this.classList.contains('ativo-' + status.toLowerCase())) {
+                    container.querySelectorAll('.btn-chamada').forEach(b => {
+                        b.classList.remove('ativo-p', 'ativo-f', 'ativo-a', 'ativo-h');
+                    });
+                    input.value = '';
+                } else {
+                    // Desmarca todos e marca só o clicado
+                    container.querySelectorAll('.btn-chamada').forEach(b => {
+                        b.classList.remove('ativo-p', 'ativo-f', 'ativo-a', 'ativo-h');
+                    });
+                    this.classList.add('ativo-' + status.toLowerCase());
+                    input.value = status;
+                }
             });
         });
     </script>
