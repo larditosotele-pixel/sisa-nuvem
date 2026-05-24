@@ -125,7 +125,6 @@ def chamada():
     conn.close()
     return render_template('chamada.html', conviventes=conviventes, data_hoje=hoje.strftime('%d/%m/%Y'))
 
-# DATA DE NASCIMENTO OPCIONAL
 @app.route('/cadastrar_convivente', methods=['GET', 'POST'])
 def cadastrar_convivente():
     leito_id = request.args.get('leito_id', type=int)
@@ -321,9 +320,11 @@ def relatorio_branco():
                          ano=ano,
                          mes_nome=meses_nomes[mes])
 
+# ROTA CARÔMETRO ATUALIZADA - 4 BOTÕES + 3 PÁGINAS
 @app.route('/carometro')
 def carometro():
     ordem = request.args.get('ordem', default='quarto')
+    orientacao = request.args.get('orientacao', default='vertical')
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -364,7 +365,8 @@ def carometro():
     return render_template('carometro.html',
                          conviventes=conviventes,
                          quartos_agrupados=quartos_agrupados,
-                         ordem=ordem)
+                         ordem=ordem,
+                         orientacao=orientacao)
 
 if __name__ == '__main__':
     app.run(debug=True)
