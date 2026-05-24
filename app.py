@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import psycopg2
 import psycopg2.extras
 import os
-from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date
 import base64
 
@@ -13,52 +12,11 @@ def get_db_connection():
     conn = psycopg2.connect(os.environ['DATABASE_URL'])
     return conn
 
-# DECORATOR PRA VERIFICAR LOGIN
-def login_required(f):
-    from functools import wraps
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        usuario = request.form['usuario']
-        senha = request.form['senha']
-        
-        conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cur.execute('SELECT * FROM usuarios WHERE usuario = %s', (usuario,))
-        user = cur.fetchone()
-        cur.close()
-        conn.close()
-        
-        if user and check_password_hash(user['senha'], senha):
-            session['user_id'] = user['id']
-            session['usuario'] = user['usuario']
-            session['nome'] = user['nome']
-            session['nivel'] = user['nivel']
-            return redirect(url_for('index'))
-        else:
-            flash('Usuário ou senha inválidos', 'error')
-    
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
 @app.route('/')
-@login_required
 def index():
     return render_template('index.html')
 
 @app.route('/conviventes')
-@login_required
 def conviventes():
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -76,7 +34,6 @@ def conviventes():
     return render_template('conviventes.html', conviventes=conviventes)
 
 @app.route('/carometro')
-@login_required
 def carometro():
     ordem = request.args.get('ordem', 'alfabetica')
     conn = None
@@ -122,9 +79,9 @@ def carometro():
         
     return render_template('carometro.html', conviventes=conviventes)
 
-# SEU OUTRAS ROTAS VÃO AQUI
-# Ex: /relatorios, /enfermagem, /farmacia, /estoque, etc
-# COPIA E COLA ELAS DO SEU APP.PY ANTIGO PRA CÁ, ANTES DO "if __name__"
+# COLE SUAS OUTRAS ROTAS AQUI SE TIVER
+# Ex: /relatorios, /enfermagem, /farmacia, etc
+# Só não precisa mais colocar @login_required em nenhuma
 
 if __name__ == '__main__':
     app.run(debug=True)
