@@ -8,7 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; }
 
-    .navbar {
+   .navbar {
             background: #2e7d32;
             color: white;
             padding: 15px 30px;
@@ -16,7 +16,7 @@
             align-items: center;
             gap: 15px;
         }
-    .logo-img {
+   .logo-img {
             width: 45px;
             height: 45px;
             background: white;
@@ -27,11 +27,11 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-   .logo-img img { width: 35px; height: 35px; object-fit: contain; }
-   .navbar-info h2 { font-size: 22px; margin: 0; }
-   .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+  .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+  .navbar-info h2 { font-size: 22px; margin: 0; }
+  .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
 
-   .header-nav {
+  .header-nav {
             background: white;
             padding: 15px 20px;
             margin: 15px;
@@ -43,14 +43,14 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-   .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
+  .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
 
-   .controles {
+  .controles {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
         }
-   .btn-controle {
+  .btn-controle {
             padding: 8px 15px;
             border: 2px solid #2e7d32;
             background: white;
@@ -61,11 +61,11 @@
             text-decoration: none;
             font-size: 14px;
         }
-   .btn-controle.ativo {
+  .btn-controle.ativo {
             background: #2e7d32;
             color: white;
         }
-   .btn-imprimir {
+  .btn-imprimir {
             padding: 8px 15px;
             background: #007bff;
             color: white;
@@ -75,80 +75,81 @@
             font-weight: bold;
         }
 
-   .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 15px; }
-        h1 { text-align: center; margin-bottom: 20px; color: #333; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 15px; }
+        h1 { text-align: center; margin-bottom: 15px; color: #333; font-size: 20px; }
 
-   .grid-conviventes {
+  .grid-conviventes {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-        }
-
-   .quarto-bloco { margin-bottom: 20px; }
-   .quarto-titulo {
-            background: #2e7d32;
-            color: white;
-            padding: 6px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-   .card-convivente {
-            background: white;
-            border-radius: 6px;
-            padding: 6px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            page-break-inside: avoid;
-        }
-   .card-convivente img {
-            width: 100%;
-            aspect-ratio: 1/1;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-bottom: 4px;
-        }
-   .card-convivente .nome {
-            font-size: 10px;
-            font-weight: bold;
-            color: #333;
-            line-height: 1.1;
-            height: 24px;
-            overflow: hidden;
-        }
-   .card-convivente .leito {
-            font-size: 9px;
-            color: #666;
-        }
-
-        /* HORIZONTAL - 8 colunas */
-        body.horizontal .grid-conviventes {
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 8px;
         }
 
+  .quarto-bloco { margin-bottom: 15px; }
+  .quarto-titulo {
+            background: #2e7d32;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+  .card-convivente {
+            background: white;
+            border-radius: 5px;
+            padding: 4px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+  .card-convivente img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 3px;
+            margin-bottom: 3px;
+        }
+  .card-convivente .nome {
+            font-size: 9px;
+            font-weight: bold;
+            color: #333;
+            line-height: 1;
+            height: 18px;
+            overflow: hidden;
+        }
+  .card-convivente .leito {
+            font-size: 8px;
+            color: #666;
+        }
+
+        /* HORIZONTAL - 9 colunas */
+        body.horizontal .grid-conviventes {
+            grid-template-columns: repeat(9, 1fr);
+            gap: 6px;
+        }
+
         @media print {
-        .navbar, .header-nav { display: none!important; }
+       .navbar,.header-nav { display: none!important; }
             body { background: white; }
-        .container { padding: 0; max-width: 100%; }
-        .grid-conviventes { gap: 6px; }
-        .card-convivente { border: 1px solid #ccc; padding: 4px; }
-        .quarto-titulo { font-size: 12px; padding: 4px; margin-bottom: 6px; }
-        .card-convivente .nome { font-size: 9px; height: 20px; }
-        .card-convivente .leito { font-size: 8px; }
+       .container { padding: 0; max-width: 100%; }
+            h1 { font-size: 16px; margin-bottom: 10px; }
+       .grid-conviventes { gap: 5px; }
+       .card-convivente { border: 1px solid #999; padding: 3px; }
+       .quarto-titulo { font-size: 11px; padding: 3px; margin-bottom: 4px; }
+       .card-convivente .nome { font-size: 8px; height: 16px; }
+       .card-convivente .leito { font-size: 7px; }
 
             @page {
                 size: A4 {{ 'landscape' if orientacao == 'horizontal' else 'portrait' }};
-                margin: 0.8cm;
+                margin: 0.6cm;
             }
         }
 
         @media (max-width: 768px) {
-        .grid-conviventes { grid-template-columns: repeat(3, 1fr); }
-        .controles { width: 100%; justify-content: center; }
+       .grid-conviventes { grid-template-columns: repeat(3, 1fr); }
+       .controles { width: 100%; justify-content: center; }
         }
     </style>
 </head>
