@@ -9,88 +9,103 @@
         body { 
             font-family: Arial, sans-serif; 
             background: #f5f5f5;
-            padding: 20px;
+            padding: 15px; /* Menos padding na tela */
         }
         .header {
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
-        .header h1 { font-size: 22px; }
-        .botoes { display: flex; gap: 10px; flex-wrap: wrap; }
+        .header h1 { font-size: 20px; }
+        .botoes { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn {
-            padding: 8px 15px;
+            padding: 6px 12px;
             border: 1px solid #007bff;
             background: white;
             color: #007bff;
             text-decoration: none;
             border-radius: 5px;
-            font-size: 14px;
+            font-size: 13px;
         }
         .btn.active { background: #007bff; color: white; }
         .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
         
         .container {
             background: white;
-            padding: 20px;
+            padding: 15px; /* Menos padding */
             border-radius: 8px;
         }
         
+        /* MUDEI: 4 colunas no Vertical pra tela ficar menos espaçada */
         .grid-vertical {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px; /* Gap menor */
         }
         
+        /* MUDEI: 5 colunas no Horizontal pra tela ficar menos espaçada */
         .grid-horizontal {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px; /* Gap menor */
         }
         
         .card {
             border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 6px;
+            padding: 8px; /* Padding menor */
             text-align: center;
             page-break-inside: avoid;
         }
         .card img {
             width: 100%;
-            height: 100px;
+            height: 80px; /* Foto menor na tela */
             object-fit: contain;
             background: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 8px;
+            border-radius: 4px;
+            margin-bottom: 5px;
         }
         .card .sem-foto {
             width: 100%;
-            height: 100px;
+            height: 80px;
             background: #e9ecef;
-            border-radius: 5px;
-            margin-bottom: 8px;
+            border-radius: 4px;
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #6c757d;
-            font-size: 12px;
+            font-size: 11px;
         }
-        .card h3 { font-size: 14px; margin-bottom: 5px; }
-        .card p { font-size: 12px; color: #666; }
+        .card h3 { 
+            font-size: 12px; 
+            margin-bottom: 3px;
+            line-height: 1.2;
+        }
+        .card p { 
+            font-size: 11px; 
+            color: #666;
+            line-height: 1.2;
+        }
         
         .titulo-quarto {
             grid-column: 1 / -1;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            margin: 20px 0 10px 0;
-            padding-bottom: 5px;
+            margin: 15px 0 8px 0;
+            padding-bottom: 4px;
             border-bottom: 2px solid #007bff;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-vertical { grid-template-columns: repeat(3, 1fr); }
+            .grid-horizontal { grid-template-columns: repeat(4, 1fr); }
         }
 
         @media (max-width: 768px) {
@@ -99,54 +114,63 @@
             }
         }
 
-        /* IMPRESSÃO - 3 PÁGINAS CRAVADO */
+        /* IMPRESSÃO - 3 PÁGINAS + ORIENTAÇÃO CORRETA */
         @media print {
+            /* MUDEI: Define orientação da folha pelo modo escolhido */
+            {% if orientacao == 'horizontal' %}
             @page { 
-                size: A4;
-                margin: 0.8cm; /* Margem menor pra caber mais */
+                size: A4 landscape; /* Paisagem quando clica em Horizontal */
+                margin: 0.7cm;
             }
+            {% else %}
+            @page { 
+                size: A4 portrait; /* Retrato quando clica em Vertical */
+                margin: 0.8cm;
+            }
+            {% endif %}
+            
             body { background: white; padding: 0; }
             .header { display: none; }
             .container { padding: 0; }
             
-            /* VERTICAL: 3 col x 8 linhas = 24 por página = 72 em 3 folhas */
+            /* VERTICAL: 4 col x 8 linhas = 32 por página = 96 em 3 folhas */
             .grid-vertical {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 5px; /* Gap menor */
+                grid-template-columns: repeat(4, 1fr);
+                gap: 4px;
             }
             .grid-vertical .card { 
-                height: 115px; /* Altura calculada pra 8 linhas */
+                height: 110px;
                 padding: 3px;
             }
             
-            /* HORIZONTAL: 5 col x 5 linhas = 25 por página = 75 em 3 folhas */
+            /* HORIZONTAL: 6 col x 5 linhas = 30 por página = 90 em 3 folhas */
             .grid-horizontal {
-                grid-template-columns: repeat(5, 1fr); /* Mudei pra 5 colunas */
+                grid-template-columns: repeat(6, 1fr); /* 6 colunas na paisagem */
                 gap: 4px;
             }
             .grid-horizontal .card { 
-                height: 145px; /* Altura calculada pra 5 linhas */
+                height: 125px;
                 padding: 3px;
             }
             
             .card img, .card .sem-foto { 
-                height: 75px; /* Foto menor pra caber mais */
+                height: 70px;
                 object-fit: contain;
                 background: white;
-                margin-bottom: 3px;
+                margin-bottom: 2px;
             }
             .card h3 { 
-                font-size: 9px; 
+                font-size: 8.5px; 
                 margin-bottom: 1px;
                 line-height: 1.1;
             }
             .card p { 
-                font-size: 8px;
+                font-size: 7.5px;
                 line-height: 1.1;
             }
             .titulo-quarto { 
-                font-size: 11px; 
-                margin: 5px 0 2px 0;
+                font-size: 10px; 
+                margin: 4px 0 2px 0;
                 padding-bottom: 2px;
             }
         }
