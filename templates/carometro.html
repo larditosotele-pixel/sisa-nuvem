@@ -1,257 +1,54 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carômetro - SISA</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        
-        .navbar {
-            background: #2e7d32;
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .logo-img {
-            width: 45px;
-            height: 45px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
-        .navbar-info h2 { font-size: 22px; margin: 0; }
-        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
-
-        .barra-controles {
-            background: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .barra-controles a { color: #007bff; text-decoration: none; font-weight: bold; }
-        .botoes-direita { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .btn-controle {
-            background: white;
-            border: 1px solid #ccc;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-controle.ativo {
-            background: #2e7d32;
-            color: white;
-            border-color: #2e7d32;
-        }
-        .btn-imprimir {
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
-        .titulo-carometro { text-align: center; margin-bottom: 20px; font-size: 24px; }
-        
-        .grid-carometro {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
-        }
-        .card-convivente {
-            background: white;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .card-convivente img {
-            width: 100%;
-            aspect-ratio: 3/4;
-            object-fit: contain;
-            background: #f0f0f0;
-            border-radius: 6px;
-            margin-bottom: 8px;
-        }
-        .card-convivente .nome { font-weight: bold; font-size: 13px; margin-bottom: 4px; word-break: break-word; }
-        .card-convivente .info { font-size: 11px; color: #666; }
-
-        /* MOBILE */
-        @media (max-width: 600px) {
-            .grid-carometro {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
-            .card-convivente {
-                padding: 6px;
-            }
-            .card-convivente img {
-                aspect-ratio: 1/1;
-            }
-            .card-convivente .nome { font-size: 10px; }
-            .card-convivente .info { font-size: 9px; }
-            .barra-controles { padding: 10px 15px; }
-            .navbar-info p { display: none; }
-        }
-
-        /* IMPRESSÃO VERTICAL - 32 POR FOLHA = 3 FOLHAS */
-        @media print {
-            .navbar, .barra-controles { display: none !important; }
-            html, body { 
-                background: white; 
-                width: 100%;
-                height: 100%;
-            }
-            .container { 
-                margin: 0; 
-                padding: 0; 
-                max-width: 100%; 
-            }
-            .titulo-carometro { 
-                font-size: 14pt; 
-                margin: 3mm 0; 
-            }
-            .grid-carometro {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 2mm;
-                padding: 0 4mm;
-            }
-            .card-convivente { 
-                box-shadow: none; 
-                border: 0.5pt solid #999; 
-                padding: 1.5mm;
-                height: 31mm;
-                page-break-inside: avoid;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-            }
-            .card-convivente img {
-                aspect-ratio: 3/4;
-                max-height: 22mm;
-                margin-bottom: 1mm;
-            }
-            .card-convivente .nome { 
-                font-size: 6.5pt; 
-                line-height: 1.1;
-                margin-bottom: 0.5mm;
-            }
-            .card-convivente .info { 
-                font-size: 6pt; 
-                line-height: 1;
-            }
-            @page { 
-                size: A4 portrait; 
-                margin: 4mm; 
-            }
-        }
-        
-        /* IMPRESSÃO HORIZONTAL - NÃO MEXI, TÁ PERFEITO */
-        body.paisagem .grid-carometro {
-            grid-template-columns: repeat(6, 1fr);
-            gap: 3mm;
-        }
-        body.paisagem .card-convivente {
-            padding: 2mm;
-            height: 33mm;
-        }
-        body.paisagem .card-convivente img {
-            aspect-ratio: 1/1;
-            max-height: 22mm;
-        }
-        body.paisagem .card-convivente .nome { font-size: 7pt; }
-        body.paisagem .card-convivente .info { font-size: 6pt; }
-        
-        @media print {
-            body.paisagem {
-                size: A4 landscape;
-            }
-            body.paisagem .grid-carometro {
-                grid-template-columns: repeat(6, 1fr);
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="navbar">
-        <div class="logo-img">
-            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo">
-        </div>
-        <div class="navbar-info">
-            <h2>SISA</h2>
-            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
-        </div>
-    </div>
-
-    <div class="barra-controles">
-        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
-        <div class="botoes-direita">
-            <button class="btn-controle" onclick="mudarOrdem('quarto')" id="btnQuarto">Por Quarto</button>
-            <button class="btn-controle ativo" onclick="mudarOrdem('alfabetica')" id="btnAZ">A-Z</button>
-            <button class="btn-controle ativo" onclick="mudarLayout('retrato')" id="btnRetrato">Vertical</button>
-            <button class="btn-controle" onclick="mudarLayout('paisagem')" id="btnPaisagem">Horizontal</button>
-            <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir / PDF</button>
-        </div>
-    </div>
-
-    <div class="container">
-        <h1 class="titulo-carometro">Carômetro - Conviventes</h1>
-        <div class="grid-carometro">
-            {% for c in conviventes %}
-            <div class="card-convivente">
-                {% if c.foto_base64 %}
-                <img src="{{ c.foto_base64 }}" alt="{{ c.nome }}">
-                {% else %}
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='213'%3E%3Crect width='160' height='213' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3ESem foto%3C/text%3E%3C/svg%3E" alt="Sem foto">
-                {% endif %}
-                <div class="nome">{{ c.nome }}</div>
-                <div class="info">Q{{ c.quarto }} - L{{ c.leito }}</div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <script>
-        function mudarOrdem(tipo) {
-            window.location.href = "{{ url_for('carometro') }}?ordem=" + tipo;
-        }
-
-        function mudarLayout(tipo) {
-            document.body.classList.remove('retrato', 'paisagem');
-            document.body.classList.add(tipo);
-            
-            document.getElementById('btnRetrato').classList.remove('ativo');
-            document.getElementById('btnPaisagem').classList.remove('ativo');
-            
-            if(tipo === 'paisagem') {
-                document.getElementById('btnPaisagem').classList.add('ativo');
-            } else {
-                document.getElementById('btnRetrato').classList.add('ativo');
-            }
-        }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const ordem = urlParams.get('ordem');
-        if(ordem === 'quarto') {
-            document.getElementById('btnQuarto').classList.add('ativo');
-            document.getElementById('btnAZ').classList.remove('ativo');
-        }
-    </script>
-</body>
-</html>
+/* IMPRESSÃO VERTICAL - 36 POR FOLHA = 3 FOLHAS */
+@media print {
+    .navbar, .barra-controles { display: none !important; }
+    html, body { 
+        background: white; 
+        width: 100%;
+        height: 100%;
+    }
+    .container { 
+        margin: 0; 
+        padding: 0; 
+        max-width: 100%; 
+    }
+    .titulo-carometro { 
+        font-size: 12pt; 
+        margin: 2mm 0 1mm 0; 
+    }
+    .grid-carometro {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5mm;
+        padding: 0 3mm;
+    }
+    .card-convivente { 
+        box-shadow: none; 
+        border: 0.5pt solid #666; 
+        padding: 1mm;
+        height: 29mm;
+        page-break-inside: avoid;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+    }
+    .card-convivente img {
+        aspect-ratio: 3/4;
+        max-height: 20mm;
+        margin-bottom: 0.5mm;
+    }
+    .card-convivente .nome { 
+        font-size: 6pt; 
+        line-height: 1;
+        margin-bottom: 0.3mm;
+        overflow: hidden;
+    }
+    .card-convivente .info { 
+        font-size: 5.5pt; 
+        line-height: 1;
+    }
+    @page { 
+        size: A4 portrait; 
+        margin: 3mm; 
+    }
+}
