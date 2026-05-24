@@ -154,7 +154,7 @@
     </div>
 
     <div class="header-nav">
-        <a href="{{ url_for('dashboard') }}">← Voltar ao Menu Principal</a>
+        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
     </div>
 
     <div class="container">
@@ -185,7 +185,6 @@
                     <button type="button" class="btn-chamada {% if c['status'] == 'H' %}ativo-h{% endif %}" data-status="H" data-id="{{ c['id'] }}">H</button>
                     <input type="hidden" name="status_{{ c['id'] }}" id="status_{{ c['id'] }}" value="{{ c['status'] or '' }}">
                 </div>
-            </div>
             {% endfor %}
             <button type="submit" class="btn-salvar">💾 Salvar Chamada</button>
         </form>
