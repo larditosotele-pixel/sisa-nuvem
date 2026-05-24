@@ -6,7 +6,12 @@
     <title>Mapa de Leitos - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        html, body { 
+            background: #f5f5f5; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body { font-family: Arial, sans-serif; }
 
  .navbar {
             background: #2e7d32;
@@ -50,6 +55,8 @@
             padding: 15px;
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
         }
 .quarto-header {
             display: flex;
@@ -74,6 +81,7 @@
             text-align: center;
             position: relative;
             transition: all 0.2s;
+            background: white;
         }
 .card-leito.ocupado { 
             border-color: #e67e22; 
@@ -139,6 +147,7 @@
             }
             .quarto-bloco {
                 padding: 10px;
+                margin-bottom: 12px;
             }
             .navbar-info p { display: none; }
             .header-nav { margin: 10px; padding: 12px 15px; }
