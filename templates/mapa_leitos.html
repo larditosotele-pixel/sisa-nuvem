@@ -73,9 +73,22 @@
             padding: 10px;
             text-align: center;
             position: relative;
+            transition: all 0.2s;
         }
-.card-leito.ocupado { border-color: #e67e22; background: #fff8f0; }
-.card-leito.vago { border-color: #95a5a6; background: #f8f9fa; cursor: pointer; }
+.card-leito.ocupado { 
+            border-color: #e67e22; 
+            background: #fff8f0; 
+            cursor: pointer;
+        }
+.card-leito.ocupado:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+.card-leito.vago { 
+            border-color: #95a5a6; 
+            background: #f8f9fa; 
+            cursor: pointer; 
+        }
 .card-leito.vago:hover { background: #e8f5e9; }
 .num-leito {
             position: absolute;
@@ -87,16 +100,24 @@
             border-radius: 4px;
             font-size: 11px;
             font-weight: bold;
+            z-index: 1;
         }
 .card-leito img {
             width: 100%;
-            height: 140px;
+            height: 180px;
             border-radius: 6px;
             object-fit: cover;
             margin-bottom: 8px;
         }
-.card-leito.nome { font-weight: bold; font-size: 13px; color: #333; margin-bottom: 8px; }
-.btn-editar { background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; width: 100%; }
+.card-leito .nome { 
+            font-weight: bold; 
+            font-size: 13px; 
+            color: #333; 
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         /* MODAL */
 .modal {
@@ -133,7 +154,14 @@
 .btn-salvar { background: #2e7d32; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; }
 .btn-desocupar { background: #c0392b; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; }
 .btn-cancelar { background: #95a5a6; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; }
-.flash { padding: 15px; margin: 15px; border-radius: 5px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.flash { 
+            padding: 15px; 
+            margin: 15px; 
+            border-radius: 5px; 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
     </style>
 </head>
 <body>
@@ -174,18 +202,21 @@
             <div class="grid-leitos">
                 {% for leito in quarto.leitos %}
                 <div class="card-leito {% if leito.ocupado %}ocupado{% else %}vago{% endif %}"
-                     {% if not leito.ocupado %}onclick="window.location='{{ url_for('cadastrar_convivente', leito_id=leito.leito_id) }}'"{% endif %}>
+                     {% if leito.ocupado %}
+                        onclick="abrirModalEditar({{ leito.convivente_id }}, '{{ leito.convivente_nome }}')"
+                     {% else %}
+                        onclick="window.location='{{ url_for('cadastrar_convivente', leito_id=leito.leito_id) }}'"
+                     {% endif %}>
                     <div class="num-leito">L{{ leito.numero_leito }}</div>
                     {% if leito.ocupado %}
                         {% if leito.foto_base64 %}
                         <img src="{{ leito.foto_base64 }}" alt="{{ leito.convivente_nome }}">
                         {% else %}
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='140'%3E%3Crect width='180' height='140' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3ESem foto%3C/text%3E%3C/svg%3E" alt="Sem foto">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3ESem foto%3C/text%3E%3C/svg%3E" alt="Sem foto">
                         {% endif %}
                         <div class="nome">{{ leito.convivente_nome }}</div>
-                        <button class="btn-editar" onclick="abrirModalEditar({{ leito.convivente_id }}, '{{ leito.convivente_nome }}')">Editar</button>
                     {% else %}
-                        <div style="height: 140px; display: flex; align-items: center; justify-content: center; color: #95a5a6;">
+                        <div style="height: 180px; display: flex; align-items: center; justify-content: center; color: #95a5a6;">
                             <div>
                                 <div style="font-size: 40px;">+</div>
                                 <div style="font-size: 12px;">VAGO</div>
@@ -195,10 +226,11 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
         {% endfor %}
     </div>
 
-    <!-- MODAL DE EDIÇÃO SEM DATA -->
+    <!-- MODAL DE EDIÇÃO -->
     <div class="modal" id="modalEditar">
         <div class="modal-content">
             <h2>Editar Convivente</h2>
@@ -240,6 +272,15 @@
         document.getElementById('modalEditar').addEventListener('click', function(e) {
             if (e.target === this) fecharModal();
         });
+
+        // Mensagens somem em 3 segundos
+        setTimeout(function() {
+            document.querySelectorAll('.flash').forEach(function(msg) {
+                msg.style.transition = 'opacity 0.5s';
+                msg.style.opacity = '0';
+                setTimeout(function() { msg.remove(); }, 500);
+            });
+        }, 3000);
     </script>
 </body>
 </html>
