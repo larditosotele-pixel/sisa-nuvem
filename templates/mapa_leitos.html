@@ -9,7 +9,6 @@
         html, body { 
             background: #f5f5f5; 
             min-height: 100vh;
-            overflow-x: hidden;
         }
         body { font-family: Arial, sans-serif; }
 
@@ -55,8 +54,7 @@
             padding: 15px;
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1;
+            clear: both;
         }
 .quarto-header {
             display: flex;
@@ -127,9 +125,9 @@
             align-items: center;
             justify-content: center;
             line-height: 1.2;
+            word-break: break-word;
         }
 
-        /* AJUSTE PRA CELULAR */
         @media (max-width: 600px) {
             .grid-leitos {
                 grid-template-columns: repeat(3, 1fr);
@@ -262,6 +260,7 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
         {% endfor %}
     </div>
 
