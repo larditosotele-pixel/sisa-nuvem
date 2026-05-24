@@ -104,26 +104,39 @@ def chamada():
         conn.commit()
         flash('Chamada salva com sucesso!')
         return redirect(url_for('chamada'))
+
+    ordem = request.args.get('ordem', 'quarto')
     hoje = date.today()
-    cur.execute('''
+
+    if ordem == 'alfabetica':
+        order_by = 'c.nome ASC'
+    else:
+        order_by = '''q.numero,
+                     CASE WHEN l.numero_leito ~ '^[0-9]+$'
+                          THEN CAST(l.numero_leito AS INTEGER)
+                          ELSE 999 END'''
+
+    cur.execute(f'''
         SELECT
             c.id, c.nome, c.foto_base64,
             q.numero as quarto_numero, l.numero_leito,
-            ch.status as status_hoje
+            ch.status as status
         FROM conviventes c
         LEFT JOIN leitos l ON c.leito_id = l.id
         LEFT JOIN quartos q ON l.quarto_id = q.id
         LEFT JOIN chamadas ch ON c.id = ch.convivente_id AND ch.data_chamada = %s
         WHERE c.ativo = TRUE
-        ORDER BY q.numero,
-                 CASE WHEN l.numero_leito ~ '^[0-9]+$'
-                      THEN CAST(l.numero_leito AS INTEGER)
-                      ELSE 999 END
+        ORDER BY {order_by}
     ''', (hoje,))
+
     conviventes = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('chamada.html', conviventes=conviventes, data_hoje=hoje.strftime('%d/%m/%Y'))
+
+    return render_template('chamada.html',
+                         conviventes=conviventes,
+                         data_hoje=hoje.strftime('%d/%m/%Y'),
+                         ordem=ordem)
 
 @app.route('/cadastrar_convivente', methods=['GET', 'POST'])
 def cadastrar_convivente():
@@ -320,7 +333,6 @@ def relatorio_branco():
                          ano=ano,
                          mes_nome=meses_nomes[mes])
 
-# ROTA CARÔMETRO ATUALIZADA - 4 BOTÕES + 3 PÁGINAS
 @app.route('/carometro')
 def carometro():
     ordem = request.args.get('ordem', default='quarto')
