@@ -70,20 +70,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex: 1; /* MUDEI: Foto ocupa espaço que sobrar */
+            flex: 1;
         }
        .card-foto img {
             width: 90%;
-            height: 100%; /* MUDEI: Força preencher */
-            max-height: 60px; /* MUDEI: Limita altura da foto */
+            height: 100%;
+            max-height: 60px;
             border-radius: 6px;
-            object-fit: cover;
-            object-position: center 30%;
+            object-fit: contain; /* MUDEI: contain não corta o rosto */
+            object-position: center;
             border: 1px solid #ccc;
+            background: #f8f9fa; /* MUDEI: Fundo cinza pra foto pequena */
         }
        .card .sem-foto {
             width: 90%;
-            height: 60px; /* MUDEI: Altura fixa igual da foto */
+            height: 60px;
             border-radius: 6px;
             background: #e9ecef;
             display: flex;
@@ -100,8 +101,7 @@
             padding: 2px 1px;
             line-height: 1.1;
             word-break: break-word;
-            min-height: 24px; /* MUDEI: min-height em vez de height */
-            /* MUDEI: Removi overflow: hidden pra não cortar nome */
+            min-height: 24px;
         }
 
        .titulo-quarto { display: none!important; }
@@ -124,62 +124,64 @@
             }
 
            .card-header {
-                font-size: 9pt; /* MUDEI: 9pt legível */
-                padding: 1px 0;
+                font-size: 10pt;
+                padding: 2px 0;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
            .card-foto {
-                padding: 1px;
+                padding: 2px;
                 flex: 1;
            }
            .card-foto img {
                 width: 95%;
                 height: 100%;
-                max-height: 75px; /* MUDEI: Foto menor pra caber nome */
+                max-height: 85px; /* MUDEI: Aumentei pra preencher melhor */
                 border: 0.5px solid #000;
+                object-fit: contain; /* MUDEI: Não corta rosto */
+                object-position: center;
+                background: #fff;
            }
            .card .sem-foto {
                 width: 95%;
-                height: 75px;
+                height: 85px;
                 border: 0.5px solid #000;
            }
            .card-nome {
-                font-size: 8pt; /* MUDEI: 8pt legível */
+                font-size: 9pt;
                 font-weight: bold;
-                min-height: 22px; /* MUDEI: Garante espaço pro nome */
-                padding: 1px;
-                line-height: 1.1;
-                /* MUDEI: Sem overflow hidden */
+                min-height: 26px; /* MUDEI: Mais espaço pro nome */
+                padding: 2px 1px;
+                line-height: 1.2;
             }
 
-            /* 3 FOLHAS FIXAS - 6 LINHAS POR FOLHA */
+            /* 3 FOLHAS FIXAS - 22 POR FOLHA = 66 TOTAL */
             {% if orientacao == 'horizontal' %}
             @page {
                 size: A4 landscape;
-                margin: 0.4cm; /* MUDEI: Margem maior */
+                margin: 0.3cm; /* MUDEI: Margem menor pra caber tudo */
             }
            .grid {
-                grid-template-columns: repeat(7, 1fr); /* MUDEI: 7 colunas */
-                grid-auto-rows: 115px; /* MUDEI: Card menor pra caber 6 linhas */
+                grid-template-columns: repeat(6, 1fr); /* MUDEI: 6 colunas */
+                grid-auto-rows: 125px; /* MUDEI: Card alto pra usar folha toda */
                 gap: 2px;
             }
-            /* 7 col x 6 linhas = 42 por folha. 65 = 2 folhas. Força 3 folhas */
-           .card:nth-child(21n) { /* MUDEI: 21 por folha = 3 folhas */
+            /* 6 col x 4 linhas = 24 por folha. 22 por folha = 3 folhas certinho */
+           .card:nth-child(22n) {
                 page-break-after: always;
             }
             {% else %}
             @page {
                 size: A4 portrait;
-                margin: 0.4cm;
+                margin: 0.3cm;
             }
            .grid {
-                grid-template-columns: repeat(5, 1fr); /* MUDEI: 5 colunas */
-                grid-auto-rows: 135px; /* MUDEI: Card menor pra caber 6 linhas */
+                grid-template-columns: repeat(4, 1fr); /* MUDEI: 4 colunas */
+                grid-auto-rows: 155px; /* MUDEI: Card alto pra usar folha toda */
                 gap: 2px;
             }
-            /* 5 col x 6 linhas = 30 por folha. 65 = 3 folhas */
-           .card:nth-child(30n) { /* MUDEI: 30 por folha = 3 folhas */
+            /* 4 col x 6 linhas = 24 por folha. 22 por folha = 3 folhas certinho */
+           .card:nth-child(22n) {
                 page-break-after: always;
             }
             {% endif %}
