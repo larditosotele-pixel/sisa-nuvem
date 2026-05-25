@@ -362,6 +362,5 @@ def carometro():
         return render_template('carometro.html', conviventes=conviventes, ordem=ordem, orientacao=orientacao)
     except Exception as e:
         return render_template('carometro.html', conviventes=[], ordem=ordem, orientacao=orientacao, erro=str(e))
-
 if __name__ == '__main__':
     app.run(debug=True)
