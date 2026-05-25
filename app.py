@@ -335,32 +335,53 @@ def carometro():
     ordem = request.args.get('ordem', 'quarto')
     orientacao = request.args.get('orientacao', 'vertical')
     try:
-        with get_db() as conn:
-            cursor = conn.cursor()
-            # MUDEI: Sempre busca flat, sem agrupar
-            if ordem == 'alfabetica':
-                cursor.execute("""
-                    SELECT c.id, c.nome, q.numero as quarto_numero, c.numero_leito, c.foto
-                    FROM conviventes c
-                    LEFT JOIN quartos q ON c.quarto_id = q.id
-                    WHERE c.quarto_id IS NOT NULL
-                    ORDER BY c.nome COLLATE NOCASE
-                """)
-            else: # ordem == 'quarto'
-                cursor.execute("""
-                    SELECT c.id, c.nome, q.numero as quarto_numero, c.numero_leito, c.foto
-                    FROM conviventes c
-                    LEFT JOIN quartos q ON c.quarto_id = q.id
-                    WHERE c.quarto_id IS NOT NULL
-                    ORDER BY CAST(q.numero AS INTEGER), CAST(c.numero_leito AS INTEGER)
-                """)
-            
-            conviventes = [dict(row) for row in cursor.fetchall()]
-            for conv in conviventes:
-                conv['foto_base64'] = converter_foto_para_base64(conv['foto'])
-                
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        if ordem == 'alfabetica':
+            cur.execute("""
+                SELECT
+                    c.id,
+                    c.nome,
+                    q.numero as quarto_numero,
+                    l.numero_leito,
+                    c.foto_base64
+                FROM conviventes c
+                LEFT JOIN leitos l ON c.leito_id = l.id
+                LEFT JOIN quartos q ON l.quarto_id = q.id
+                WHERE c.ativo = TRUE AND c.leito_id IS NOT NULL
+                ORDER BY c.nome COLLATE "C"
+            """)
+        else: # ordem == 'quarto'
+            cur.execute("""
+                SELECT
+                    c.id,
+                    c.nome,
+                    q.numero as quarto_numero,
+                    l.numero_leito,
+                    c.foto_base64
+                FROM conviventes c
+                LEFT JOIN leitos l ON c.leito_id = l.id
+                LEFT JOIN quartos q ON l.quarto_id = q.id
+                WHERE c.ativo = TRUE AND c.leito_id IS NOT NULL
+                ORDER BY
+                    CASE WHEN q.numero ~ '^[0-9]+$'
+                         THEN CAST(q.numero AS INTEGER)
+                         ELSE 999 END,
+                    CASE WHEN l.numero_leito ~ '^[0-9]+$'
+                         THEN CAST(l.numero_leito AS INTEGER)
+                         ELSE 999 END
+            """)
+
+        conviventes = [dict(row) for row in cur.fetchall()]
+        cur.close()
+        conn.close()
+
         return render_template('carometro.html', conviventes=conviventes, ordem=ordem, orientacao=orientacao)
+
     except Exception as e:
+        print(f"ERRO NO CARÔMETRO: {e}")
         return render_template('carometro.html', conviventes=[], ordem=ordem, orientacao=orientacao, erro=str(e))
+
 if __name__ == '__main__':
     app.run(debug=True)
