@@ -2,6 +2,3 @@ Flask
 psycopg2-binary
 pytz
 gunicorn
-xhtml2pdf==0.2.11
-reportlab==3.6.13
-Pillow==9.5.0
