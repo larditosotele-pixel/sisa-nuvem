@@ -45,7 +45,7 @@
 
        .grid {
             display: grid;
-            grid-template-columns: repeat(10, 1fr); /* TELA: 10 colunas */
+            grid-template-columns: repeat(10, 1fr); /* TELA: 10 colunas igual seu print */
             gap: 2px;
         }
 
@@ -71,6 +71,7 @@
             justify-content: center;
             align-items: center;
             flex: 1;
+            background: #fff;
         }
        .card-foto img {
             width: 100%;
@@ -78,7 +79,7 @@
             max-height: 60px;
             border-radius: 4px;
             object-fit: cover;
-            object-position: center top;
+            object-position: center 20%; /* TELA: 20% pega rosto bom */
             border: 1px solid #ccc;
         }
        .card .sem-foto {
@@ -101,6 +102,7 @@
             line-height: 1.1;
             word-break: break-word;
             min-height: 24px;
+            background: #f8f9fa;
         }
 
        .titulo-quarto { display: none!important; }
@@ -110,78 +112,87 @@
         }
 
         @media print {
-            body { background: white; padding: 0; margin: 0; }
+            html, body { 
+                height: 100%;
+                margin: 0 !important; 
+                padding: 0 !important;
+            }
            .header { display: none; }
            .container { padding: 0; }
 
            .card {
                 page-break-inside: avoid!important;
                 break-inside: avoid!important;
-                border: 0.5px solid #000; /* MUDEI: Borda mais fina */
+                border: 0.3px solid #000;
                 display: flex;
                 flex-direction: column;
             }
 
            .card-header {
-                font-size: 8pt; /* MUDEI: Menor pra caber mais linhas */
-                padding: 1px 0;
+                font-size: 7pt;
+                padding: 0.5px 0;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
            .card-foto {
                 padding: 0;
                 flex: 1;
+                background: #fff;
            }
            .card-foto img {
                 width: 100%;
                 height: 100%;
-                max-height: 55px; /* MUDEI: Mais baixo pra caber 8 linhas */
+                max-height: 48px; /* MUDEI: 48px pra caber 8 linhas sem sobra */
                 border: none;
                 border-radius: 0;
-                object-fit: cover;
-                object-position: center 15%; /* MUDEI: 15% pega testa + olho + boca */
+                object-fit: contain; /* MUDEI: contain não corta rosto NUNCA */
+                object-position: center;
+                background: #fff; /* MUDEI: Fundo branco tira borda visual */
            }
            .card .sem-foto {
                 width: 100%;
-                height: 55px;
+                height: 48px;
                 border: none;
                 border-radius: 0;
-                font-size: 7pt;
+                font-size: 6pt;
            }
            .card-nome {
-                font-size: 7pt; /* MUDEI: Menor pra caber 8 linhas */
+                font-size: 6.5pt;
                 font-weight: bold;
-                min-height: 18px; /* MUDEI: Menor */
-                padding: 1px;
+                min-height: 16px; /* MUDEI: Menor ainda */
+                padding: 0.5px;
                 line-height: 1;
+                background: #f8f9fa;
             }
 
-            /* 3 FOLHAS - 8 LINHAS POR FOLHA = 0 ESPAÇO BRANCO */
+            /* PRINT: 3 FOLHAS EXATAS - 8 LINHAS POR FOLHA */
             {% if orientacao == 'horizontal' %}
             @page {
                 size: A4 landscape;
-                margin: 0.15cm; /* MUDEI: Mínima mesmo */
+                margin: 0.1cm; /* MUDEI: 1mm de margem */
             }
            .grid {
-                grid-template-columns: repeat(8, 1fr); /* MUDEI: 8 colunas */
-                grid-auto-rows: 85px; /* MUDEI: 85px x 8 linhas = 680px = cabe na A4 */
-                gap: 1px;
+                grid-template-columns: repeat(9, 1fr); /* MUDEI: 9 colunas */
+                grid-auto-rows: 75px; /* MUDEI: 75px x 8 = 600px = cabe justo */
+                gap: 0.5px;
+                height: 600px; /* MUDEI: Força altura total da folha */
             }
-            /* 8 col x 8 linhas = 64 por folha. 22 por folha = 3 folhas */
+            /* 9 col x 8 linhas = 72. Quebra em 22 = 3 folhas */
            .card:nth-child(22n) {
                 page-break-after: always;
             }
             {% else %}
             @page {
                 size: A4 portrait;
-                margin: 0.15cm;
+                margin: 0.1cm;
             }
            .grid {
-                grid-template-columns: repeat(6, 1fr); /* MUDEI: 6 colunas */
-                grid-auto-rows: 105px; /* MUDEI: 105px x 8 linhas = 840px = cabe na A4 */
-                gap: 1px;
+                grid-template-columns: repeat(7, 1fr); /* MUDEI: 7 colunas */
+                grid-auto-rows: 95px; /* MUDEI: 95px x 8 = 760px = cabe justo */
+                gap: 0.5px;
+                height: 760px; /* MUDEI: Força altura total da folha */
             }
-            /* 6 col x 8 linhas = 48 por folha. 22 por folha = 3 folhas */
+            /* 7 col x 8 linhas = 56. Quebra em 22 = 3 folhas */
            .card:nth-child(22n) {
                 page-break-after: always;
             }
