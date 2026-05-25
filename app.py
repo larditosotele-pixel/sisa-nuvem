@@ -332,74 +332,36 @@ def relatorio_branco():
 
 @app.route('/carometro')
 def carometro():
+    ordem = request.args.get('ordem', 'quarto')
+    orientacao = request.args.get('orientacao', 'vertical')
     try:
-        ordem = request.args.get('ordem', 'quarto')
-        orientacao = request.args.get('orientacao', 'vertical')
-
-        conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        # MUDEI: ORDENAÇÃO CORRIGIDA PRA NÃO DAR BAGUNÇA
-        if ordem == 'alfabetica':
-            order_by = 'c.nome ASC'
-        else:
-            # Ordena por número do quarto e depois número do leito - AMBOS COMO INTEIRO
-            order_by = '''CAST(q.numero AS INTEGER) ASC,
-                          CASE WHEN l.numero_leito ~ '^[0-9]+$'
-                               THEN CAST(l.numero_leito AS INTEGER)
-                               ELSE 999 END ASC'''
-
-        cur.execute(f'''
-            SELECT
-                c.id, c.nome, c.foto_base64,
-                q.numero as quarto_numero, l.numero_leito
-            FROM conviventes c
-            LEFT JOIN leitos l ON c.leito_id = l.id
-            LEFT JOIN quartos q ON l.quarto_id = q.id
-            WHERE c.ativo = TRUE
-            ORDER BY {order_by}
-        ''')
-
-        conviventes_db = cur.fetchall()
-        cur.close()
-        conn.close()
-
-        conviventes_processados = []
-        for c in conviventes_db:
-            foto_b64 = c['foto_base64']
-            if foto_b64 and not foto_b64.startswith('data:'):
-                foto_b64 = f"data:image/jpeg;base64,{foto_b64}"
-
-            conviventes_processados.append({
-                'nome': c['nome'],
-                'quarto_numero': c['quarto_numero'],
-                'numero_leito': c['numero_leito'],
-                'foto_base64': foto_b64
-            })
-
-        quartos_agrupados = {}
-        if ordem == 'quarto':
-            for conv in conviventes_processados:
-                quarto = conv['quarto_numero']
-                if quarto not in quartos_agrupados:
-                    quartos_agrupados[quarto] = []
-                quartos_agrupados[quarto].append(conv)
-            # MUDEI: Ordena os quartos como número, não texto
-            quartos_agrupados = dict(sorted(quartos_agrupados.items(), key=lambda x: int(x[0])))
-
-        return render_template('carometro.html',
-                             conviventes=conviventes_processados,
-                             quartos_agrupados=quartos_agrupados,
-                             ordem=ordem,
-                             orientacao=orientacao,
-                             erro=None)
+        with get_db() as conn:
+            cursor = conn.cursor()
+            # MUDEI: Sempre busca flat, sem agrupar
+            if ordem == 'alfabetica':
+                cursor.execute("""
+                    SELECT c.id, c.nome, q.numero as quarto_numero, c.numero_leito, c.foto
+                    FROM conviventes c
+                    LEFT JOIN quartos q ON c.quarto_id = q.id
+                    WHERE c.quarto_id IS NOT NULL
+                    ORDER BY c.nome COLLATE NOCASE
+                """)
+            else: # ordem == 'quarto'
+                cursor.execute("""
+                    SELECT c.id, c.nome, q.numero as quarto_numero, c.numero_leito, c.foto
+                    FROM conviventes c
+                    LEFT JOIN quartos q ON c.quarto_id = q.id
+                    WHERE c.quarto_id IS NOT NULL
+                    ORDER BY CAST(q.numero AS INTEGER), CAST(c.numero_leito AS INTEGER)
+                """)
+            
+            conviventes = [dict(row) for row in cursor.fetchall()]
+            for conv in conviventes:
+                conv['foto_base64'] = converter_foto_para_base64(conv['foto'])
+                
+        return render_template('carometro.html', conviventes=conviventes, ordem=ordem, orientacao=orientacao)
     except Exception as e:
-        return render_template('carometro.html',
-                             conviventes=[],
-                             quartos_agrupados={},
-                             ordem='quarto',
-                             orientacao='vertical',
-                             erro=str(e))
+        return render_template('carometro.html', conviventes=[], ordem=ordem, orientacao=orientacao, erro=str(e))
 
 if __name__ == '__main__':
     app.run(debug=True)
