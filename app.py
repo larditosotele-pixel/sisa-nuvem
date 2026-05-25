@@ -90,20 +90,35 @@ def adicionar_leito_mapa(quarto_id):
 def chamada():
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     if request.method == 'POST':
         hoje = date.today()
+
+        # Pega todos os status de uma vez
+        dados_para_salvar = []
         for key, value in request.form.items():
-            if key.startswith('status_'):
-                convivente_id = key.split('_')[1]
-                cur.execute('SELECT id FROM chamadas WHERE convivente_id = %s AND data_chamada = %s', (convivente_id, hoje))
-                if cur.fetchone():
-                    cur.execute('UPDATE chamadas SET status = %s WHERE convivente_id = %s AND data_chamada = %s', (value, convivente_id, hoje))
-                else:
-                    cur.execute('INSERT INTO chamadas (convivente_id, data_chamada, status) VALUES (%s, %s, %s)', (convivente_id, hoje, value))
+            if key.startswith('status_') and value: # Ignora vazio
+                convivente_id = int(key.split('_')[1])
+                dados_para_salvar.append((convivente_id, hoje, value))
+
+        if dados_para_salvar:
+            # UPSERT: Insere ou atualiza tudo numa tacada só
+            # Se já existe registro pro convivente + data, só atualiza o status
+            args_str = ','.join(cur.mogrify("(%s,%s,%s)", i).decode('utf-8') for i in dados_para_salvar)
+            cur.execute(f"""
+                INSERT INTO chamadas (convivente_id, data_chamada, status)
+                VALUES {args_str}
+                ON CONFLICT (convivente_id, data_chamada)
+                DO UPDATE SET status = EXCLUDED.status
+            """)
+
         conn.commit()
+        cur.close()
+        conn.close()
         flash('Chamada salva com sucesso!')
         return redirect(url_for('chamada'))
 
+    # Parte do GET continua igual...
     ordem = request.args.get('ordem', 'quarto')
     hoje = date.today()
 
@@ -136,7 +151,6 @@ def chamada():
                          conviventes=conviventes,
                          data_hoje=hoje.strftime('%d/%m/%Y'),
                          ordem=ordem)
-
 @app.route('/cadastrar_convivente', methods=['GET', 'POST'])
 def cadastrar_convivente():
     leito_id = request.args.get('leito_id', type=int)
