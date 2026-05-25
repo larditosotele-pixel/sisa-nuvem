@@ -57,45 +57,46 @@
        .card-header {
             background: #4a90e2;
             color: white;
-            font-size: 6px;
+            font-size: 8px; /* MUDEI: Aumentei de 6px pra 8px */
             font-weight: bold;
             text-align: center;
-            padding: 0px;
-            line-height: 1;
+            padding: 1px 0; /* MUDEI: Dei 1px de respiro */
+            line-height: 1.1;
             white-space: nowrap;
         }
        .card-foto {
-            padding: 0px;
+            padding: 1px; /* MUDEI: Dei 1px de respiro pra foto não colar */
             display: flex;
             justify-content: center;
             align-items: center;
         }
        .card-foto img {
             width: 100%;
-            aspect-ratio: 1/1;
+            aspect-ratio: 3/4; /* MUDEI: Era 1/1 quadrado. Agora 3/4 pra pegar rosto inteiro */
             border-radius: 50%;
             object-fit: cover;
-            object-position: center 15%;
+            object-position: center 25%; /* MUDEI: Era 15%. Agora 25% pra descer um pouco */
             border: none;
         }
-       .card.sem-foto {
+       .card .sem-foto {
             width: 100%;
-            aspect-ratio: 1/1;
+            aspect-ratio: 3/4; /* MUDEI: Igual da foto */
             border-radius: 50%;
             background: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #6c757d;
-            font-size: 4px;
+            font-size: 6px; /* MUDEI: Aumentei */
         }
        .card-nome {
-            font-size: 5px;
+            font-size: 7px; /* MUDEI: Aumentei de 5px pra 7px */
+            font-weight: bold; /* MUDEI: Nome em negrito pra ler melhor */
             text-align: center;
-            padding: 0px;
-            line-height: 1;
+            padding: 1px 0;
+            line-height: 1.1;
             word-break: break-word;
-            height: 10px;
+            height: 14px; /* MUDEI: Aumentei altura pra caber 2 linhas */
             overflow: hidden;
         }
 
@@ -117,13 +118,19 @@
             }
 
            .card-header {
-                font-size: 4.5px;
+                font-size: 6px; /* MUDEI: Aumentei de 4.5px pra 6px */
+                padding: 0.5px 0;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+           .card-foto {
+                padding: 0.5px; /* MUDEI: Respiro na impressão */
+           }
            .card-nome {
-                font-size: 4px;
-                height: 8px;
+                font-size: 5.5px; /* MUDEI: Aumentei de 4px pra 5.5px */
+                font-weight: bold;
+                height: 11px; /* MUDEI: Aumentei altura */
+                padding: 0.5px 0;
             }
 
             {% if orientacao == 'horizontal' %}
@@ -133,7 +140,7 @@
             }
            .grid {
                 grid-template-columns: repeat(15, 1fr);
-                grid-auto-rows: 72px;
+                grid-auto-rows: 78px; /* MUDEI: Aumentei 6px pra caber fonte maior */
                 gap: 0.5px;
             }
             {% else %}
@@ -143,7 +150,7 @@
             }
            .grid {
                 grid-template-columns: repeat(11, 1fr);
-                grid-auto-rows: 75px;
+                grid-auto-rows: 82px; /* MUDEI: Aumentei 7px pra caber fonte maior */
                 gap: 0.5px;
             }
             {% endif %}
