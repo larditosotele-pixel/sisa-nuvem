@@ -42,10 +42,10 @@
             border-radius: 6px;
         }
         
-        /* TELA: 8 colunas pra usar a tela toda */
+        /* TELA: 7 colunas, card em pé */
         .grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 3px;
         }
         
@@ -54,16 +54,19 @@
             border-radius: 2px;
             padding: 1px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
         }
         .card img {
             width: 100%;
-            height: 75px;
-            object-fit: cover; /* MUDEI: cover preenche o card, acaba o branco */
+            aspect-ratio: 3/4; /* MUDEI: Card vertical 3x4, igual RG */
+            object-fit: cover; 
+            object-position: top center; /* MUDEI: Prioriza o rosto, não corta testa */
             background: #fff;
         }
         .card .sem-foto {
             width: 100%;
-            height: 75px;
+            aspect-ratio: 3/4;
             background: #e9ecef;
             display: flex;
             align-items: center;
@@ -94,10 +97,9 @@
 
         @media (max-width: 768px) {
             .grid { grid-template-columns: repeat(4, 1fr); }
-            .card img, .card .sem-foto { height: 60px; }
         }
 
-        /* IMPRESSÃO - 3 FOLHAS GARANTIDO */
+        /* IMPRESSÃO - CARD VERTICAL + 3 FOLHAS */
         @media print {
             body { background: white; padding: 0; }
             .header { display: none; }
@@ -111,17 +113,14 @@
             .card { 
                 padding: 0px;
                 border: 0.5px solid #555;
-                display: flex;
-                flex-direction: column;
             }
             
             .card img, .card .sem-foto { 
-                height: 55px; /* MUDEI: Foto menor = mais linhas */
-                object-fit: cover; /* MUDEI: Mata o espaço branco lateral */
-                background: white;
-                flex-shrink: 0;
+                aspect-ratio: 3/4; /* MUDEI: Mantém vertical na impressão */
+                object-fit: cover;
+                object-position: top center; /* MUDEI: Não corta rosto */
             }
-            .card h3 { font-size: 6px; margin: 0; line-height: 1; }
+            .card h3 { font-size: 5.5px; margin: 0; line-height: 1; }
             .card p { font-size: 5px; line-height: 1; }
             
             .titulo-quarto { 
@@ -134,24 +133,30 @@
             {% if orientacao == 'horizontal' %}
             @page { 
                 size: A4 landscape;
-                margin: 0.3cm; /* MUDEI: Margem mínima possível */
+                margin: 0.25cm; /* MUDEI: Margem mínima total */
             }
-            /* HORIZONTAL: 8 col x 8 linhas = 64 por folha = 192 em 3 folhas */
+            /* HORIZONTAL: 10 col x 6 linhas = 60 por folha = 180 em 3 folhas */
             .grid {
-                grid-template-columns: repeat(8, 1fr);
-                grid-auto-rows: 85px; /* MUDEI: Altura mínima pra caber 8 linhas */
-                gap: 1px; /* MUDEI: Gap quase zero */
+                grid-template-columns: repeat(10, 1fr);
+                grid-auto-rows: 105px; /* MUDEI: Altura pro card 3x4 */
+                gap: 1px;
+            }
+            .card img, .card .sem-foto { 
+                height: 75px; /* MUDEI: Altura da foto no card vertical */
             }
             {% else %}
             @page { 
                 size: A4 portrait;
-                margin: 0.3cm; /* MUDEI: Margem mínima possível */
+                margin: 0.25cm; /* MUDEI: Margem mínima total */
             }
-            /* VERTICAL: 6 col x 9 linhas = 54 por folha = 162 em 3 folhas */
+            /* VERTICAL: 7 col x 8 linhas = 56 por folha = 168 em 3 folhas */
             .grid {
-                grid-template-columns: repeat(6, 1fr);
-                grid-auto-rows: 98px; /* MUDEI: Altura mínima pra caber 9 linhas */
-                gap: 1px; /* MUDEI: Gap quase zero */
+                grid-template-columns: repeat(7, 1fr);
+                grid-auto-rows: 115px; /* MUDEI: Altura pro card 3x4 */
+                gap: 1px;
+            }
+            .card img, .card .sem-foto { 
+                height: 85px; /* MUDEI: Altura da foto no card vertical */
             }
             {% endif %}
         }
