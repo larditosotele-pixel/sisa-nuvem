@@ -9,179 +9,148 @@
         body { 
             font-family: Arial, sans-serif; 
             background: #f5f5f5;
-            padding: 6px;
+            padding: 3px;
         }
         .header {
             background: white;
-            padding: 6px;
-            border-radius: 6px;
-            margin-bottom: 6px;
+            padding: 5px;
+            border-radius: 4px;
+            margin-bottom: 3px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 3px;
         }
-        .header h1 { font-size: 15px; }
-        .botoes { display: flex; gap: 4px; flex-wrap: wrap; }
+        .header h1 { font-size: 13px; }
+        .botoes { display: flex; gap: 2px; flex-wrap: wrap; }
         .btn {
-            padding: 3px 6px;
+            padding: 2px 4px;
             border: 1px solid #007bff;
             background: white;
             color: #007bff;
             text-decoration: none;
-            border-radius: 3px;
-            font-size: 11px;
+            border-radius: 2px;
+            font-size: 9px;
         }
         .btn.active { background: #007bff; color: white; }
         .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
         
         .container {
             background: white;
-            padding: 4px;
-            border-radius: 6px;
+            padding: 1px;
+            border-radius: 4px;
         }
         
+        /* TELA: 12 colunas */
         .grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 3px;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1px;
         }
         
-        /* CARD ESTILO DA FOTO */
+        /* CARD IGUAL DA FOTO, SEM BRANCO SOBRANDO */
         .card {
-            border: 1px solid #333;
+            border: 1px solid #000;
             background: white;
             display: flex;
             flex-direction: column;
         }
         .card-header {
-            background: #4a90e2; /* MUDEI: Tarja azul igual da foto */
+            background: #4a90e2;
             color: white;
-            font-size: 8px;
+            font-size: 6px;
             font-weight: bold;
             text-align: center;
-            padding: 1px 0;
-            line-height: 1.2;
+            padding: 0px;
+            line-height: 1;
+            white-space: nowrap;
         }
         .card-foto {
-            padding: 2px;
+            padding: 0px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         .card-foto img {
-            width: 45px; /* MUDEI: Tamanho fixo pra foto redonda */
-            height: 45px;
-            border-radius: 50%; /* MUDEI: Foto redonda igual da foto */
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
             object-fit: cover;
-            object-position: top center;
-            border: 1px solid #ddd;
+            object-position: center 15%; /* MUDEI: Sobe a foto pra pegar o rosto */
+            border: none;
         }
         .card .sem-foto {
-            width: 45px;
-            height: 45px;
+            width: 100%;
+            aspect-ratio: 1/1;
             border-radius: 50%;
             background: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #6c757d;
-            font-size: 6px;
-            border: 1px solid #ddd;
+            font-size: 4px;
         }
         .card-nome { 
-            font-size: 7px; 
+            font-size: 5px; 
             text-align: center;
-            padding: 1px 2px 2px 2px;
+            padding: 0px;
             line-height: 1;
             word-break: break-word;
-            min-height: 16px; /* Garante espaço pra 2 linhas de nome */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 10px; /* Altura fixa pra 2 linhas */
+            overflow: hidden;
         }
         
-        .titulo-quarto {
-            grid-column: 1 / -1;
-            font-size: 10px;
-            font-weight: bold;
-            margin: 4px 0 2px 0;
-            padding: 2px 0;
-            border-bottom: 2px solid #007bff;
-            background: #f0f8ff;
-            text-align: center;
-        }
+        /* MATEI O TÍTULO QUE CAUSAVA O BURACO */
+        .titulo-quarto { display: none !important; }
 
         @media (max-width: 768px) {
-            .grid { grid-template-columns: repeat(4, 1fr); }
-            .card-foto img, .card .sem-foto { width: 35px; height: 35px; }
+            .grid { grid-template-columns: repeat(6, 1fr); }
         }
 
-        /* IMPRESSÃO - 3 FOLHAS CRAVADO NOS 4 MODOS */
+        /* IMPRESSÃO - 3 FOLHAS EM TODOS OS 4 MODOS */
         @media print {
             body { background: white; padding: 0; }
             .header { display: none; }
             .container { padding: 0; }
             
-            .card, .titulo-quarto { 
+            .card { 
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
+                border: 0.3px solid #000;
             }
             
-            .card {
-                border: 0.5px solid #000;
-            }
             .card-header {
-                font-size: 6px;
-                padding: 0.5px 0;
-                -webkit-print-color-adjust: exact; /* MUDEI: Força imprimir o azul */
-                print-color-adjust: exact;
-            }
-            .card-foto {
-                padding: 1px;
-            }
-            .card-foto img, .card .sem-foto { 
-                width: 35px; /* MUDEI: Foto menor pra caber mais */
-                height: 35px;
-                border: 0.5px solid #999;
-            }
-            .card-nome { 
-                font-size: 5px; 
-                padding: 0px 1px 1px 1px;
-                min-height: 12px;
-            }
-            
-            .titulo-quarto { 
-                font-size: 7px; 
-                margin: 2px 0 1px 0;
-                padding: 1px 0;
-                border-bottom: 1px solid #007bff;
+                font-size: 4.5px;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+            }
+            .card-nome { 
+                font-size: 4px; 
+                height: 8px;
             }
 
             {% if orientacao == 'horizontal' %}
             @page { 
                 size: A4 landscape;
-                margin: 0.2cm; /* MUDEI: Margem mínima */
+                margin: 0.1cm; /* MARGEM MÍNIMA ABSOLUTA */
             }
-            /* HORIZONTAL: 10 col x 6 linhas = 60 por folha = 180 em 3 folhas */
+            /* HORIZONTAL: 15 col x 7 linhas = 105 por folha = 315 em 3 folhas */
             .grid {
-                grid-template-columns: repeat(10, 1fr);
-                grid-auto-rows: 95px; 
-                gap: 1px;
+                grid-template-columns: repeat(15, 1fr);
+                grid-auto-rows: 72px; /* CARD BAIXINHO */
+                gap: 0.5px;
             }
             {% else %}
             @page { 
                 size: A4 portrait;
-                margin: 0.2cm; /* MUDEI: Margem mínima */
+                margin: 0.1cm; /* MARGEM MÍNIMA ABSOLUTA */
             }
-            /* VERTICAL: 8 col x 7 linhas = 56 por folha = 168 em 3 folhas */
+            /* VERTICAL: 11 col x 9 linhas = 99 por folha = 297 em 3 folhas */
             .grid {
-                grid-template-columns: repeat(8, 1fr);
-                grid-auto-rows: 110px; 
-                gap: 1px;
+                grid-template-columns: repeat(11, 1fr);
+                grid-auto-rows: 75px; /* CARD BAIXINHO */
+                gap: 0.5px;
             }
             {% endif %}
         }
@@ -210,43 +179,21 @@
         {% endif %}
 
         <div class="grid">
-            {% if ordem == 'alfabetica' %}
-                {% for conv in conviventes %}
-                    <div class="card">
-                        <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
-                        <div class="card-foto">
-                            {% if conv.foto_base64 %}
-                                <img src="{{ conv.foto_base64 }}" alt="{{ conv.nome }}">
-                            {% else %}
-                                <div class="sem-foto">S/Foto</div>
-                            {% endif %}
-                        </div>
-                        <div class="card-nome">{{ conv.nome }}</div>
+            {% for conv in conviventes %}
+                <div class="card">
+                    <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
+                    <div class="card-foto">
+                        {% if conv.foto_base64 %}
+                            <img src="{{ conv.foto_base64 }}" alt="{{ conv.nome }}">
+                        {% else %}
+                            <div class="sem-foto">S/Foto</div>
+                        {% endif %}
                     </div>
-                {% else %}
-                    <p>Nenhum convivente encontrado.</p>
-                {% endfor %}
-            
+                    <div class="card-nome">{{ conv.nome }}</div>
+                </div>
             {% else %}
-                {% for quarto, lista in quartos_agrupados.items() %}
-                    <div class="titulo-quarto">Quarto {{ quarto }}</div>
-                    {% for conv in lista %}
-                        <div class="card">
-                            <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
-                            <div class="card-foto">
-                                {% if conv.foto_base64 %}
-                                    <img src="{{ conv.foto_base64 }}" alt="{{ conv.nome }}">
-                                {% else %}
-                                    <div class="sem-foto">S/Foto</div>
-                                {% endif %}
-                            </div>
-                            <div class="card-nome">{{ conv.nome }}</div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p>Nenhum convivente encontrado.</p>
-                {% endfor %}
-            {% endif %}
+                <p>Nenhum convivente encontrado.</p>
+            {% endfor %}
         </div>
     </div>
 </body>
