@@ -3,7 +3,9 @@ import psycopg2
 import psycopg2.extras
 import base64
 from datetime import date
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
+from weasyprint import HTML, CSS
+from weasyprint.text.fonts import FontConfiguration
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'uma_chave_secreta_muito_segura_e_dificil')
@@ -352,8 +354,7 @@ def carometro():
                 WHERE c.ativo = TRUE AND c.leito_id IS NOT NULL
                 ORDER BY c.nome COLLATE "C"
             """)
-        else: # ordem == 'quarto'
-            # CORRIGIDO: q.numero é INTEGER, não precisa de regex
+        else:
             cur.execute("""
                 SELECT
                     c.id,
@@ -381,6 +382,98 @@ def carometro():
     except Exception as e:
         print(f"ERRO NO CARÔMETRO: {e}")
         return render_template('carometro.html', conviventes=[], ordem=ordem, orientacao=orientacao, erro=str(e))
+
+# NOVA ROTA - GERA PDF NO SERVIDOR
+@app.route('/carometro/pdf')
+def carometro_pdf():
+    ordem = request.args.get('ordem', 'quarto')
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        if ordem == 'alfabetica':
+            cur.execute("""
+                SELECT c.id, c.nome, q.numero as quarto_numero, l.numero_leito, c.foto_base64
+                FROM conviventes c
+                LEFT JOIN leitos l ON c.leito_id = l.id
+                LEFT JOIN quartos q ON l.quarto_id = q.id
+                WHERE c.ativo = TRUE AND c.leito_id IS NOT NULL
+                ORDER BY c.nome COLLATE "C"
+            """)
+        else:
+            cur.execute("""
+                SELECT c.id, c.nome, q.numero as quarto_numero, l.numero_leito, c.foto_base64
+                FROM conviventes c
+                LEFT JOIN leitos l ON c.leito_id = l.id
+                LEFT JOIN quartos q ON l.quarto_id = q.id
+                WHERE c.ativo = TRUE AND c.leito_id IS NOT NULL
+                ORDER BY q.numero, CASE WHEN l.numero_leito ~ '^[0-9]+$' THEN CAST(l.numero_leito AS INTEGER) ELSE 999 END
+            """)
+
+        conviventes = [dict(row) for row in cur.fetchall()]
+        cur.close()
+        conn.close()
+
+        html_string = render_template('carometro_pdf.html', conviventes=conviventes)
+
+        pdf_css = CSS(string='''
+            @page { size: A4 portrait; margin: 3mm; }
+            body { margin: 0; font-family: Arial; }
+          .grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                grid-template-rows: repeat(9, 1fr);
+                gap: 1mm;
+                height: 291mm;
+                width: 100%;
+            }
+          .card {
+                border: 0.2mm solid #000;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+          .card-header {
+                background: #4a90e2;
+                color: white;
+                font-size: 7pt;
+                text-align: center;
+                padding: 0.5mm;
+                flex-shrink: 0;
+            }
+          .card-foto {
+                flex: 1;
+                min-height: 0;
+            }
+          .card-foto img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center 25%;
+            }
+          .card-nome {
+                font-size: 6pt;
+                font-weight: bold;
+                text-align: center;
+                padding: 0.5mm;
+                height: 6mm;
+                flex-shrink: 0;
+                background: #f8f9fa;
+            }
+          .card:nth-child(21n) { page-break-after: always; }
+        ''')
+
+        font_config = FontConfiguration()
+        html = HTML(string=html_string)
+        pdf = html.write_pdf(stylesheets=[pdf_css], font_config=font_config)
+
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'inline; filename=carometro.pdf'
+        return response
+
+    except Exception as e:
+        return str(e), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
