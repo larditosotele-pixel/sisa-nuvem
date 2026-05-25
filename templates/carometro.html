@@ -13,39 +13,40 @@
         }
        .header {
             background: white;
-            padding: 5px;
+            padding: 8px; /* MUDEI: Aumentei */
             border-radius: 4px;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 3px;
+            gap: 5px;
         }
-       .header h1 { font-size: 13px; }
-       .botoes { display: flex; gap: 2px; flex-wrap: wrap; }
+       .header h1 { font-size: 16px; /* MUDEI: Aumentei */ }
+       .botoes { display: flex; gap: 4px; flex-wrap: wrap; }
        .btn {
-            padding: 2px 4px;
+            padding: 5px 8px; /* MUDEI: Botão maior */
             border: 1px solid #007bff;
             background: white;
             color: #007bff;
             text-decoration: none;
-            border-radius: 2px;
-            font-size: 9px;
+            border-radius: 3px;
+            font-size: 12px; /* MUDEI: Fonte maior */
+            font-weight: bold;
         }
        .btn.active { background: #007bff; color: white; }
        .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
 
        .container {
             background: white;
-            padding: 1px;
+            padding: 2px;
             border-radius: 4px;
         }
 
        .grid {
             display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 1px;
+            grid-template-columns: repeat(10, 1fr); /* MUDEI: Era 12. Agora 10 pra foto ficar menor */
+            gap: 2px;
         }
 
        .card {
@@ -57,53 +58,54 @@
        .card-header {
             background: #4a90e2;
             color: white;
-            font-size: 8px; /* MUDEI: Aumentei de 6px pra 8px */
+            font-size: 10px; /* MUDEI: Aumentei pra 10px */
             font-weight: bold;
             text-align: center;
-            padding: 1px 0; /* MUDEI: Dei 1px de respiro */
+            padding: 2px 0; /* MUDEI: Mais respiro */
             line-height: 1.1;
             white-space: nowrap;
         }
        .card-foto {
-            padding: 1px; /* MUDEI: Dei 1px de respiro pra foto não colar */
+            padding: 2px; /* MUDEI: Mais respiro */
             display: flex;
             justify-content: center;
             align-items: center;
         }
        .card-foto img {
-            width: 100%;
-            aspect-ratio: 3/4; /* MUDEI: Era 1/1 quadrado. Agora 3/4 pra pegar rosto inteiro */
-            border-radius: 50%;
+            width: 80%; /* MUDEI: Era 100%. Agora 80% pra não estourar */
+            aspect-ratio: 3/4;
+            border-radius: 8px; /* MUDEI: Quadrado com canto arredondado, não círculo */
             object-fit: cover;
-            object-position: center 25%; /* MUDEI: Era 15%. Agora 25% pra descer um pouco */
-            border: none;
+            object-position: center 30%; /* MUDEI: Desci mais pra pegar rosto+ombro */
+            border: 1px solid #ccc;
         }
        .card .sem-foto {
-            width: 100%;
-            aspect-ratio: 3/4; /* MUDEI: Igual da foto */
-            border-radius: 50%;
+            width: 80%;
+            aspect-ratio: 3/4;
+            border-radius: 8px;
             background: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #6c757d;
-            font-size: 6px; /* MUDEI: Aumentei */
+            font-size: 8px;
+            border: 1px solid #ccc;
         }
        .card-nome {
-            font-size: 7px; /* MUDEI: Aumentei de 5px pra 7px */
-            font-weight: bold; /* MUDEI: Nome em negrito pra ler melhor */
+            font-size: 9px; /* MUDEI: Aumentei pra 9px */
+            font-weight: bold;
             text-align: center;
-            padding: 1px 0;
+            padding: 2px 1px;
             line-height: 1.1;
             word-break: break-word;
-            height: 14px; /* MUDEI: Aumentei altura pra caber 2 linhas */
+            height: 20px; /* MUDEI: Mais altura pra 2 linhas */
             overflow: hidden;
         }
 
        .titulo-quarto { display: none!important; }
 
         @media (max-width: 768px) {
-           .grid { grid-template-columns: repeat(6, 1fr); }
+           .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
         @media print {
@@ -114,44 +116,48 @@
            .card {
                 page-break-inside: avoid!important;
                 break-inside: avoid!important;
-                border: 0.3px solid #000;
+                border: 0.5px solid #000;
             }
 
            .card-header {
-                font-size: 6px; /* MUDEI: Aumentei de 4.5px pra 6px */
-                padding: 0.5px 0;
+                font-size: 8px; /* MUDEI: Fonte grande no print */
+                padding: 1px 0;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
            .card-foto {
-                padding: 0.5px; /* MUDEI: Respiro na impressão */
+                padding: 1px;
+           }
+           .card-foto img {
+                width: 85%; /* MUDEI: Um pouco maior no print */
+                border: 0.5px solid #999;
            }
            .card-nome {
-                font-size: 5.5px; /* MUDEI: Aumentei de 4px pra 5.5px */
+                font-size: 7px; /* MUDEI: Fonte grande no print */
                 font-weight: bold;
-                height: 11px; /* MUDEI: Aumentei altura */
-                padding: 0.5px 0;
+                height: 16px;
+                padding: 1px;
             }
 
             {% if orientacao == 'horizontal' %}
             @page {
                 size: A4 landscape;
-                margin: 0.1cm;
+                margin: 0.15cm; /* MUDEI: Margem mínima */
             }
            .grid {
-                grid-template-columns: repeat(15, 1fr);
-                grid-auto-rows: 78px; /* MUDEI: Aumentei 6px pra caber fonte maior */
-                gap: 0.5px;
+                grid-template-columns: repeat(13, 1fr); /* MUDEI: 13 colunas = 78 cards por linha */
+                grid-auto-rows: 95px; /* MUDEI: Card maior pra caber fonte */
+                gap: 1px;
             }
             {% else %}
             @page {
                 size: A4 portrait;
-                margin: 0.1cm;
+                margin: 0.15cm;
             }
            .grid {
-                grid-template-columns: repeat(11, 1fr);
-                grid-auto-rows: 82px; /* MUDEI: Aumentei 7px pra caber fonte maior */
-                gap: 0.5px;
+                grid-template-columns: repeat(9, 1fr); /* MUDEI: 9 colunas = 81 cards por linha */
+                grid-auto-rows: 105px; /* MUDEI: Card maior */
+                gap: 1px;
             }
             {% endif %}
         }
