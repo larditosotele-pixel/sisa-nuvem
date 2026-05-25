@@ -353,6 +353,7 @@ def carometro():
                 ORDER BY c.nome COLLATE "C"
             """)
         else: # ordem == 'quarto'
+            # CORRIGIDO: q.numero é INTEGER, não precisa de regex
             cur.execute("""
                 SELECT
                     c.id,
@@ -365,9 +366,7 @@ def carometro():
                 LEFT JOIN quartos q ON l.quarto_id = q.id
                 WHERE c.ativo = TRUE AND c.leito_id IS NOT NULL
                 ORDER BY
-                    CASE WHEN q.numero ~ '^[0-9]+$'
-                         THEN CAST(q.numero AS INTEGER)
-                         ELSE 999 END,
+                    q.numero,
                     CASE WHEN l.numero_leito ~ '^[0-9]+$'
                          THEN CAST(l.numero_leito AS INTEGER)
                          ELSE 999 END
