@@ -42,118 +42,115 @@
             border-radius: 6px;
         }
         
-        /* TELA: 6 colunas */
         .grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 5px;
+            gap: 4px;
         }
         
         .card {
             border: 1px solid #999;
-            border-radius: 4px;
-            padding: 3px;
+            border-radius: 3px;
+            padding: 2px;
             text-align: center;
         }
         .card img {
             width: 100%;
-            height: 90px;
+            height: 80px;
             object-fit: contain;
             background: #fff;
         }
         .card .sem-foto {
             width: 100%;
-            height: 90px;
+            height: 80px;
             background: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #6c757d;
-            font-size: 9px;
+            font-size: 8px;
         }
         .card h3 { 
-            font-size: 10px; 
-            margin: 2px 0 0 0;
-            line-height: 1.1;
+            font-size: 9px; 
+            margin: 1px 0 0 0;
+            line-height: 1;
         }
         .card p { 
-            font-size: 9px; 
+            font-size: 8px; 
             color: #555;
-            line-height: 1.1;
+            line-height: 1;
         }
         
         .titulo-quarto {
             grid-column: 1 / -1;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
-            margin: 6px 0 2px 0;
-            padding-bottom: 2px;
+            margin: 4px 0 1px 0;
+            padding: 2px 0;
             border-bottom: 1px solid #007bff;
         }
 
-        /* Celular */
         @media (max-width: 768px) {
             .grid { grid-template-columns: repeat(3, 1fr); }
-            .card img, .card .sem-foto { height: 70px; }
+            .card img, .card .sem-foto { height: 65px; }
         }
 
-        /* IMPRESSÃO - REGRA PRA 3 FOLHAS CRAVADO */
+        /* IMPRESSÃO - COMPACTO PRA 3 FOLHAS */
         @media print {
             body { background: white; padding: 0; }
             .header { display: none; }
             .container { padding: 0; }
             
-            /* MUDEI TUDO AQUI: Altura fixa + sem quebra */
-            .grid {
-                gap: 3px;
-            }
-            
+            /* MUDEI: Remove quebra e espaço dos títulos */
             .card, .titulo-quarto { 
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
             
             .card { 
-                padding: 2px;
-                border: 0.5px solid #777;
+                padding: 1px;
+                border: 0.5px solid #666;
                 display: flex;
                 flex-direction: column;
             }
             
             .card img, .card .sem-foto { 
-                height: 75px;
+                height: 60px; /* MUDEI: Foto menor pra caber mais */
                 object-fit: contain;
                 background: white;
                 flex-shrink: 0;
             }
-            .card h3 { font-size: 8px; margin-top: 1px; }
-            .card p { font-size: 7px; }
+            .card h3 { font-size: 7px; margin: 1px 0 0 0; }
+            .card p { font-size: 6px; }
             
             .titulo-quarto { 
-                font-size: 8px; 
-                margin: 3px 0 1px 0;
-                padding-bottom: 1px;
+                font-size: 7px; 
+                margin: 2px 0 1px 0;
+                padding: 1px 0;
+                line-height: 1;
             }
 
             {% if orientacao == 'horizontal' %}
             @page { 
                 size: A4 landscape;
-                margin: 0.5cm;
+                margin: 0.4cm; /* MUDEI: Margem mínima */
             }
-            /* HORIZONTAL: 5 col x 6 linhas = 30 por folha = 90 em 3 folhas */
+            /* HORIZONTAL: 6 col x 7 linhas = 42 por folha = 126 em 3 folhas */
             .grid {
-                grid-template-columns: repeat(5, 1fr);
-                grid-auto-rows: 108px; /* ALTURA TRAVADA PRA CABER 6 LINHAS */
+                grid-template-columns: repeat(6, 1fr);
+                grid-auto-rows: 95px; /* MUDEI: Altura menor = mais linhas */
+                gap: 2px; /* MUDEI: Gap mínimo */
             }
             {% else %}
             @page { 
                 size: A4 portrait;
-                margin: 0.6cm;
+                margin: 0.4cm; /* MUDEI: Margem mínima */
             }
-            /* VERTICAL: 4 col x 7 linhas = 28 por folha = 84 em 3 folhas */
+            /* VERTICAL: 5 col x 8 linhas = 40 por folha = 120 em 3 folhas */
             .grid {
-                grid-template-columns: repeat(4, 1fr);
-                grid-auto-rows: 125px; /* ALTURA TRAVADA PRA CABER 7 LINHAS */
+                grid-template-columns: repeat(5, 1fr);
+                grid-auto-rows: 110px; /* MUDEI: Altura menor = mais linhas */
+                gap: 2px; /* MUDEI: Gap mínimo */
             }
             {% endif %}
         }
