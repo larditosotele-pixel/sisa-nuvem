@@ -11,7 +11,7 @@
             background: #f5f5f5;
             padding: 3px;
         }
-       .header {
+      .header {
             background: white;
             padding: 8px;
             border-radius: 4px;
@@ -22,9 +22,9 @@
             flex-wrap: wrap;
             gap: 5px;
         }
-       .header h1 { font-size: 16px; }
-       .botoes { display: flex; gap: 4px; flex-wrap: wrap; }
-       .btn {
+      .header h1 { font-size: 16px; }
+      .botoes { display: flex; gap: 4px; flex-wrap: wrap; }
+      .btn {
             padding: 5px 8px;
             border: 1px solid #007bff;
             background: white;
@@ -34,28 +34,28 @@
             font-size: 12px;
             font-weight: bold;
         }
-       .btn.active { background: #007bff; color: white; }
-       .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
+      .btn.active { background: #007bff; color: white; }
+      .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
 
-       .container {
+      .container {
             background: white;
             padding: 2px;
             border-radius: 4px;
         }
 
-       .grid {
+      .grid {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             gap: 2px;
         }
 
-       .card {
+      .card {
             border: 1px solid #000;
             background: white;
             display: flex;
             flex-direction: column;
         }
-       .card-header {
+      .card-header {
             background: #4a90e2;
             color: white;
             font-size: 10px;
@@ -65,7 +65,7 @@
             line-height: 1.1;
             white-space: nowrap;
         }
-       .card-foto {
+      .card-foto {
             padding: 1px;
             display: flex;
             justify-content: center;
@@ -73,7 +73,7 @@
             flex: 1;
             background: #fff;
         }
-       .card-foto img {
+      .card-foto img {
             width: 100%;
             height: 100%;
             max-height: 60px;
@@ -82,7 +82,7 @@
             object-position: center 20%;
             border: 1px solid #ccc;
         }
-       .card .sem-foto {
+      .card.sem-foto {
             width: 100%;
             height: 60px;
             border-radius: 4px;
@@ -94,7 +94,7 @@
             font-size: 8px;
             border: 1px solid #ccc;
         }
-       .card-nome {
+      .card-nome {
             font-size: 9px;
             font-weight: bold;
             text-align: center;
@@ -105,89 +105,87 @@
             background: #f8f9fa;
         }
 
-       .titulo-quarto { display: none!important; }
+      .titulo-quarto { display: none!important; }
 
         @media (max-width: 768px) {
-           .grid { grid-template-columns: repeat(5, 1fr); }
+          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 3mm; /* MUDEI: 3mm é o mínimo que impressora aceita */
+                margin: 3mm;
             }
-            
-            html, body { 
+
+            html, body {
                 width: 100%;
                 height: 100%;
-                margin: 0 !important; 
-                padding: 0 !important;
+                margin: 0!important;
+                padding: 0!important;
             }
-           .header { display: none; }
-           .container { 
-                padding: 0; 
+          .header { display: none; }
+          .container {
+                padding: 0;
                 width: 100%;
                 height: 100%;
             }
 
-            /* MUDEI TUDO AQUI: FORÇO 8 LINHAS EXATAS COM VH */
-           .grid {
+          .grid {
                 display: grid;
-                grid-template-columns: repeat(8, 1fr); /* 8 colunas */
-                grid-template-rows: repeat(8, 12.5vh); /* MUDEI: 8 linhas de 12.5% da altura = 100% */
+                grid-template-columns: repeat(8, 1fr);
+                grid-template-rows: repeat(8, 12.5vh);
                 gap: 1mm;
                 width: 100%;
-                height: 100vh; /* MUDEI: Ocupa 100% da altura da folha */
+                height: 100vh;
             }
 
-           .card {
+          .card {
                 page-break-inside: avoid!important;
                 break-inside: avoid!important;
-                border: 0.2mm solid #000; /* MUDEI: Borda em mm */
+                border: 0.2mm solid #000;
                 display: flex;
                 flex-direction: column;
-                overflow: hidden; /* MUDEI: Corta se passar */
+                overflow: hidden;
             }
 
-           .card-header {
+          .card-header {
                 font-size: 6pt;
                 padding: 0.5mm 0;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-                flex-shrink: 0; /* MUDEI: Não encolhe */
+                flex-shrink: 0;
             }
-           .card-foto {
+          .card-foto {
                 padding: 0;
                 flex: 1;
-                min-height: 0; /* MUDEI: Permite encolher */
+                min-height: 0;
            }
-           .card-foto img {
+          .card-foto img {
                 width: 100%;
                 height: 100%;
                 border: none;
                 border-radius: 0;
                 object-fit: cover;
-                object-position: center 25%; /* MUDEI: 25% pega testa até queixo */
+                object-position: center 25%;
            }
-           .card .sem-foto {
+          .card.sem-foto {
                 width: 100%;
                 height: 100%;
                 border: none;
                 border-radius: 0;
                 font-size: 5pt;
            }
-           .card-nome {
+          .card-nome {
                 font-size: 6pt;
                 font-weight: bold;
-                height: 7mm; /* MUDEI: Altura fixa em mm */
+                height: 7mm;
                 padding: 0.5mm;
                 line-height: 1;
-                flex-shrink: 0; /* MUDEI: Não encolhe */
+                flex-shrink: 0;
                 overflow: hidden;
             }
 
-            /* 8 col x 8 linhas = 64 por folha. Quebra em 21 = 3 folhas */
-           .card:nth-child(21n) {
+          .card:nth-child(21n) {
                 page-break-after: always;
             }
         }
@@ -206,7 +204,8 @@
                class="btn {% if orientacao == 'vertical' %}active{% endif %}">Vertical</a>
             <a href="{{ url_for('carometro', ordem=ordem, orientacao='horizontal') }}"
                class="btn {% if orientacao == 'horizontal' %}active{% endif %}">Horizontal</a>
-            <a href="#" onclick="window.print()" class="btn btn-imprimir">🖨️ Imprimir</a>
+            <!-- MUDEI AQUI: Agora gera PDF direto -->
+            <a href="{{ url_for('carometro_pdf', ordem=ordem) }}" target="_blank" class="btn btn-imprimir">📄 Gerar PDF</a>
         </div>
     </div>
 
