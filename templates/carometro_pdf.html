@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+    <div class="grid">
+        {% for conv in conviventes %}
+        <div class="card">
+            <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
+            <div class="card-foto">
+                {% if conv.foto_base64 %}
+                    <img src="{{ conv.foto_base64 }}">
+                {% else %}
+                    <div style="background:#eee;height:100%;"></div>
+                {% endif %}
+            </div>
+            <div class="card-nome">{{ conv.nome }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
