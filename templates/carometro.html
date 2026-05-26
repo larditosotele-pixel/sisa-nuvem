@@ -202,97 +202,97 @@
             <head>
                 <meta charset="UTF-8">
                 <title>Carômetro - Impressão</title>
-                <style>
-                    @page { 
-                        size: A4 ${orientacao}; 
-                        margin: 0; 
-                    }
-                    * { 
-                        -webkit-print-color-adjust: exact !important; 
-                        print-color-adjust: exact !important;
-                        box-sizing: border-box;
-                        margin: 0;
-                        padding: 0;
-                    }
-                    body { background: white; }
-                    .pagina {
-                        width: ${orientacao === 'retrato' ? '210mm' : '297mm'};
-                        height: ${orientacao === 'retrato' ? '297mm' : '210mm'};
-                        padding: 4mm;
-                        page-break-after: always;
-                        overflow: hidden;
-                    }
-                    .pagina:last-child { page-break-after: auto; }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        table-layout: fixed;
-                    }
-                    tr {
-                        height: ${alturaLinha};
-                        page-break-inside: avoid !important;
-                    }
-                    td {
-                        width: ${100/colunas}%;
-                        height: ${alturaLinha};
-                        padding: 0.5mm;
-                        vertical-align: top;
-                        border: 0.5pt solid #000;
-                        overflow: hidden;
-                    }
-                    .card {
-                        width: 100%;
-                        height: ${alturaCard};
-                        display: flex;
-                        flex-direction: column;
-                        overflow: hidden;
-                    }
-                    .header {
-                        background: #4a90e2 !important;
-                        color: white !important;
-                        font-size: 5pt;
-                        font-weight: bold;
-                        text-align: center;
-                        height: 3.5mm;
-                        line-height: 3.5mm;
-                        flex-shrink: 0;
-                    }
-                    .foto {
-                        flex: 1;
-                        overflow: hidden;
-                        min-height: 0;
-                    }
-                    .foto img {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover;
-                        object-position: center 45%;
-                    }
-                    .sem-foto {
-                        width: 100%;
-                        height: 100%;
-                        background: #e9ecef;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: #6c757d;
-                        font-size: 5pt;
-                    }
-                    .nome {
-                        background: #f8f9fa !important;
-                        font-size: 5pt;
-                        font-weight: bold;
-                        text-align: center;
-                        padding: 0.5mm;
-                        height: 9mm;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        line-height: 1;
-                        flex-shrink: 0;
-                        overflow: hidden;
-                    }
-                </style>
+<style>
+    @page { 
+        size: A4 ${orientacao}; 
+        margin: 0; 
+    }
+    * { 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body { background: white; }
+    .pagina {
+        width: ${orientacao === 'retrato' ? '210mm' : '297mm'};
+        height: ${orientacao === 'retrato' ? '297mm' : '210mm'};
+        padding: 4mm;
+        page-break-after: always;
+        overflow: hidden;
+    }
+    .pagina:last-child { page-break-after: auto; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+    tr {
+        height: ${alturaLinha};
+        page-break-inside: avoid !important;
+    }
+    td {
+        width: ${100/colunas}%;
+        height: ${alturaLinha};
+        padding: 0.5mm;
+        vertical-align: top;
+        border: 0.5pt solid #000;
+        overflow: hidden;
+    }
+    .card {
+        width: 100%;
+        height: ${alturaCard};
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .header {
+        background: #4a90e2 !important;
+        color: white !important;
+        font-size: 7pt;        /* AUMENTEI: era 5pt */
+        font-weight: bold;
+        text-align: center;
+        height: 4.5mm;         /* AUMENTEI: era 3.5mm */
+        line-height: 4.5mm;
+        flex-shrink: 0;
+    }
+    .foto {
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+    }
+    .foto img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 45%;
+    }
+    .sem-foto {
+        width: 100%;
+        height: 100%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 6pt;
+    }
+    .nome {
+        background: #f8f9fa !important;
+        font-size: 7.5pt;      /* AUMENTEI: era 5pt */
+        font-weight: bold;
+        text-align: center;
+        padding: 1mm;          /* AUMENTEI: era 0.5mm */
+        height: 11mm;          /* AUMENTEI: era 9mm */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.1;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+</style>
             </head>
             <body>
         `;
