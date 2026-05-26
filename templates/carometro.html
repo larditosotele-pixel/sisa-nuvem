@@ -188,17 +188,22 @@
                 .navbar, .header, .botoes { display: none; }
                 .container { padding: 0; border-radius: 0; margin: 0; }
                 .grid {
+                    display: block;
+                }
+                .linha-grid {
                     display: grid;
                     grid-template-columns: repeat(6, 1fr);
-                    grid-auto-rows: 45mm;
                     gap: 1mm;
+                    height: 45mm;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
+                    margin-bottom: 1mm;
                 }
                 .card {
                     border: 0.5pt solid #000;
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
                     display: flex;
                     flex-direction: column;
+                    overflow: hidden;
                 }
                 .card-header {
                     background: #4a90e2 !important;
@@ -262,17 +267,22 @@
                 .navbar, .header, .botoes { display: none; }
                 .container { padding: 0; border-radius: 0; margin: 0; }
                 .grid {
+                    display: block;
+                }
+                .linha-grid {
                     display: grid;
                     grid-template-columns: repeat(9, 1fr);
-                    grid-auto-rows: 44mm;
                     gap: 1.5mm;
+                    height: 44mm;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
+                    margin-bottom: 1.5mm;
                 }
                 .card {
                     border: 0.5pt solid #000;
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
                     display: flex;
                     flex-direction: column;
+                    overflow: hidden;
                 }
                 .card-header {
                     background: #4a90e2 !important;
@@ -330,11 +340,27 @@
         `;
 
         function imprimir(orientacao) {
+            const grid = document.querySelector('.grid');
+            const cards = Array.from(grid.querySelectorAll('.card'));
+            const colunas = orientacao === 'retrato' ? 6 : 9;
+            
+            grid.innerHTML = '';
+            for (let i = 0; i < cards.length; i += colunas) {
+                const linha = document.createElement('div');
+                linha.className = 'linha-grid';
+                cards.slice(i, i + colunas).forEach(card => linha.appendChild(card));
+                grid.appendChild(linha);
+            }
+
             const styleTag = document.getElementById('estilo-impressao');
             styleTag.innerHTML = orientacao === 'retrato' ? cssRetrato : cssPaisagem;
+            
             setTimeout(() => {
                 window.print();
-                setTimeout(() => { styleTag.innerHTML = ''; }, 500);
+                setTimeout(() => { 
+                    styleTag.innerHTML = ''; 
+                    location.reload();
+                }, 500);
             }, 100);
         }
     </script>
