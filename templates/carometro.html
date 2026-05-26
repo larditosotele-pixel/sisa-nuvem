@@ -107,18 +107,18 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* IMPRESSÃO NATIVA - AQUI QUE RESOLVE TUDO */
+        /* IMPRESSÃO - SEMPRE 3 FOLHAS PRA 100 LEITOS */
         @media print {
             @page {
                 size: A4 landscape;
-                margin: 5mm;
+                margin: 4mm; /* MARGEM MÍNIMA PRA CABER 4 LINHAS */
             }
             body {
                 background: white;
                 padding: 0;
             }
          .header, .botoes {
-                display: none; /* ESCONDE BOTÕES NA IMPRESSÃO */
+                display: none;
             }
          .container {
                 padding: 0;
@@ -127,8 +127,8 @@
          .grid {
                 display: grid;
                 grid-template-columns: repeat(9, 1fr); /* 9 COLUNAS */
-                grid-auto-rows: 49mm; /* ALTURA FIXA DO CARD */
-                gap: 2mm;
+                grid-auto-rows: 44mm; /* ALTURA MENOR = 4 LINHAS CABEM = 36 POR FOLHA */
+                gap: 1.5mm;
                 page-break-inside: avoid;
             }
          .card {
@@ -142,11 +142,12 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
                 color: white;
-                font-size: 8pt;
+                font-size: 7pt;
                 font-weight: bold;
                 text-align: center;
-                padding: 1mm 0;
-                height: 6mm;
+                padding: 0.5mm 0;
+                height: 5mm;
+                flex-shrink: 0;
             }
          .card-foto {
                 padding: 0;
@@ -155,11 +156,12 @@
                 justify-content: center;
                 align-items: center;
                 background: #fff;
+                min-height: 0;
             }
          .card-foto img {
                 width: 100%;
                 height: 100%;
-                object-fit: cover; /* PREENCHE SEM ACHATAR */
+                object-fit: cover; /* SEM ACHATAR */
                 object-position: center 20%;
             }
          .sem-foto {
@@ -173,14 +175,15 @@
                 font-size: 6pt;
             }
          .card-nome {
-                font-size: 8pt; /* NOME GRANDE E LEGÍVEL */
+                font-size: 7pt; /* NOME MAIOR */
                 font-weight: bold;
                 text-align: center;
-                padding: 1mm;
+                padding: 0.5mm;
                 background: #f8f9fa !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-                height: 12mm;
+                height: 11mm;
+                flex-shrink: 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -196,7 +199,7 @@
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
             <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="window.print()" class="btn btn-imprimir">🖨️ Imprimir / Salvar PDF</button>
+            <button onclick="window.print()" class="btn btn-imprimir">🖨️ Imprimir / Salvar PDF - 3 Folhas</button>
         </div>
     </div>
 
