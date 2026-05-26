@@ -180,163 +180,155 @@
         </div>
     </div>
 
-        <script>
+            <script>
         const cssRetrato = `
-            @page { size: A4 portrait; margin: 4mm; }
+            @page { size: A4 portrait; margin: 3mm; }
             @media print {
-                body { background: white; padding: 0; }
-                .navbar, .header, .botoes { display: none; }
-                .container { padding: 0; border-radius: 0; margin: 0; }
+                * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                html, body { background: white !important; padding: 0 !important; margin: 0 !important; }
+                .navbar, .header, .botoes, #estilo-base { display: none !important; }
+                .container { padding: 0 !important; margin: 0 !important; border: 0 !important; }
                 .grid {
-                    display: block;
+                    display: block !important;
                 }
                 .linha-grid {
-                    display: grid;
+                    display: grid !important;
                     grid-template-columns: repeat(6, 1fr);
-                    gap: 1mm;
-                    height: 46mm;
+                    gap: 0.8mm;
+                    height: 42.5mm;
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
-                    page-break-after: auto;
+                    page-break-after: auto !important;
                 }
                 .linha-grid:last-child {
-                    page-break-after: avoid;
+                    page-break-after: avoid !important;
                 }
                 .card {
-                    border: 0.5pt solid #000;
-                    display: block;
-                    height: 45mm;
-                    overflow: hidden;
+                    border: 0.5pt solid #000 !important;
+                    display: block !important;
+                    height: 42mm !important;
+                    overflow: hidden !important;
                 }
                 .card-header {
                     background: #4a90e2 !important;
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
-                    color: white;
-                    font-size: 7pt;
-                    font-weight: bold;
-                    text-align: center;
-                    padding: 0.5mm 0;
-                    height: 5mm;
-                    line-height: 4mm;
+                    color: white !important;
+                    font-size: 6.5pt !important;
+                    font-weight: bold !important;
+                    text-align: center !important;
+                    height: 4.5mm !important;
+                    line-height: 4.5mm !important;
+                    padding: 0 !important;
                 }
                 .card-foto {
-                    height: 29mm;
-                    width: 100%;
-                    display: block;
-                    background: #fff;
+                    height: 27mm !important;
+                    width: 100% !important;
+                    display: block !important;
                 }
                 .card-foto img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    object-position: center 45%;
-                    display: block;
+                    width: 100% !important;
+                    height: 100% !important;
+                    object-fit: cover !important;
+                    object-position: center 45% !important;
+                    display: block !important;
                 }
                 .sem-foto {
-                    width: 100%;
-                    height: 100%;
-                    background: #e9ecef;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #6c757d;
-                    font-size: 6pt;
+                    width: 100% !important;
+                    height: 100% !important;
+                    background: #e9ecef !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    color: #6c757d !important;
+                    font-size: 6pt !important;
                 }
                 .card-nome {
-                    font-size: 7pt;
-                    font-weight: bold;
-                    text-align: center;
-                    padding: 0.5mm;
+                    font-size: 6.5pt !important;
+                    font-weight: bold !important;
+                    text-align: center !important;
+                    padding: 0.5mm !important;
                     background: #f8f9fa !important;
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
-                    height: 11mm;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    line-height: 1.1;
-                    overflow: hidden;
+                    height: 10.5mm !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    line-height: 1.1 !important;
+                    overflow: hidden !important;
                 }
             }
         `;
 
         const cssPaisagem = `
-            @page { size: A4 landscape; margin: 4mm; }
+            @page { size: A4 landscape; margin: 3mm; }
             @media print {
-                body { background: white; padding: 0; }
-                .navbar, .header, .botoes { display: none; }
-                .container { padding: 0; border-radius: 0; margin: 0; }
+                * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                html, body { background: white !important; padding: 0 !important; margin: 0 !important; }
+                .navbar, .header, .botoes, #estilo-base { display: none !important; }
+                .container { padding: 0 !important; margin: 0 !important; border: 0 !important; }
                 .grid {
-                    display: block;
+                    display: block !important;
                 }
                 .linha-grid {
-                    display: grid;
+                    display: grid !important;
                     grid-template-columns: repeat(9, 1fr);
-                    gap: 1.5mm;
-                    height: 45mm;
+                    gap: 1mm;
+                    height: 41mm;
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
-                    page-break-after: auto;
+                    page-break-after: auto !important;
                 }
                 .linha-grid:last-child {
-                    page-break-after: avoid;
+                    page-break-after: avoid !important;
                 }
                 .card {
-                    border: 0.5pt solid #000;
-                    display: block;
-                    height: 44mm;
-                    overflow: hidden;
+                    border: 0.5pt solid #000 !important;
+                    display: block !important;
+                    height: 40.5mm !important;
+                    overflow: hidden !important;
                 }
                 .card-header {
                     background: #4a90e2 !important;
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
-                    color: white;
-                    font-size: 7pt;
-                    font-weight: bold;
-                    text-align: center;
-                    padding: 0.5mm 0;
-                    height: 5mm;
-                    line-height: 4mm;
+                    color: white !important;
+                    font-size: 6.5pt !important;
+                    font-weight: bold !important;
+                    text-align: center !important;
+                    height: 4.5mm !important;
+                    line-height: 4.5mm !important;
+                    padding: 0 !important;
                 }
                 .card-foto {
-                    height: 28mm;
-                    width: 100%;
-                    display: block;
-                    background: #fff;
+                    height: 25.5mm !important;
+                    width: 100% !important;
+                    display: block !important;
                 }
                 .card-foto img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    object-position: center 45%;
-                    display: block;
+                    width: 100% !important;
+                    height: 100% !important;
+                    object-fit: cover !important;
+                    object-position: center 45% !important;
+                    display: block !important;
                 }
                 .sem-foto {
-                    width: 100%;
-                    height: 100%;
-                    background: #e9ecef;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #6c757d;
-                    font-size: 6pt;
+                    width: 100% !important;
+                    height: 100% !important;
+                    background: #e9ecef !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    color: #6c757d !important;
+                    font-size: 6pt !important;
                 }
                 .card-nome {
-                    font-size: 7pt;
-                    font-weight: bold;
-                    text-align: center;
-                    padding: 0.5mm;
+                    font-size: 6.5pt !important;
+                    font-weight: bold !important;
+                    text-align: center !important;
+                    padding: 0.5mm !important;
                     background: #f8f9fa !important;
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
-                    height: 11mm;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    line-height: 1.1;
-                    overflow: hidden;
+                    height: 10.5mm !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    line-height: 1.1 !important;
+                    overflow: hidden !important;
                 }
             }
         `;
