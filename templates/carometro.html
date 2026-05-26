@@ -109,39 +109,42 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* PDF RETRATO - 12x3 = 36 por folha | CARD 3x4 */
-     .pdf-page-retrato {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-auto-rows: minmax(0, 1fr);
-            gap: 1.5mm;
-            page-break-after: always;
-            width: 204mm;
-            height: 291mm;
-            padding: 2mm;
-            background: white;
-        }
+        /* PDF RETRATO - 12x3 = 36 por folha | CARD 3x4 SEM VAZIO */
+.pdf-page-retrato {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    /* REMOVE ESSA LINHA: grid-template-rows: repeat(3, 1fr); */
+    gap: 1.5mm;
+    page-break-after: always;
+    width: 204mm;
+    height: 291mm;
+    padding: 2mm;
+    background: white;
+    align-content: start; /* JOGA TUDO PRA CIMA */
+}
 
-        /* PDF PAISAGEM - 12x3 = 36 por folha | CARD 3x4 */
-     .pdf-page-paisagem {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-auto-rows: minmax(0, 1fr);
-            gap: 1.5mm;
-            page-break-after: always;
-            width: 291mm;
-            height: 204mm;
-            padding: 2mm;
-            background: white;
-        }
+/* PDF PAISAGEM - 12x3 = 36 por folha | CARD 3x4 SEM VAZIO */
+.pdf-page-paisagem {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    /* REMOVE ESSA LINHA: grid-template-rows: repeat(3, 1fr); */
+    gap: 1.5mm;
+    page-break-after: always;
+    width: 291mm;
+    height: 204mm;
+    padding: 2mm;
+    background: white;
+    align-content: start; /* JOGA TUDO PRA CIMA */
+}
 
-     .pdf-page .card {
-            border: 0.3mm solid #000;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            aspect-ratio: 3/4; /* CARD FICA 3x4 - IGUAL A FOTO */
+.pdf-page .card {
+    border: 0.3mm solid #000;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    aspect-ratio: 3/4; /* CARD 3x4 - PROPORÇÃO DA FOTO */
+}
         }
      .pdf-page .card-header {
             background: #4a90e2;
