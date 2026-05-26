@@ -191,10 +191,6 @@
         const colunas = orientacao === 'retrato' ? 5 : 8;
         const linhas = orientacao === 'retrato' ? 8 : 5;
         const cardsPorPagina = colunas * linhas;
-        
-        // CÁLCULO EXATO: 297mm - 8mm margem = 289mm / 8 linhas = 36.125mm
-        const alturaLinha = orientacao === 'retrato' ? '36.125mm' : '40.4mm';
-        const alturaCard = orientacao === 'retrato' ? '35.125mm' : '39.4mm';
 
         let html = `
             <!DOCTYPE html>
@@ -202,109 +198,109 @@
             <head>
                 <meta charset="UTF-8">
                 <title>Carômetro - Impressão</title>
-<style>
-    @page { 
-        size: A4 ${orientacao}; 
-        margin: 0; 
-    }
-    * { 
-        -webkit-print-color-adjust: exact !important; 
-        print-color-adjust: exact !important;
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-    body { background: white; }
-    .pagina {
-        width: ${orientacao === 'retrato' ? '210mm' : '297mm'};
-        height: ${orientacao === 'retrato' ? '297mm' : '210mm'};
-        padding: 4mm;
-        page-break-after: always;
-        overflow: hidden;
-    }
-    .pagina:last-child { page-break-after: auto; }
-    table {
-        width: 100%;
-        height: 100%;  /* ADICIONEI: força tabela a ocupar 100% da .pagina */
-        border-collapse: collapse;
-        table-layout: fixed;
-    }
-    tr {
-        height: 12.5%;  /* MUDEI: 100% / 8 linhas = 12.5% pra retrato */
-        page-break-inside: avoid !important;
-    }
-    td {
-        width: ${100/colunas}%;
-        height: 100%;  /* MUDEI: deixa a tr controlar a altura */
-        padding: 0.5mm;
-        vertical-align: top;
-        border: 0.5pt solid #000;
-        overflow: hidden;
-    }
-    .card {
-        width: 100%;
-        height: 100%;  /* MUDEI: ocupa a td inteira */
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    .header {
-        background: #4a90e2 !important;
-        color: white !important;
-        font-size: 7pt;
-        font-weight: bold;
-        text-align: center;
-        height: 4.5mm;
-        line-height: 4.5mm;
-        flex-shrink: 0;
-    }
-    .foto {
-        flex: 1;
-        overflow: hidden;
-        min-height: 0;
-        padding: 0.5mm;
-    }
-    .foto img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        object-position: center 30%;
-        background: #f0f0f0;
-    }
-    .sem-foto {
-        width: 100%;
-        height: 100%;
-        background: #e9ecef;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #6c757d;
-        font-size: 6pt;
-    }
-    .nome {
-        background: #f8f9fa !important;
-        font-size: 7.5pt;
-        font-weight: bold;
-        text-align: center;
-        padding: 1mm;
-        height: 11mm;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1.1;
-        flex-shrink: 0;
-        overflow: hidden;
-    }
-    
-    /* AJUSTE PRO PAISAGEM TAMBÉM */
-    @media print {
-        body[orientacao="paisagem"] tr {
-            height: 20%; /* 100% / 5 linhas = 20% */
-        }
-    }
-</style>
+                <style>
+                    @page { 
+                        size: A4 ${orientacao}; 
+                        margin: 0; 
+                    }
+                    * { 
+                        -webkit-print-color-adjust: exact !important; 
+                        print-color-adjust: exact !important;
+                        box-sizing: border-box;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    html, body { 
+                        height: 100%; 
+                        background: white; 
+                    }
+                    .pagina {
+                        width: ${orientacao === 'retrato' ? '210mm' : '297mm'};
+                        height: ${orientacao === 'retrato' ? '297mm' : '210mm'};
+                        padding: 4mm;
+                        page-break-after: always;
+                        display: flex;              /* MUDEI: força conteúdo a esticar */
+                        flex-direction: column;     /* MUDEI: organiza em coluna */
+                        overflow: hidden;
+                    }
+                    .pagina:last-child { page-break-after: auto; }
+                    table {
+                        width: 100%;
+                        flex: 1;                    /* MUDEI: tabela ocupa todo espaço livre */
+                        border-collapse: collapse;
+                        table-layout: fixed;
+                    }
+                    tbody {
+                        height: 100%;
+                    }
+                    tr {
+                        height: ${100/linhas}%;     /* MUDEI: divide igual entre as linhas */
+                        page-break-inside: avoid !important;
+                    }
+                    td {
+                        width: ${100/colunas}%;
+                        padding: 0.5mm;
+                        vertical-align: top;
+                        border: 0.5pt solid #000;
+                        overflow: hidden;
+                    }
+                    .card {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+                    }
+                    .header {
+                        background: #4a90e2 !important;
+                        color: white !important;
+                        font-size: 7pt;
+                        font-weight: bold;
+                        text-align: center;
+                        height: 4.5mm;
+                        line-height: 4.5mm;
+                        flex-shrink: 0;
+                    }
+                    .foto {
+                        flex: 1;
+                        overflow: hidden;
+                        min-height: 0;
+                        padding: 0.5mm;
+                    }
+                    .foto img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                        object-position: center 30%;
+                        background: #f0f0f0;
+                    }
+                    .sem-foto {
+                        width: 100%;
+                        height: 100%;
+                        background: #e9ecef;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #6c757d;
+                        font-size: 6pt;
+                    }
+                    .nome {
+                        background: #f8f9fa !important;
+                        font-size: 7.5pt;
+                        font-weight: bold;
+                        text-align: center;
+                        padding: 1mm;
+                        height: 11mm;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        line-height: 1.1;
+                        flex-shrink: 0;
+                        overflow: hidden;
+                    }
+                </style>
             </head>
-            <body orientacao="${orientacao}">
+            <body>
         `;
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
