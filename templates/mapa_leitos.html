@@ -54,7 +54,7 @@
             padding: 15px;
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            /* REMOVIDO: clear: both; <- causava a sobreposição */
+            display: flow-root; /* NOVO: força criar bloco novo, sem sobrepor */
         }
         .quarto-header {
             display: flex;
@@ -71,7 +71,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 10px;
-            align-items: start; /* ADICIONADO: impede cards esticarem e sobreporem */
+            grid-auto-rows: 220px; /* NOVO: trava altura da linha. Fim da pirâmide */
         }
         .card-leito {
             border: 2px solid #ddd;
@@ -79,9 +79,11 @@
             padding: 8px;
             text-align: center;
             position: relative;
-            transition: all 0.2s;
             background: white;
-            align-self: start; /* ADICIONADO: cada card cuida da própria altura */
+            height: 220px; /* NOVO: altura fixa total do card */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* NOVO: nada vaza pra fora */
         }
         .card-leito.ocupado { 
             border-color: #e67e22; 
@@ -89,7 +91,6 @@
             cursor: pointer;
         }
         .card-leito.ocupado:hover { 
-            /* REMOVIDO: transform: translateY(-2px); <- fazia o card subir por cima */
             box-shadow: 0 3px 6px rgba(0,0,0,0.15);
         }
         .card-leito.vago { 
@@ -112,38 +113,41 @@
         }
         .card-leito img {
             width: 100%;
-            aspect-ratio: 3/4;
+            height: 150px; /* NOVO: altura fixa pra foto */
             border-radius: 6px;
             object-fit: contain;
             background: #f0f0f0;
             margin-bottom: 6px;
+            flex-shrink: 0;
         }
         .card-leito .nome { 
             font-weight: bold; 
             font-size: 11px; 
             color: #333; 
-            min-height: 28px;
+            flex: 1; /* NOVO: ocupa resto do espaço */
             display: flex;
             align-items: center;
             justify-content: center;
             line-height: 1.2;
             word-break: break-word;
+            overflow: hidden;
         }
 
         @media (max-width: 600px) {
             .grid-leitos {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 6px;
+                grid-auto-rows: 160px; /* NOVO: altura menor no mobile */
             }
             .card-leito {
                 padding: 6px;
+                height: 160px; /* NOVO: altura fixa mobile */
             }
             .card-leito img {
-                aspect-ratio: 1/1;
+                height: 100px; /* NOVO: foto menor mobile */
             }
             .card-leito .nome {
                 font-size: 9px;
-                min-height: 22px;
             }
             .quarto-bloco {
                 padding: 10px;
@@ -251,12 +255,13 @@
                         {% endif %}
                         <div class="nome">{{ leito.convivente_nome }}</div>
                     {% else %}
-                        <div style="aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; color: #95a5a6; background: #f0f0f0; border-radius: 6px; margin-bottom: 6px;">
+                        <div style="height: 150px; display: flex; align-items: center; justify-content: center; color: #95a5a6; background: #f0f0f0; border-radius: 6px; margin-bottom: 6px;">
                             <div>
                                 <div style="font-size: 28px;">+</div>
                                 <div style="font-size: 10px;">VAGO</div>
                             </div>
                         </div>
+                        <div class="nome"></div>
                     {% endif %}
                 </div>
                 {% endfor %}
