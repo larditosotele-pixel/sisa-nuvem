@@ -10,6 +10,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'uma_chave_secreta_muito_segura_e_dificil')
 
+# FUSO HORÁRIO DE SÃO PAULO - CORRIGE O BUG DAS 21H
+fuso_sp = pytz.timezone('America/Sao_Paulo')
+
 def get_db_connection():
     db_url = os.environ.get('DATABASE_URL')
     if not db_url:
@@ -94,7 +97,9 @@ def chamada():
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if request.method == 'POST':
-        hoje = date.today()
+        # PEGA A DATA DO FORMULÁRIO EM VEZ DE HOJE
+        data_str = request.form.get('data_chamada')
+        hoje = datetime.strptime(data_str, '%Y-%m-%d').date()
 
         # Pega todos os status de uma vez
         dados_para_salvar = []
@@ -105,7 +110,6 @@ def chamada():
 
         if dados_para_salvar:
             # UPSERT: Insere ou atualiza tudo numa tacada só
-            # Se já existe registro pro convivente + data, só atualiza o status
             args_str = ','.join(cur.mogrify("(%s,%s,%s)", i).decode('utf-8') for i in dados_para_salvar)
             cur.execute(f"""
                 INSERT INTO chamadas (convivente_id, data_chamada, status)
@@ -118,11 +122,20 @@ def chamada():
         cur.close()
         conn.close()
         flash('Chamada salva com sucesso!')
-        return redirect(url_for('chamada'))
+        return redirect(url_for('chamada', data=data_str))
 
-    # Parte do GET continua igual...
+    # PARTE DO GET - CORRIGIDA COM FUSO E NAVEGAÇÃO
     ordem = request.args.get('ordem', 'quarto')
-    hoje = date.today()
+    data_str = request.args.get('data')
+
+    # USA FUSO DE SP PRA PEGAR DATA CORRETA
+    if data_str:
+        try:
+            hoje = datetime.strptime(data_str, '%Y-%m-%d').date()
+        except ValueError:
+            hoje = datetime.now(fuso_sp).date()
+    else:
+        hoje = datetime.now(fuso_sp).date()
 
     if ordem == 'alfabetica':
         order_by = 'c.nome ASC'
@@ -149,10 +162,18 @@ def chamada():
     cur.close()
     conn.close()
 
+    # DATAS PRA NAVEGAÇÃO
+    dia_anterior = (hoje - timedelta(days=1)).strftime('%Y-%m-%d')
+    proximo_dia = (hoje + timedelta(days=1)).strftime('%Y-%m-%d')
+
     return render_template('chamada.html',
                          conviventes=conviventes,
                          data_hoje=hoje.strftime('%d/%m/%Y'),
+                         data_selecionada=hoje.strftime('%Y-%m-%d'),
+                         dia_anterior=dia_anterior,
+                         proximo_dia=proximo_dia,
                          ordem=ordem)
+
 @app.route('/cadastrar_convivente', methods=['GET', 'POST'])
 def cadastrar_convivente():
     leito_id = request.args.get('leito_id', type=int)
@@ -241,7 +262,7 @@ def relatorio_mensal():
     from datetime import datetime
     import calendar
 
-    hoje = datetime.now()
+    hoje = datetime.now(fuso_sp) # USA FUSO SP
     mes = request.args.get('mes', default=hoje.month, type=int)
     ano = request.args.get('ano', default=hoje.year, type=int)
 
@@ -305,7 +326,7 @@ def relatorio_branco():
     from datetime import datetime
     import calendar
 
-    hoje = datetime.now()
+    hoje = datetime.now(fuso_sp) # USA FUSO SP
     mes = request.args.get('mes', default=hoje.month, type=int)
     ano = request.args.get('ano', default=hoje.year, type=int)
 
