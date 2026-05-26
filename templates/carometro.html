@@ -73,7 +73,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex: 1;
             background: #fff;
             height: 60px;
         }
@@ -110,34 +109,34 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* PDF RETRATO - 7x3 = 21 por folha */
+        /* PDF RETRATO - 11x3 = 33 por folha */
      .pdf-page-retrato {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(11, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 2mm;
+            gap: 1mm;
             page-break-after: always;
             width: 204mm;
             height: 291mm;
-            padding: 3mm;
+            padding: 2mm;
             background: white;
         }
 
-        /* PDF PAISAGEM - 7x3 = 21 por folha */
+        /* PDF PAISAGEM - 11x3 = 33 por folha */
      .pdf-page-paisagem {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(11, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 2mm;
+            gap: 1mm;
             page-break-after: always;
             width: 291mm;
             height: 204mm;
-            padding: 3mm;
+            padding: 2mm;
             background: white;
         }
 
      .pdf-page .card {
-            border: 0.3mm solid #000;
+            border: 0.2mm solid #000;
             background: white;
             display: flex;
             flex-direction: column;
@@ -146,24 +145,28 @@
      .pdf-page .card-header {
             background: #4a90e2;
             color: white;
-            font-size: 8pt;
+            font-size: 6pt;
             font-weight: bold;
             text-align: center;
-            padding: 1mm 0;
-            height: 5mm;
+            padding: 0.5mm 0;
+            height: 4mm;
+            flex-shrink: 0;
         }
      .pdf-page .card-foto {
-            padding: 1mm;
+            padding: 0.5mm;
             display: flex;
             justify-content: center;
             align-items: center;
             background: #fff;
             flex: 1;
+            min-height: 0;
         }
      .pdf-page .card-foto img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain; /* NÃO ESTICA MAIS - MANTÉM PROPORÇÃO */
             border: 0.1mm solid #ccc;
         }
      .pdf-page .sem-foto {
@@ -174,19 +177,21 @@
             align-items: center;
             justify-content: center;
             color: #6c757d;
-            font-size: 7pt;
+            font-size: 5pt;
             border: 0.1mm solid #ccc;
         }
      .pdf-page .card-nome {
-            font-size: 7pt;
+            font-size: 5.5pt;
             font-weight: bold;
             text-align: center;
-            padding: 1mm;
+            padding: 0.5mm;
             background: #f8f9fa;
-            height: 12mm;
+            height: 9mm;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1;
         }
     </style>
 </head>
@@ -197,8 +202,8 @@
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
             <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="gerarPDF('retrato')" class="btn btn-imprimir">📄 PDF Retrato</button>
-            <button onclick="gerarPDF('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem</button>
+            <button onclick="gerarPDF('retrato')" class="btn btn-imprimir">📄 PDF Retrato 3 folhas</button>
+            <button onclick="gerarPDF('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem 3 folhas</button>
         </div>
     </div>
 
@@ -220,12 +225,11 @@
         </div>
     </div>
 
-    <!-- PDF COM TODOS OS CONVIVENTES - SEM LIMITE -->
+    <!-- PDF COM 33 POR FOLHA = 99 EM 3 PÁGINAS -->
     <div id="conteudo-pdf" style="position: absolute; left: -9999px; top: 0;">
-        {% set total = conviventes|length %}
-        {% for i in range(0, total, 21) %}
+        {% for i in range(0, conviventes|length, 33) %}
         <div class="pdf-page">
-            {% for conv in conviventes[i:i+21] %}
+            {% for conv in conviventes[i:i+33] %}
             <div class="card">
                 <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
                 <div class="card-foto">
@@ -256,12 +260,12 @@
 
             const formato = orientacao === 'paisagem' ? 'landscape' : 'portrait';
             const total = {{ conviventes|length }};
-            const nome_arquivo = `carometro_{{ ordem }}_${orientacao}_${total}conv.pdf`;
+            const nome_arquivo = `carometro_{{ ordem }}_${orientacao}_3folhas_${total}conv.pdf`;
 
             const opt = {
                 margin: 0,
                 filename: nome_arquivo,
-                image: { type: 'jpeg', quality: 0.98 },
+                image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 2, useCORS: true, letterRendering: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: formato }
             };
