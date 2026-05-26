@@ -97,25 +97,25 @@ def chamada():
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     if request.method == 'POST':
-        # PEGA A DATA DO FORMULÁRIO EM VEZ DE HOJE
+        # PEGA A DATA DO FORMULÁRIO
         data_str = request.form.get('data_chamada')
         hoje = datetime.strptime(data_str, '%Y-%m-%d').date()
 
-        # Pega todos os status de uma vez
+        # PRIMEIRO: APAGA TODAS AS CHAMADAS DESSE DIA - CORRIGE O BUG DE DESMARCAR
+        cur.execute('DELETE FROM chamadas WHERE data_chamada = %s', (hoje,))
+
+        # SEGUNDO: INSERE SÓ QUEM TEM STATUS MARCADO
         dados_para_salvar = []
         for key, value in request.form.items():
-            if key.startswith('status_') and value: # Ignora vazio
+            if key.startswith('status_') and value: # Só salva se marcou P, F, A ou H
                 convivente_id = int(key.split('_')[1])
                 dados_para_salvar.append((convivente_id, hoje, value))
 
         if dados_para_salvar:
-            # UPSERT: Insere ou atualiza tudo numa tacada só
             args_str = ','.join(cur.mogrify("(%s,%s,%s)", i).decode('utf-8') for i in dados_para_salvar)
             cur.execute(f"""
                 INSERT INTO chamadas (convivente_id, data_chamada, status)
                 VALUES {args_str}
-                ON CONFLICT (convivente_id, data_chamada)
-                DO UPDATE SET status = EXCLUDED.status
             """)
 
         conn.commit()
