@@ -37,6 +37,7 @@
         }
      .btn.active { background: #007bff; color: white; }
      .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
+     .btn-paisagem { background: #ffc107; color: #000; border-color: #ffc107; }
 
      .container {
             background: white;
@@ -107,30 +108,34 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* IMPRESSÃO - 3 FOLHAS GARANTIDO - SEM CORTAR QUEIXO */
+        /* IMPRESSÃO PAISAGEM - 9x4 = 36 por folha = 3 FOLHAS */
         @media print {
-            @page {
-                size: A4 landscape;
-                margin: 4mm;
-            }
-            body {
-                background: white;
-                padding: 0;
-            }
-         .header, .botoes {
-                display: none;
-            }
-         .container {
-                padding: 0;
-                border-radius: 0;
-            }
-         .grid {
+            body { background: white; padding: 0; }
+         .header, .botoes { display: none; }
+         .container { padding: 0; border-radius: 0; }
+         
+            /* PAISAGEM */
+         body.paisagem { }
+         body.paisagem @page { size: A4 landscape; margin: 4mm; }
+         body.paisagem .grid {
                 display: grid;
                 grid-template-columns: repeat(9, 1fr);
                 grid-auto-rows: 44mm;
                 gap: 1.5mm;
                 page-break-inside: avoid;
             }
+
+            /* RETRATO */
+         body.retrato { }
+         body.retrato @page { size: A4 portrait; margin: 4mm; }
+         body.retrato .grid {
+                display: grid;
+                grid-template-columns: repeat(6, 1fr); /* 6 colunas em retrato */
+                grid-auto-rows: 44mm;
+                gap: 1.5mm;
+                page-break-inside: avoid;
+            }
+
          .card {
                 border: 0.5pt solid #000;
                 page-break-inside: avoid;
@@ -192,14 +197,15 @@
         }
     </style>
 </head>
-<body>
+<body class="paisagem">
     <div class="header">
         <h1>Carômetro - Conviventes | Total: {{ conviventes|length }} / 100</h1>
         <div class="botoes">
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
             <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="window.print()" class="btn btn-imprimir">🖨️ Imprimir / Salvar PDF - 3 Folhas</button>
+            <button onclick="imprimir('retrato')" class="btn btn-imprimir">📄 PDF Retrato</button>
+            <button onclick="imprimir('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem</button>
         </div>
     </div>
 
@@ -220,5 +226,14 @@
             {% endfor %}
         </div>
     </div>
+
+    <script>
+        function imprimir(orientacao) {
+            document.body.className = orientacao;
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+    </script>
 </body>
 </html>
