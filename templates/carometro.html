@@ -180,7 +180,7 @@
         </div>
     </div>
 
-    <script>
+        <script>
         const cssRetrato = `
             @page { size: A4 portrait; margin: 4mm; }
             @media print {
@@ -194,15 +194,18 @@
                     display: grid;
                     grid-template-columns: repeat(6, 1fr);
                     gap: 1mm;
-                    height: 45mm;
+                    height: 46mm;
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
-                    margin-bottom: 1mm;
+                    page-break-after: auto;
+                }
+                .linha-grid:last-child {
+                    page-break-after: avoid;
                 }
                 .card {
                     border: 0.5pt solid #000;
-                    display: flex;
-                    flex-direction: column;
+                    display: block;
+                    height: 45mm;
                     overflow: hidden;
                 }
                 .card-header {
@@ -215,22 +218,20 @@
                     text-align: center;
                     padding: 0.5mm 0;
                     height: 5mm;
-                    flex-shrink: 0;
+                    line-height: 4mm;
                 }
                 .card-foto {
-                    padding: 0;
-                    flex: 1;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                    height: 29mm;
+                    width: 100%;
+                    display: block;
                     background: #fff;
-                    min-height: 0;
                 }
                 .card-foto img {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
                     object-position: center 45%;
+                    display: block;
                 }
                 .sem-foto {
                     width: 100%;
@@ -251,11 +252,11 @@
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
                     height: 11mm;
-                    flex-shrink: 0;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     line-height: 1.1;
+                    overflow: hidden;
                 }
             }
         `;
@@ -273,15 +274,18 @@
                     display: grid;
                     grid-template-columns: repeat(9, 1fr);
                     gap: 1.5mm;
-                    height: 44mm;
+                    height: 45mm;
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
-                    margin-bottom: 1.5mm;
+                    page-break-after: auto;
+                }
+                .linha-grid:last-child {
+                    page-break-after: avoid;
                 }
                 .card {
                     border: 0.5pt solid #000;
-                    display: flex;
-                    flex-direction: column;
+                    display: block;
+                    height: 44mm;
                     overflow: hidden;
                 }
                 .card-header {
@@ -294,22 +298,20 @@
                     text-align: center;
                     padding: 0.5mm 0;
                     height: 5mm;
-                    flex-shrink: 0;
+                    line-height: 4mm;
                 }
                 .card-foto {
-                    padding: 0;
-                    flex: 1;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                    height: 28mm;
+                    width: 100%;
+                    display: block;
                     background: #fff;
-                    min-height: 0;
                 }
                 .card-foto img {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
                     object-position: center 45%;
+                    display: block;
                 }
                 .sem-foto {
                     width: 100%;
@@ -330,11 +332,11 @@
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
                     height: 11mm;
-                    flex-shrink: 0;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     line-height: 1.1;
+                    overflow: hidden;
                 }
             }
         `;
@@ -364,5 +366,3 @@
             }, 100);
         }
     </script>
-</body>
-</html>
