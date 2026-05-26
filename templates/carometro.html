@@ -187,7 +187,32 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            line-height: 1.1;
+            line-height: 1.1;.pdf-page .card {
+    border: 0.3mm solid #000;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    aspect-ratio: 1/1; /* MUDEI AQUI: QUADRADO - ACABA O ACHATAMENTO */
+}
+.pdf-page .card-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center 20%; /* SOBE MAIS PRA PEGAR TESTA/CABELO */
+}
+.pdf-page .card-nome {
+    font-size: 7pt; /* FONTE MAIOR AINDA */
+    font-weight: bold;
+    text-align: center;
+    padding: 0.5mm;
+    background: #f8f9fa;
+    flex: 0 0 12mm; /* MAIS ALTURA PRO NOME */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+}
         }
     </style>
 </head>
