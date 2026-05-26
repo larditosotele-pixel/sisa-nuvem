@@ -54,7 +54,7 @@
             padding: 15px;
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            clear: both;
+            /* REMOVIDO: clear: both; <- causava a sobreposição */
         }
         .quarto-header {
             display: flex;
@@ -71,6 +71,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 10px;
+            align-items: start; /* ADICIONADO: impede cards esticarem e sobreporem */
         }
         .card-leito {
             border: 2px solid #ddd;
@@ -80,6 +81,7 @@
             position: relative;
             transition: all 0.2s;
             background: white;
+            align-self: start; /* ADICIONADO: cada card cuida da própria altura */
         }
         .card-leito.ocupado { 
             border-color: #e67e22; 
@@ -87,7 +89,7 @@
             cursor: pointer;
         }
         .card-leito.ocupado:hover { 
-            transform: translateY(-2px);
+            /* REMOVIDO: transform: translateY(-2px); <- fazia o card subir por cima */
             box-shadow: 0 3px 6px rgba(0,0,0,0.15);
         }
         .card-leito.vago { 
@@ -147,7 +149,6 @@
                 padding: 10px;
                 margin-bottom: 12px;
             }
-            /* REMOVIDO: .navbar-info p { display: none; } */
             .header-nav { margin: 10px; padding: 12px 15px; }
             .container { padding: 0 8px 20px; }
             .num-leito { font-size: 9px; padding: 1px 5px; }
