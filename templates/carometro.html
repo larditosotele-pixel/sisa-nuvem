@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carômetro - SISA</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -38,7 +37,6 @@
         }
      .btn.active { background: #007bff; color: white; }
      .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
-     .btn-paisagem { background: #ffc107; color: #000; border-color: #ffc107; }
 
      .container {
             background: white;
@@ -109,110 +107,85 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* PDF RETRATO - 9x4 = 36 por folha - CARD MAIS LARGO */
-     .pdf-page-retrato {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            gap: 2mm;
-            page-break-after: always;
-            width: 204mm;
-            height: 291mm;
-            padding: 2mm;
-            background: white;
-            align-content: start;
-        }
-
-        /* PDF PAISAGEM - 9x4 = 36 por folha - CARD MAIS LARGO */
-     .pdf-page-paisagem {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            gap: 2mm;
-            page-break-after: always;
-            width: 291mm;
-            height: 204mm;
-            padding: 2mm;
-            background: white;
-            align-content: start;
-        }
-
-     .pdf-page .card {
-            border: 0.3mm solid #000;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            aspect-ratio: 4/5; /* MUDEI AQUI: MAIS LARGO - ROSTO NÃO ACHATA MAIS */
-        }
-     .pdf-page .card-header {
-            background: #4a90e2;
-            color: white;
-            font-size: 6.5pt;
-            font-weight: bold;
-            text-align: center;
-            padding: 0.5mm 0;
-            flex: 0 0 5.5mm;
-        }
-     .pdf-page .card-foto {
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #fff;
-            flex: 1;
-            min-height: 0;
-        }
-     .pdf-page .card-foto img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-            object-position: center 25%; /* SOBE UM POUCO PRA PEGAR A TESTA */
-        }
-     .pdf-page .sem-foto {
-            width: 100%;
-            height: 100%;
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-            font-size: 5pt;
-        }
-     .pdf-page .card-nome {
-            font-size: 6.5pt; /* AUMENTEI A FONTE DO NOME */
-            font-weight: bold;
-            text-align: center;
-            padding: 0.5mm;
-            background: #f8f9fa;
-            flex: 0 0 11mm; /* AUMENTEI A ALTURA PRA CABER NOME MAIOR */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.1;.pdf-page .card {
-    border: 0.3mm solid #000;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    aspect-ratio: 1/1; /* MUDEI AQUI: QUADRADO - ACABA O ACHATAMENTO */
-}
-.pdf-page .card-foto img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    object-position: center 20%; /* SOBE MAIS PRA PEGAR TESTA/CABELO */
-}
-.pdf-page .card-nome {
-    font-size: 7pt; /* FONTE MAIOR AINDA */
-    font-weight: bold;
-    text-align: center;
-    padding: 0.5mm;
-    background: #f8f9fa;
-    flex: 0 0 12mm; /* MAIS ALTURA PRO NOME */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.1;
-}
+        /* IMPRESSÃO NATIVA - AQUI QUE RESOLVE TUDO */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 5mm;
+            }
+            body {
+                background: white;
+                padding: 0;
+            }
+         .header, .botoes {
+                display: none; /* ESCONDE BOTÕES NA IMPRESSÃO */
+            }
+         .container {
+                padding: 0;
+                border-radius: 0;
+            }
+         .grid {
+                display: grid;
+                grid-template-columns: repeat(9, 1fr); /* 9 COLUNAS */
+                grid-auto-rows: 49mm; /* ALTURA FIXA DO CARD */
+                gap: 2mm;
+                page-break-inside: avoid;
+            }
+         .card {
+                border: 0.5pt solid #000;
+                page-break-inside: avoid;
+                display: flex;
+                flex-direction: column;
+            }
+         .card-header {
+                background: #4a90e2 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                color: white;
+                font-size: 8pt;
+                font-weight: bold;
+                text-align: center;
+                padding: 1mm 0;
+                height: 6mm;
+            }
+         .card-foto {
+                padding: 0;
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #fff;
+            }
+         .card-foto img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover; /* PREENCHE SEM ACHATAR */
+                object-position: center 20%;
+            }
+         .sem-foto {
+                width: 100%;
+                height: 100%;
+                background: #e9ecef;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #6c757d;
+                font-size: 6pt;
+            }
+         .card-nome {
+                font-size: 8pt; /* NOME GRANDE E LEGÍVEL */
+                font-weight: bold;
+                text-align: center;
+                padding: 1mm;
+                background: #f8f9fa !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                height: 12mm;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1.1;
+            }
         }
     </style>
 </head>
@@ -223,12 +196,11 @@
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
             <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="gerarPDF('retrato')" class="btn btn-imprimir">📄 PDF Retrato</button>
-            <button onclick="gerarPDF('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem</button>
+            <button onclick="window.print()" class="btn btn-imprimir">🖨️ Imprimir / Salvar PDF</button>
         </div>
     </div>
 
-    <div class="container" id="conteudo-tela">
+    <div class="container">
         <div class="grid">
             {% for conv in conviventes %}
                 <div class="card">
@@ -245,57 +217,5 @@
             {% endfor %}
         </div>
     </div>
-
-    <!-- PDF COM 36 POR FOLHA = 108 TOTAL EM 3 PÁGINAS -->
-    <div id="conteudo-pdf" style="position: absolute; left: -9999px; top: 0;">
-        {% for i in range(0, conviventes|length, 36) %}
-        <div class="pdf-page">
-            {% for conv in conviventes[i:i+36] %}
-            <div class="card">
-                <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
-                <div class="card-foto">
-                    {% if conv.foto_base64 %}
-                        <img src="{{ conv.foto_base64 }}">
-                    {% else %}
-                        <div class="sem-foto">S/Foto</div>
-                    {% endif %}
-                </div>
-                <div class="card-nome">{{ conv.nome }}</div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endfor %}
-    </div>
-
-    <script>
-        function gerarPDF(orientacao) {
-            const element = document.getElementById('conteudo-pdf');
-            const pages = element.querySelectorAll('.pdf-page');
-            
-            pages.forEach(page => {
-                page.className = 'pdf-page pdf-page-' + orientacao;
-            });
-
-            element.style.position = 'static';
-            element.style.left = '0';
-
-            const formato = orientacao === 'paisagem' ? 'landscape' : 'portrait';
-            const total = {{ conviventes|length }};
-            const nome_arquivo = `carometro_{{ ordem }}_${orientacao}_${total}de100.pdf`;
-
-            const opt = {
-                margin: 0,
-                filename: nome_arquivo,
-                image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: formato }
-            };
-
-            html2pdf().set(opt).from(element).save().then(function() {
-                element.style.position = 'absolute';
-                element.style.left = '-9999px';
-            });
-        }
-    </script>
 </body>
 </html>
