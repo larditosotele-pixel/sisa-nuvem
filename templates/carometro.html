@@ -110,10 +110,11 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* CSS PDF RETRATO - 7x3 = 21 por folha */
+        /* PDF RETRATO - 7x3 = 21 por folha */
      .pdf-page-retrato {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             gap: 2mm;
             page-break-after: always;
             width: 204mm;
@@ -121,18 +122,12 @@
             padding: 3mm;
             background: white;
         }
-     .pdf-page-retrato .card {
-            border: 0.3mm solid #000;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            height: 95mm;
-        }
 
-        /* CSS PDF PAISAGEM - 10x2 = 20 por folha, mas vamos forçar 21 */
+        /* PDF PAISAGEM - 7x3 = 21 por folha */
      .pdf-page-paisagem {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             gap: 2mm;
             page-break-after: always;
             width: 291mm;
@@ -140,14 +135,14 @@
             padding: 3mm;
             background: white;
         }
-     .pdf-page-paisagem .card {
+
+     .pdf-page .card {
             border: 0.3mm solid #000;
             background: white;
             display: flex;
             flex-direction: column;
-            height: 66mm; /* 204mm / 3 linhas */
+            overflow: hidden;
         }
-
      .pdf-page .card-header {
             background: #4a90e2;
             color: white;
@@ -197,7 +192,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>Carômetro - Conviventes</h1>
+        <h1>Carômetro - Conviventes | Total: {{ conviventes|length }}</h1>
         <div class="botoes">
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
@@ -225,13 +220,12 @@
         </div>
     </div>
 
-    <!-- CONTAINER ESCONDIDO SÓ PRO PDF -->
+    <!-- PDF COM TODOS OS CONVIVENTES - SEM LIMITE -->
     <div id="conteudo-pdf" style="position: absolute; left: -9999px; top: 0;">
-        {% set limite = 63 %} <!-- 21 x 3 páginas = 63 -->
-        {% set conviventes_pdf = conviventes[:limite] %}
-        {% for i in range(0, conviventes_pdf|length, 21) %}
+        {% set total = conviventes|length %}
+        {% for i in range(0, total, 21) %}
         <div class="pdf-page">
-            {% for conv in conviventes_pdf[i:i+21] %}
+            {% for conv in conviventes[i:i+21] %}
             <div class="card">
                 <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
                 <div class="card-foto">
@@ -253,7 +247,6 @@
             const element = document.getElementById('conteudo-pdf');
             const pages = element.querySelectorAll('.pdf-page');
             
-            // Aplica classe de orientação
             pages.forEach(page => {
                 page.className = 'pdf-page pdf-page-' + orientacao;
             });
@@ -262,7 +255,8 @@
             element.style.left = '0';
 
             const formato = orientacao === 'paisagem' ? 'landscape' : 'portrait';
-            const nome_arquivo = `carometro_{{ ordem }}_${orientacao}.pdf`;
+            const total = {{ conviventes|length }};
+            const nome_arquivo = `carometro_{{ ordem }}_${orientacao}_${total}conv.pdf`;
 
             const opt = {
                 margin: 0,
