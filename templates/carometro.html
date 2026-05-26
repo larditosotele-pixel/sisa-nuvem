@@ -109,11 +109,11 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* PDF RETRATO - 9x4 = 36 por folha - PREENCHE A FOLHA */
+        /* PDF RETRATO - 9x4 = 36 por folha - CARD MAIS LARGO */
      .pdf-page-retrato {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
-            gap: 1.5mm;
+            gap: 2mm;
             page-break-after: always;
             width: 204mm;
             height: 291mm;
@@ -122,11 +122,11 @@
             align-content: start;
         }
 
-        /* PDF PAISAGEM - 9x4 = 36 por folha - PREENCHE A FOLHA */
+        /* PDF PAISAGEM - 9x4 = 36 por folha - CARD MAIS LARGO */
      .pdf-page-paisagem {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
-            gap: 1.5mm;
+            gap: 2mm;
             page-break-after: always;
             width: 291mm;
             height: 204mm;
@@ -141,16 +141,16 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            aspect-ratio: 3/4; /* CARD 3x4 - IGUAL A FOTO */
+            aspect-ratio: 4/5; /* MUDEI AQUI: MAIS LARGO - ROSTO NÃO ACHATA MAIS */
         }
      .pdf-page .card-header {
             background: #4a90e2;
             color: white;
-            font-size: 6pt;
+            font-size: 6.5pt;
             font-weight: bold;
             text-align: center;
             padding: 0.5mm 0;
-            flex: 0 0 5mm;
+            flex: 0 0 5.5mm;
         }
      .pdf-page .card-foto {
             padding: 0;
@@ -164,8 +164,8 @@
      .pdf-page .card-foto img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* PREENCHE SEM DISTORCER */
-            object-position: center top; /* PRIORIZA O ROSTO */
+            object-fit: cover; 
+            object-position: center 25%; /* SOBE UM POUCO PRA PEGAR A TESTA */
         }
      .pdf-page .sem-foto {
             width: 100%;
@@ -178,16 +178,16 @@
             font-size: 5pt;
         }
      .pdf-page .card-nome {
-            font-size: 5.5pt;
+            font-size: 6.5pt; /* AUMENTEI A FONTE DO NOME */
             font-weight: bold;
             text-align: center;
             padding: 0.5mm;
             background: #f8f9fa;
-            flex: 0 0 10mm;
+            flex: 0 0 11mm; /* AUMENTEI A ALTURA PRA CABER NOME MAIOR */
             display: flex;
             align-items: center;
             justify-content: center;
-            line-height: 1;
+            line-height: 1.1;
         }
     </style>
 </head>
