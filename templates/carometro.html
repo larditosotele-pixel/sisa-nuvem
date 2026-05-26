@@ -9,22 +9,45 @@
         body {
             font-family: Arial, sans-serif;
             background: #f5f5f5;
-            padding: 3px;
         }
-     .header {
+        .navbar {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-img {
+            width: 45px;
+            height: 45px;
             background: white;
-            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+        .navbar-info h2 { font-size: 22px; margin: 0; }
+        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
+        .header {
+            background: white;
+            padding: 8px 15px;
             border-radius: 4px;
-            margin-bottom: 5px;
+            margin: 5px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-     .header h1 { font-size: 16px; }
-     .botoes { display: flex; gap: 4px; flex-wrap: wrap; }
-     .btn {
+        .header h1 { font-size: 16px; }
+        .botoes { display: flex; gap: 4px; flex-wrap: wrap; }
+        .btn {
             padding: 5px 8px;
             border: 1px solid #007bff;
             background: white;
@@ -35,29 +58,30 @@
             font-weight: bold;
             cursor: pointer;
         }
-     .btn.active { background: #007bff; color: white; }
-     .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
-     .btn-paisagem { background: #ffc107; color: #000; border-color: #ffc107; }
+        .btn.active { background: #007bff; color: white; }
+        .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
+        .btn-paisagem { background: #ffc107; color: #000; border-color: #ffc107; }
 
-     .container {
+        .container {
             background: white;
-            padding: 2px;
+            padding: 5px 15px 15px;
+            margin: 0 15px 15px;
             border-radius: 4px;
         }
 
-     .grid {
+        .grid {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             gap: 2px;
         }
 
-     .card {
+        .card {
             border: 1px solid #000;
             background: white;
             display: flex;
             flex-direction: column;
         }
-     .card-header {
+        .card-header {
             background: #4a90e2;
             color: white;
             font-size: 10px;
@@ -67,7 +91,7 @@
             line-height: 1.1;
             white-space: nowrap;
         }
-     .card-foto {
+        .card-foto {
             padding: 1px;
             display: flex;
             justify-content: center;
@@ -75,13 +99,13 @@
             background: #fff;
             height: 60px;
         }
-     .card-foto img {
+        .card-foto img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
             border: 1px solid #ccc;
         }
-     .sem-foto {
+        .sem-foto {
             width: 100%;
             height: 100%;
             border-radius: 4px;
@@ -93,7 +117,7 @@
             font-size: 8px;
             border: 1px solid #ccc;
         }
-     .card-nome {
+        .card-nome {
             font-size: 9px;
             font-weight: bold;
             text-align: center;
@@ -105,13 +129,28 @@
         }
 
         @media (max-width: 768px) {
-         .grid { grid-template-columns: repeat(5, 1fr); }
+            .grid { grid-template-columns: repeat(5, 1fr); }
+            .navbar { padding: 12px 15px; }
+            .navbar-info h2 { font-size: 18px; }
+            .navbar-info p { font-size: 10px; }
+            .header { margin: 5px; }
+            .container { margin: 0 5px 5px; padding: 5px; }
         }
     </style>
     
     <style id="estilo-impressao"></style>
 </head>
 <body>
+    <div class="navbar">
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+        </div>
+        <div class="navbar-info">
+            <h2>SISA</h2>
+            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
+        </div>
+    </div>
+
     <div class="header">
         <h1>Carômetro - Conviventes | Total: {{ conviventes|length }} / 100</h1>
         <div class="botoes">
@@ -146,22 +185,22 @@
             @page { size: A4 portrait; margin: 4mm; }
             @media print {
                 body { background: white; padding: 0; }
-             .header, .botoes { display: none; }
-             .container { padding: 0; border-radius: 0; }
-             .grid {
+                .navbar, .header, .botoes { display: none; }
+                .container { padding: 0; border-radius: 0; margin: 0; }
+                .grid {
                     display: grid;
                     grid-template-columns: repeat(6, 1fr);
-                    grid-auto-rows: 45mm; /* MUDEI AQUI: era 47mm */
-                    gap: 1mm; /* MUDEI AQUI: era 1.5mm */
-                    page-break-inside: avoid;
+                    grid-auto-rows: 45mm;
+                    gap: 1mm;
                 }
-             .card {
+                .card {
                     border: 0.5pt solid #000;
-                    page-break-inside: avoid;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
                     display: flex;
                     flex-direction: column;
                 }
-             .card-header {
+                .card-header {
                     background: #4a90e2 !important;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
@@ -173,7 +212,7 @@
                     height: 5mm;
                     flex-shrink: 0;
                 }
-             .card-foto {
+                .card-foto {
                     padding: 0;
                     flex: 1;
                     display: flex;
@@ -182,13 +221,13 @@
                     background: #fff;
                     min-height: 0;
                 }
-             .card-foto img {
+                .card-foto img {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
                     object-position: center 45%;
                 }
-             .sem-foto {
+                .sem-foto {
                     width: 100%;
                     height: 100%;
                     background: #e9ecef;
@@ -198,7 +237,7 @@
                     color: #6c757d;
                     font-size: 6pt;
                 }
-             .card-nome {
+                .card-nome {
                     font-size: 7pt;
                     font-weight: bold;
                     text-align: center;
@@ -220,22 +259,22 @@
             @page { size: A4 landscape; margin: 4mm; }
             @media print {
                 body { background: white; padding: 0; }
-             .header, .botoes { display: none; }
-             .container { padding: 0; border-radius: 0; }
-             .grid {
+                .navbar, .header, .botoes { display: none; }
+                .container { padding: 0; border-radius: 0; margin: 0; }
+                .grid {
                     display: grid;
                     grid-template-columns: repeat(9, 1fr);
                     grid-auto-rows: 44mm;
                     gap: 1.5mm;
-                    page-break-inside: avoid;
                 }
-             .card {
+                .card {
                     border: 0.5pt solid #000;
-                    page-break-inside: avoid;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
                     display: flex;
                     flex-direction: column;
                 }
-             .card-header {
+                .card-header {
                     background: #4a90e2 !important;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
@@ -247,7 +286,7 @@
                     height: 5mm;
                     flex-shrink: 0;
                 }
-             .card-foto {
+                .card-foto {
                     padding: 0;
                     flex: 1;
                     display: flex;
@@ -256,13 +295,13 @@
                     background: #fff;
                     min-height: 0;
                 }
-             .card-foto img {
+                .card-foto img {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
                     object-position: center 45%;
                 }
-             .sem-foto {
+                .sem-foto {
                     width: 100%;
                     height: 100%;
                     background: #e9ecef;
@@ -272,7 +311,7 @@
                     color: #6c757d;
                     font-size: 6pt;
                 }
-             .card-nome {
+                .card-nome {
                     font-size: 7pt;
                     font-weight: bold;
                     text-align: center;
