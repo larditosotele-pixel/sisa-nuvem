@@ -180,9 +180,9 @@
         </div>
     </div>
 
-                <script>
+    <script>
         const cssRetrato = `
-            @page { size: A4 portrait; margin: 3mm; }
+            @page { size: A4 portrait; margin: 4mm; }
             @media print {
                 * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                 html, body { 
@@ -190,7 +190,6 @@
                     padding: 0 !important; 
                     margin: 0 !important; 
                 }
-                /* REMOVE TUDO DE CIMA NA IMPRESSÃO */
                 .navbar, .header { display: none !important; }
                 .container { 
                     padding: 0 !important; 
@@ -201,17 +200,17 @@
                 .grid {
                     display: block !important;
                 }
+                /* 5 COLUNAS X 8 LINHAS = 40 CARDS POR FOLHA */
                 .linha-grid {
                     display: grid !important;
-                    grid-template-columns: repeat(6, 1fr);
-                    gap: 0.8mm;
-                    height: 48mm;
+                    grid-template-columns: repeat(5, 1fr);
+                    gap: 1mm;
+                    height: 36mm;
                     page-break-inside: avoid !important;
                     break-inside: avoid-page !important;
-                    page-break-after: avoid !important;
                 }
-                /* Força quebrar só depois de 6 linhas */
-                .linha-grid:nth-child(6n) {
+                /* QUEBRA DE PÁGINA DEPOIS DE 8 LINHAS */
+                .linha-grid:nth-child(8n) {
                     page-break-after: always !important;
                 }
                 .linha-grid:last-child {
@@ -220,7 +219,7 @@
                 .card {
                     border: 0.5pt solid #000 !important;
                     display: block !important;
-                    height: 47.5mm !important;
+                    height: 35.5mm !important;
                     overflow: hidden !important;
                     box-sizing: border-box !important;
                 }
@@ -235,7 +234,7 @@
                     padding: 0 !important;
                 }
                 .card-foto {
-                    height: 32.5mm !important;
+                    height: 21.5mm !important;
                     width: 100% !important;
                     display: block !important;
                 }
@@ -262,7 +261,7 @@
                     text-align: center !important;
                     padding: 0.5mm !important;
                     background: #f8f9fa !important;
-                    height: 11mm !important;
+                    height: 10mm !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
@@ -273,7 +272,7 @@
         `;
 
         const cssPaisagem = `
-            @page { size: A4 landscape; margin: 3mm; }
+            @page { size: A4 landscape; margin: 4mm; }
             @media print {
                 * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                 html, body { 
@@ -291,17 +290,17 @@
                 .grid {
                     display: block !important;
                 }
+                /* PAISAGEM: 8 COLUNAS X 5 LINHAS = 40 CARDS */
                 .linha-grid {
                     display: grid !important;
-                    grid-template-columns: repeat(9, 1fr);
+                    grid-template-columns: repeat(8, 1fr);
                     gap: 1mm;
-                    height: 48.5mm;
+                    height: 39mm;
                     page-break-inside: avoid !important;
                     break-inside: avoid-page !important;
-                    page-break-after: avoid !important;
                 }
-                /* Força quebrar só depois de 4 linhas */
-                .linha-grid:nth-child(4n) {
+                /* QUEBRA DE PÁGINA DEPOIS DE 5 LINHAS */
+                .linha-grid:nth-child(5n) {
                     page-break-after: always !important;
                 }
                 .linha-grid:last-child {
@@ -310,7 +309,7 @@
                 .card {
                     border: 0.5pt solid #000 !important;
                     display: block !important;
-                    height: 48mm !important;
+                    height: 38.5mm !important;
                     overflow: hidden !important;
                     box-sizing: border-box !important;
                 }
@@ -325,7 +324,7 @@
                     padding: 0 !important;
                 }
                 .card-foto {
-                    height: 33mm !important;
+                    height: 24.5mm !important;
                     width: 100% !important;
                     display: block !important;
                 }
@@ -352,7 +351,7 @@
                     text-align: center !important;
                     padding: 0.5mm !important;
                     background: #f8f9fa !important;
-                    height: 11mm !important;
+                    height: 10mm !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
@@ -365,7 +364,7 @@
         function imprimir(orientacao) {
             const grid = document.querySelector('.grid');
             const cards = Array.from(grid.querySelectorAll('.card'));
-            const colunas = orientacao === 'retrato' ? 6 : 9;
+            const colunas = orientacao === 'retrato' ? 5 : 8;
             
             grid.innerHTML = '';
             for (let i = 0; i < cards.length; i += colunas) {
