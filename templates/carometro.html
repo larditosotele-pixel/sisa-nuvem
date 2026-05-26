@@ -38,6 +38,7 @@
         }
      .btn.active { background: #007bff; color: white; }
      .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
+     .btn-paisagem { background: #ffc107; color: #000; border-color: #ffc107; }
 
      .container {
             background: white;
@@ -109,45 +110,64 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* CSS CORRIGIDO SÓ PRO PDF */
-     .pdf-page {
+        /* CSS PDF RETRATO - 7x3 = 21 por folha */
+     .pdf-page-retrato {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 1mm;
+            gap: 2mm;
             page-break-after: always;
-            height: 291mm;
             width: 204mm;
+            height: 291mm;
             padding: 3mm;
             background: white;
         }
-     .pdf-page .card {
-            border: 0.2mm solid #000;
-            overflow: hidden;
+     .pdf-page-retrato .card {
+            border: 0.3mm solid #000;
             background: white;
             display: flex;
             flex-direction: column;
+            height: 95mm;
         }
+
+        /* CSS PDF PAISAGEM - 10x2 = 20 por folha, mas vamos forçar 21 */
+     .pdf-page-paisagem {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2mm;
+            page-break-after: always;
+            width: 291mm;
+            height: 204mm;
+            padding: 3mm;
+            background: white;
+        }
+     .pdf-page-paisagem .card {
+            border: 0.3mm solid #000;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            height: 66mm; /* 204mm / 3 linhas */
+        }
+
      .pdf-page .card-header {
             background: #4a90e2;
             color: white;
-            font-size: 7pt;
+            font-size: 8pt;
             font-weight: bold;
             text-align: center;
-            padding: 0.5mm;
-            line-height: 1.1;
+            padding: 1mm 0;
+            height: 5mm;
         }
      .pdf-page .card-foto {
-            padding: 0.5mm;
+            padding: 1mm;
             display: flex;
             justify-content: center;
             align-items: center;
-            flex: 1;
             background: #fff;
+            flex: 1;
         }
      .pdf-page .card-foto img {
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
             border: 0.1mm solid #ccc;
         }
@@ -159,17 +179,19 @@
             align-items: center;
             justify-content: center;
             color: #6c757d;
-            font-size: 6pt;
+            font-size: 7pt;
             border: 0.1mm solid #ccc;
         }
      .pdf-page .card-nome {
-            font-size: 6pt;
+            font-size: 7pt;
             font-weight: bold;
             text-align: center;
-            padding: 0.5mm;
-            line-height: 1.1;
+            padding: 1mm;
             background: #f8f9fa;
-            min-height: 6mm;
+            height: 12mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -180,7 +202,8 @@
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
             <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="gerarPDF()" class="btn btn-imprimir">📄 Baixar PDF</button>
+            <button onclick="gerarPDF('retrato')" class="btn btn-imprimir">📄 PDF Retrato</button>
+            <button onclick="gerarPDF('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem</button>
         </div>
     </div>
 
@@ -204,10 +227,11 @@
 
     <!-- CONTAINER ESCONDIDO SÓ PRO PDF -->
     <div id="conteudo-pdf" style="position: absolute; left: -9999px; top: 0;">
-        {% set total = conviventes|length %}
-        {% for i in range(0, total, 21) %}
+        {% set limite = 63 %} <!-- 21 x 3 páginas = 63 -->
+        {% set conviventes_pdf = conviventes[:limite] %}
+        {% for i in range(0, conviventes_pdf|length, 21) %}
         <div class="pdf-page">
-            {% for conv in conviventes[i:i+21] %}
+            {% for conv in conviventes_pdf[i:i+21] %}
             <div class="card">
                 <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
                 <div class="card-foto">
@@ -225,22 +249,30 @@
     </div>
 
     <script>
-        function gerarPDF() {
-            // Mostra o container temporariamente pro html2pdf enxergar
+        function gerarPDF(orientacao) {
             const element = document.getElementById('conteudo-pdf');
+            const pages = element.querySelectorAll('.pdf-page');
+            
+            // Aplica classe de orientação
+            pages.forEach(page => {
+                page.className = 'pdf-page pdf-page-' + orientacao;
+            });
+
             element.style.position = 'static';
             element.style.left = '0';
 
+            const formato = orientacao === 'paisagem' ? 'landscape' : 'portrait';
+            const nome_arquivo = `carometro_{{ ordem }}_${orientacao}.pdf`;
+
             const opt = {
                 margin: 0,
-                filename: 'carometro.pdf',
+                filename: nome_arquivo,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: formato }
             };
 
             html2pdf().set(opt).from(element).save().then(function() {
-                // Esconde de novo depois de gerar
                 element.style.position = 'absolute';
                 element.style.left = '-9999px';
             });
