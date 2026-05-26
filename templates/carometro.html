@@ -109,10 +109,10 @@
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
 
-        /* PDF RETRATO - 11x3 = 33 por folha */
+        /* PDF RETRATO - 12x3 = 36 por folha = 108 total */
      .pdf-page-retrato {
             display: grid;
-            grid-template-columns: repeat(11, 1fr);
+            grid-template-columns: repeat(12, 1fr);
             grid-template-rows: repeat(3, 1fr);
             gap: 1mm;
             page-break-after: always;
@@ -122,10 +122,10 @@
             background: white;
         }
 
-        /* PDF PAISAGEM - 11x3 = 33 por folha */
+        /* PDF PAISAGEM - 12x3 = 36 por folha = 108 total */
      .pdf-page-paisagem {
             display: grid;
-            grid-template-columns: repeat(11, 1fr);
+            grid-template-columns: repeat(12, 1fr);
             grid-template-rows: repeat(3, 1fr);
             gap: 1mm;
             page-break-after: always;
@@ -145,7 +145,7 @@
      .pdf-page .card-header {
             background: #4a90e2;
             color: white;
-            font-size: 6pt;
+            font-size: 5.5pt;
             font-weight: bold;
             text-align: center;
             padding: 0.5mm 0;
@@ -166,7 +166,7 @@
             max-height: 100%;
             width: auto;
             height: auto;
-            object-fit: contain; /* NÃO ESTICA MAIS - MANTÉM PROPORÇÃO */
+            object-fit: contain; /* MANTÉM PROPORÇÃO 3x4 SEM ACHATAR */
             border: 0.1mm solid #ccc;
         }
      .pdf-page .sem-foto {
@@ -181,12 +181,12 @@
             border: 0.1mm solid #ccc;
         }
      .pdf-page .card-nome {
-            font-size: 5.5pt;
+            font-size: 5pt;
             font-weight: bold;
             text-align: center;
             padding: 0.5mm;
             background: #f8f9fa;
-            height: 9mm;
+            height: 8mm;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -197,13 +197,13 @@
 </head>
 <body>
     <div class="header">
-        <h1>Carômetro - Conviventes | Total: {{ conviventes|length }}</h1>
+        <h1>Carômetro - Conviventes | Total: {{ conviventes|length }} / 100</h1>
         <div class="botoes">
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
             <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="gerarPDF('retrato')" class="btn btn-imprimir">📄 PDF Retrato 3 folhas</button>
-            <button onclick="gerarPDF('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem 3 folhas</button>
+            <button onclick="gerarPDF('retrato')" class="btn btn-imprimir">📄 PDF Retrato</button>
+            <button onclick="gerarPDF('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem</button>
         </div>
     </div>
 
@@ -225,11 +225,11 @@
         </div>
     </div>
 
-    <!-- PDF COM 33 POR FOLHA = 99 EM 3 PÁGINAS -->
+    <!-- PDF COM 36 POR FOLHA = 108 TOTAL EM 3 PÁGINAS -->
     <div id="conteudo-pdf" style="position: absolute; left: -9999px; top: 0;">
-        {% for i in range(0, conviventes|length, 33) %}
+        {% for i in range(0, conviventes|length, 36) %}
         <div class="pdf-page">
-            {% for conv in conviventes[i:i+33] %}
+            {% for conv in conviventes[i:i+36] %}
             <div class="card">
                 <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
                 <div class="card-foto">
@@ -260,7 +260,7 @@
 
             const formato = orientacao === 'paisagem' ? 'landscape' : 'portrait';
             const total = {{ conviventes|length }};
-            const nome_arquivo = `carometro_{{ ordem }}_${orientacao}_3folhas_${total}conv.pdf`;
+            const nome_arquivo = `carometro_{{ ordem }}_${orientacao}_${total}de100.pdf`;
 
             const opt = {
                 margin: 0,
