@@ -181,207 +181,211 @@
     </div>
 
     <script>
-        const cssRetrato = `
-            @page { size: A4 portrait; margin: 4mm; }
-            @media print {
-                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                html, body { 
-                    background: white !important; 
-                    padding: 0 !important; 
-                    margin: 0 !important; 
-                }
-                .navbar, .header { display: none !important; }
-                .container { 
-                    padding: 0 !important; 
-                    margin: 0 !important; 
-                    border: 0 !important;
-                    box-shadow: none !important;
-                }
-                .grid {
-                    display: block !important;
-                }
-                /* 5 COLUNAS X 8 LINHAS = 40 CARDS POR FOLHA */
-                .linha-grid {
-                    display: grid !important;
-                    grid-template-columns: repeat(5, 1fr);
-                    gap: 1mm;
-                    height: 36mm;
-                    page-break-inside: avoid !important;
-                    break-inside: avoid-page !important;
-                }
-                /* QUEBRA DE PÁGINA DEPOIS DE 8 LINHAS */
-                .linha-grid:nth-child(8n) {
-                    page-break-after: always !important;
-                }
-                .linha-grid:last-child {
-                    page-break-after: avoid !important;
-                }
-                .card {
-                    border: 0.5pt solid #000 !important;
-                    display: block !important;
-                    height: 35.5mm !important;
-                    overflow: hidden !important;
-                    box-sizing: border-box !important;
-                }
-                .card-header {
-                    background: #4a90e2 !important;
-                    color: white !important;
-                    font-size: 6pt !important;
-                    font-weight: bold !important;
-                    text-align: center !important;
-                    height: 4mm !important;
-                    line-height: 4mm !important;
-                    padding: 0 !important;
-                }
-                .card-foto {
-                    height: 21.5mm !important;
-                    width: 100% !important;
-                    display: block !important;
-                }
-                .card-foto img {
-                    width: 100% !important;
-                    height: 100% !important;
-                    object-fit: cover !important;
-                    object-position: center 45% !important;
-                    display: block !important;
-                }
-                .sem-foto {
-                    width: 100% !important;
-                    height: 100% !important;
-                    background: #e9ecef !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    color: #6c757d !important;
-                    font-size: 6pt !important;
-                }
-                .card-nome {
-                    font-size: 6pt !important;
-                    font-weight: bold !important;
-                    text-align: center !important;
-                    padding: 0.5mm !important;
-                    background: #f8f9fa !important;
-                    height: 10mm !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    line-height: 1 !important;
-                    overflow: hidden !important;
-                }
-            }
-        `;
-
-        const cssPaisagem = `
-            @page { size: A4 landscape; margin: 4mm; }
-            @media print {
-                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                html, body { 
-                    background: white !important; 
-                    padding: 0 !important; 
-                    margin: 0 !important; 
-                }
-                .navbar, .header { display: none !important; }
-                .container { 
-                    padding: 0 !important; 
-                    margin: 0 !important; 
-                    border: 0 !important;
-                    box-shadow: none !important;
-                }
-                .grid {
-                    display: block !important;
-                }
-                /* PAISAGEM: 8 COLUNAS X 5 LINHAS = 40 CARDS */
-                .linha-grid {
-                    display: grid !important;
-                    grid-template-columns: repeat(8, 1fr);
-                    gap: 1mm;
-                    height: 39mm;
-                    page-break-inside: avoid !important;
-                    break-inside: avoid-page !important;
-                }
-                /* QUEBRA DE PÁGINA DEPOIS DE 5 LINHAS */
-                .linha-grid:nth-child(5n) {
-                    page-break-after: always !important;
-                }
-                .linha-grid:last-child {
-                    page-break-after: avoid !important;
-                }
-                .card {
-                    border: 0.5pt solid #000 !important;
-                    display: block !important;
-                    height: 38.5mm !important;
-                    overflow: hidden !important;
-                    box-sizing: border-box !important;
-                }
-                .card-header {
-                    background: #4a90e2 !important;
-                    color: white !important;
-                    font-size: 6pt !important;
-                    font-weight: bold !important;
-                    text-align: center !important;
-                    height: 4mm !important;
-                    line-height: 4mm !important;
-                    padding: 0 !important;
-                }
-                .card-foto {
-                    height: 24.5mm !important;
-                    width: 100% !important;
-                    display: block !important;
-                }
-                .card-foto img {
-                    width: 100% !important;
-                    height: 100% !important;
-                    object-fit: cover !important;
-                    object-position: center 45% !important;
-                    display: block !important;
-                }
-                .sem-foto {
-                    width: 100% !important;
-                    height: 100% !important;
-                    background: #e9ecef !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    color: #6c757d !important;
-                    font-size: 6pt !important;
-                }
-                .card-nome {
-                    font-size: 6pt !important;
-                    font-weight: bold !important;
-                    text-align: center !important;
-                    padding: 0.5mm !important;
-                    background: #f8f9fa !important;
-                    height: 10mm !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    line-height: 1 !important;
-                    overflow: hidden !important;
-                }
-            }
-        `;
-
         function imprimir(orientacao) {
-            const grid = document.querySelector('.grid');
-            const cards = Array.from(grid.querySelectorAll('.card'));
+            const cards = Array.from(document.querySelectorAll('.card'));
             const colunas = orientacao === 'retrato' ? 5 : 8;
+            const linhasPorPagina = orientacao === 'retrato' ? 8 : 5;
             
-            grid.innerHTML = '';
+            // Cria estrutura de tabela pra impressão
+            let tabelaHTML = '<div class="pagina-impressao">';
+            let contadorLinha = 0;
+            
             for (let i = 0; i < cards.length; i += colunas) {
-                const linha = document.createElement('div');
-                linha.className = 'linha-grid';
-                cards.slice(i, i + colunas).forEach(card => linha.appendChild(card));
-                grid.appendChild(linha);
+                if (contadorLinha % linhasPorPagina === 0 && i > 0) {
+                    tabelaHTML += '</tbody></table><div class="quebra-pagina"></div><table class="tabela-carometro"><tbody>';
+                } else if (i === 0) {
+                    tabelaHTML += '<table class="tabela-carometro"><tbody>';
+                }
+                
+                tabelaHTML += '<tr class="linha-carometro">';
+                const cardsLinha = cards.slice(i, i + colunas);
+                
+                cardsLinha.forEach(card => {
+                    const quarto = card.querySelector('.card-header').textContent;
+                    const foto = card.querySelector('.card-foto').innerHTML;
+                    const nome = card.querySelector('.card-nome').textContent;
+                    
+                    tabelaHTML += `
+                        <td class="celula-card">
+                            <div class="card-print">
+                                <div class="card-header-print">${quarto}</div>
+                                <div class="card-foto-print">${foto}</div>
+                                <div class="card-nome-print">${nome}</div>
+                            </div>
+                        </td>
+                    `;
+                });
+                
+                // Completa com células vazias se faltar card na linha
+                for (let j = cardsLinha.length; j < colunas; j++) {
+                    tabelaHTML += '<td class="celula-card vazia"></td>';
+                }
+                
+                tabelaHTML += '</tr>';
+                contadorLinha++;
             }
+            tabelaHTML += '</tbody></table></div>';
 
+            const cssRetrato = `
+                @page { size: A4 portrait; margin: 4mm; }
+                @media print {
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+                    .navbar, .header, .container { display: none !important; }
+                    .pagina-impressao { display: block !important; }
+                    .tabela-carometro {
+                        width: 100%;
+                        border-collapse: collapse;
+                        page-break-inside: avoid !important;
+                    }
+                    .quebra-pagina {
+                        page-break-after: always !important;
+                        break-after: page !important;
+                    }
+                    .linha-carometro {
+                        page-break-inside: avoid !important;
+                        break-inside: avoid-page !important;
+                    }
+                    .celula-card {
+                        width: 20%;
+                        padding: 0.5mm;
+                        vertical-align: top;
+                        border: 0.5pt solid #000;
+                    }
+                    .celula-card.vazia { border: 0.5pt solid #ccc; }
+                    .card-print {
+                        height: 34mm;
+                        display: block;
+                    }
+                    .card-header-print {
+                        background: #4a90e2 !important;
+                        color: white !important;
+                        font-size: 5.5pt;
+                        font-weight: bold;
+                        text-align: center;
+                        height: 3.5mm;
+                        line-height: 3.5mm;
+                    }
+                    .card-foto-print {
+                        height: 20.5mm;
+                        display: block;
+                    }
+                    .card-foto-print img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        object-position: center 45%;
+                    }
+                    .sem-foto {
+                        width: 100%;
+                        height: 100%;
+                        background: #e9ecef;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #6c757d;
+                        font-size: 5pt;
+                    }
+                    .card-nome-print {
+                        font-size: 5.5pt;
+                        font-weight: bold;
+                        text-align: center;
+                        padding: 0.5mm;
+                        background: #f8f9fa !important;
+                        height: 10mm;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        line-height: 1;
+                    }
+                }
+            `;
+
+            const cssPaisagem = `
+                @page { size: A4 landscape; margin: 4mm; }
+                @media print {
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+                    .navbar, .header, .container { display: none !important; }
+                    .pagina-impressao { display: block !important; }
+                    .tabela-carometro {
+                        width: 100%;
+                        border-collapse: collapse;
+                        page-break-inside: avoid !important;
+                    }
+                    .quebra-pagina {
+                        page-break-after: always !important;
+                        break-after: page !important;
+                    }
+                    .linha-carometro {
+                        page-break-inside: avoid !important;
+                        break-inside: avoid-page !important;
+                    }
+                    .celula-card {
+                        width: 12.5%;
+                        padding: 0.5mm;
+                        vertical-align: top;
+                        border: 0.5pt solid #000;
+                    }
+                    .celula-card.vazia { border: 0.5pt solid #ccc; }
+                    .card-print {
+                        height: 37mm;
+                        display: block;
+                    }
+                    .card-header-print {
+                        background: #4a90e2 !important;
+                        color: white !important;
+                        font-size: 5.5pt;
+                        font-weight: bold;
+                        text-align: center;
+                        height: 3.5mm;
+                        line-height: 3.5mm;
+                    }
+                    .card-foto-print {
+                        height: 23.5mm;
+                        display: block;
+                    }
+                    .card-foto-print img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        object-position: center 45%;
+                    }
+                    .sem-foto {
+                        width: 100%;
+                        height: 100%;
+                        background: #e9ecef;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #6c757d;
+                        font-size: 5pt;
+                    }
+                    .card-nome-print {
+                        font-size: 5.5pt;
+                        font-weight: bold;
+                        text-align: center;
+                        padding: 0.5mm;
+                        background: #f8f9fa !important;
+                        height: 10mm;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        line-height: 1;
+                    }
+                }
+            `;
+
+            // Esconde o conteúdo normal e injeta a tabela
+            document.body.insertAdjacentHTML('beforeend', tabelaHTML);
             const styleTag = document.getElementById('estilo-impressao');
             styleTag.innerHTML = orientacao === 'retrato' ? cssRetrato : cssPaisagem;
             
             setTimeout(() => {
                 window.print();
                 setTimeout(() => { 
+                    document.querySelector('.pagina-impressao').remove();
                     styleTag.innerHTML = ''; 
-                    location.reload();
                 }, 500);
             }, 100);
         }
