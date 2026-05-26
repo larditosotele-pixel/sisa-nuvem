@@ -180,14 +180,24 @@
         </div>
     </div>
 
-            <script>
+                <script>
         const cssRetrato = `
             @page { size: A4 portrait; margin: 3mm; }
             @media print {
-                * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                html, body { background: white !important; padding: 0 !important; margin: 0 !important; }
-                .navbar, .header, .botoes, #estilo-base { display: none !important; }
-                .container { padding: 0 !important; margin: 0 !important; border: 0 !important; }
+                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                html, body { 
+                    background: white !important; 
+                    padding: 0 !important; 
+                    margin: 0 !important; 
+                }
+                /* REMOVE TUDO DE CIMA NA IMPRESSÃO */
+                .navbar, .header { display: none !important; }
+                .container { 
+                    padding: 0 !important; 
+                    margin: 0 !important; 
+                    border: 0 !important;
+                    box-shadow: none !important;
+                }
                 .grid {
                     display: block !important;
                 }
@@ -195,10 +205,14 @@
                     display: grid !important;
                     grid-template-columns: repeat(6, 1fr);
                     gap: 0.8mm;
-                    height: 42.5mm;
+                    height: 48mm;
                     page-break-inside: avoid !important;
-                    break-inside: avoid !important;
-                    page-break-after: auto !important;
+                    break-inside: avoid-page !important;
+                    page-break-after: avoid !important;
+                }
+                /* Força quebrar só depois de 6 linhas */
+                .linha-grid:nth-child(6n) {
+                    page-break-after: always !important;
                 }
                 .linha-grid:last-child {
                     page-break-after: avoid !important;
@@ -206,21 +220,22 @@
                 .card {
                     border: 0.5pt solid #000 !important;
                     display: block !important;
-                    height: 42mm !important;
+                    height: 47.5mm !important;
                     overflow: hidden !important;
+                    box-sizing: border-box !important;
                 }
                 .card-header {
                     background: #4a90e2 !important;
                     color: white !important;
-                    font-size: 6.5pt !important;
+                    font-size: 6pt !important;
                     font-weight: bold !important;
                     text-align: center !important;
-                    height: 4.5mm !important;
-                    line-height: 4.5mm !important;
+                    height: 4mm !important;
+                    line-height: 4mm !important;
                     padding: 0 !important;
                 }
                 .card-foto {
-                    height: 27mm !important;
+                    height: 32.5mm !important;
                     width: 100% !important;
                     display: block !important;
                 }
@@ -242,16 +257,16 @@
                     font-size: 6pt !important;
                 }
                 .card-nome {
-                    font-size: 6.5pt !important;
+                    font-size: 6pt !important;
                     font-weight: bold !important;
                     text-align: center !important;
                     padding: 0.5mm !important;
                     background: #f8f9fa !important;
-                    height: 10.5mm !important;
+                    height: 11mm !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    line-height: 1.1 !important;
+                    line-height: 1 !important;
                     overflow: hidden !important;
                 }
             }
@@ -260,10 +275,19 @@
         const cssPaisagem = `
             @page { size: A4 landscape; margin: 3mm; }
             @media print {
-                * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                html, body { background: white !important; padding: 0 !important; margin: 0 !important; }
-                .navbar, .header, .botoes, #estilo-base { display: none !important; }
-                .container { padding: 0 !important; margin: 0 !important; border: 0 !important; }
+                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                html, body { 
+                    background: white !important; 
+                    padding: 0 !important; 
+                    margin: 0 !important; 
+                }
+                .navbar, .header { display: none !important; }
+                .container { 
+                    padding: 0 !important; 
+                    margin: 0 !important; 
+                    border: 0 !important;
+                    box-shadow: none !important;
+                }
                 .grid {
                     display: block !important;
                 }
@@ -271,10 +295,14 @@
                     display: grid !important;
                     grid-template-columns: repeat(9, 1fr);
                     gap: 1mm;
-                    height: 41mm;
+                    height: 48.5mm;
                     page-break-inside: avoid !important;
-                    break-inside: avoid !important;
-                    page-break-after: auto !important;
+                    break-inside: avoid-page !important;
+                    page-break-after: avoid !important;
+                }
+                /* Força quebrar só depois de 4 linhas */
+                .linha-grid:nth-child(4n) {
+                    page-break-after: always !important;
                 }
                 .linha-grid:last-child {
                     page-break-after: avoid !important;
@@ -282,21 +310,22 @@
                 .card {
                     border: 0.5pt solid #000 !important;
                     display: block !important;
-                    height: 40.5mm !important;
+                    height: 48mm !important;
                     overflow: hidden !important;
+                    box-sizing: border-box !important;
                 }
                 .card-header {
                     background: #4a90e2 !important;
                     color: white !important;
-                    font-size: 6.5pt !important;
+                    font-size: 6pt !important;
                     font-weight: bold !important;
                     text-align: center !important;
-                    height: 4.5mm !important;
-                    line-height: 4.5mm !important;
+                    height: 4mm !important;
+                    line-height: 4mm !important;
                     padding: 0 !important;
                 }
                 .card-foto {
-                    height: 25.5mm !important;
+                    height: 33mm !important;
                     width: 100% !important;
                     display: block !important;
                 }
@@ -318,16 +347,16 @@
                     font-size: 6pt !important;
                 }
                 .card-nome {
-                    font-size: 6.5pt !important;
+                    font-size: 6pt !important;
                     font-weight: bold !important;
                     text-align: center !important;
                     padding: 0.5mm !important;
                     background: #f8f9fa !important;
-                    height: 10.5mm !important;
+                    height: 11mm !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    line-height: 1.1 !important;
+                    line-height: 1 !important;
                     overflow: hidden !important;
                 }
             }
