@@ -6,61 +6,118 @@
     <title>Lista de Presença - {{ nome_mes }}/{{ ano }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 20px; }
-    .container { max-width: 1600px; margin: 0 auto; background: white; padding: 20px; }
-    .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #2c3e50; }
-    .header h1 { font-size: 20px; color: #2c3e50; margin-bottom: 5px; text-transform: uppercase; font-weight: 700; }
-    .subheader { display: flex; justify-content: space-between; align-items: center; background: #ecf0f1; padding: 10px 15px; border-radius: 4px; margin-bottom: 15px; }
-    .subheader h2 { font-size: 16px; color: #2c3e50; text-transform: uppercase; font-weight: 700; }
-    .controles { display: flex; gap: 10px; align-items: center; }
-    .btn { padding: 8px 16px; border-radius: 4px; text-decoration: none; font-weight: 600; background: #3498db; color: white; border: none; cursor: pointer; font-size: 13px; }
-    .btn-voltar { background: #7f8c8d; }
+        body { font-family: Arial, sans-serif; background: #f5f7fa; }
+
+        /* NAVBAR VERDE - ADICIONADO */
+      .navbar {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+      .logo-img {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+      .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+      .navbar-info h2 { font-size: 22px; margin: 0; }
+      .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
+        /* HEADER-NAV BOTÃO VOLTAR */
+       .header-nav {
+            background: white;
+            padding: 15px 20px;
+            margin: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+       .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
+
+       .container { max-width: 1600px; margin: 0 auto; background: white; padding: 20px; }
+       .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #2c3e50; }
+       .header h1 { font-size: 20px; color: #2c3e50; margin-bottom: 5px; text-transform: uppercase; font-weight: 700; }
+       .subheader { display: flex; justify-content: space-between; align-items: center; background: #ecf0f1; padding: 10px 15px; border-radius: 4px; margin-bottom: 15px; }
+       .subheader h2 { font-size: 16px; color: #2c3e50; text-transform: uppercase; font-weight: 700; }
+       .controles { display: flex; gap: 10px; align-items: center; }
+       .btn { padding: 8px 16px; border-radius: 4px; text-decoration: none; font-weight: 600; background: #3498db; color: white; border: none; cursor: pointer; font-size: 13px; }
+       .btn-voltar { background: #7f8c8d; }
         input[type="month"] { padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 14px; }
-        
+
         /* TABELA - ZEBRADO EM TODAS AS COLUNAS */
         table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 30px; }
         th, td { border: 1px solid #95a5a6; padding: 6px 4px; text-align: center; }
         thead th { background: #34495e; color: white; font-weight: 700; font-size: 11px; }
         thead th.fim-semana { background: #f39c12; color: #000; }
-        
+
         /* NOME/QUARTO/LEITO SEM BACKGROUND FIXO - AGORA SEGUE O ZEBRADO */
-    .col-nome { text-align: left; padding-left: 8px; min-width: 200px; font-size: 13px; font-weight: 600; }
-    .col-quarto,.col-leito { min-width: 50px; font-size: 12px; }
-        
+       .col-nome { text-align: left; padding-left: 8px; min-width: 200px; font-size: 13px; font-weight: 600; }
+       .col-quarto,.col-leito { min-width: 50px; font-size: 12px; }
+
         /* ZEBRADO: BRANCA, CINZA, BRANCA, CINZA... NA LINHA INTEIRA */
         tbody tr:nth-child(odd) { background: #ffffff; }
         tbody tr:nth-child(even) { background: #f8f9fa; }
-    .linha-branco { height: 28px; }
-        
+       .linha-branco { height: 28px; }
+
         /* COLUNA DE FIM DE SEMANA LARANJA DESCENDO EM TODAS AS LINHAS */
         td.fim-semana { background: #fdebd0!important; color: #000; }
         tbody tr:nth-child(even) td.fim-semana { background: #fad7a0!important; }
-        
+
         /* STATUS POR CIMA DO ZEBRADO E DO LARANJA */
-    .status-P { background: #27ae60!important; color: white; font-weight: 700; }
-    .status-F { background: #e74c3c!important; color: white; font-weight: 700; }
-    .status-A { background: #f39c12!important; color: #333; font-weight: 700; }
-    .status-H { background: #3498db!important; color: white; font-weight: 700; }
-        
+       .status-P { background: #27ae60!important; color: white; font-weight: 700; }
+       .status-F { background: #e74c3c!important; color: white; font-weight: 700; }
+       .status-A { background: #f39c12!important; color: #333; font-weight: 700; }
+       .status-H { background: #3498db!important; color: white; font-weight: 700; }
+
         /* ASSINATURA APROVADA - LARGURA 100% */
-    .assinaturas { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; page-break-inside: avoid; }
-    .col-assinatura h3 { font-size: 14px; margin-bottom: 15px; text-align: center; text-transform: uppercase; font-weight: 700; border-bottom: 2px solid #2c3e50; padding-bottom: 5px; }
-    .linha-ass { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px; font-weight: 600; width: 100%; }
-    .dia-box { background: #2c3e50; color: white; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; min-width: 35px; text-align: center; flex-shrink: 0; }
-    .campos-linha { flex: 1; white-space: nowrap; }
-    .btn-imprimir-historico { grid-column: 1 / -1; margin: 30px auto 0; padding: 12px 40px; background: #34495e; color: white; border: none; border-radius: 4px; font-weight: 700; font-size: 14px; cursor: pointer; display: block; }
-        
+       .assinaturas { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; page-break-inside: avoid; }
+       .col-assinatura h3 { font-size: 14px; margin-bottom: 15px; text-align: center; text-transform: uppercase; font-weight: 700; border-bottom: 2px solid #2c3e50; padding-bottom: 5px; }
+       .linha-ass { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px; font-weight: 600; width: 100%; }
+       .dia-box { background: #2c3e50; color: white; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; min-width: 35px; text-align: center; flex-shrink: 0; }
+       .campos-linha { flex: 1; white-space: nowrap; }
+       .btn-imprimir-historico { grid-column: 1 / -1; margin: 30px auto 0; padding: 12px 40px; background: #34495e; color: white; border: none; border-radius: 4px; font-weight: 700; font-size: 14px; cursor: pointer; display: block; }
+
+        @media (max-width: 600px) {
+           .navbar-info p { font-size: 10px; }
+        }
+
         @media print {
-        .controles { display: none; }
+           .controles { display: none; }
+           .navbar { display: none; }
+           .header-nav { display: none; }
             body { background: white; padding: 0; }
-        .container { padding: 10px; box-shadow: none; }
-        .btn { display: none; }
-        .btn-imprimir-historico { display: none; }
+           .container { padding: 10px; box-shadow: none; }
+           .btn { display: none; }
+           .btn-imprimir-historico { display: none; }
             @page { size: A4 landscape; margin: 1cm; }
         }
     </style>
 </head>
 <body>
+    <!-- NAVBAR VERDE FORA DO CONTAINER - ADICIONADO -->
+    <div class="navbar">
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+        </div>
+        <div class="navbar-info">
+            <h2>SISA</h2>
+            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
+        </div>
+    </div>
+
+    <!-- BOTÃO VOLTAR -->
+    <div class="header-nav">
+        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>MAPEAMENTO E CHAMADA - CAE IDOSO LAR DITOSO</h1>
@@ -70,12 +127,10 @@
             <div class="controles">
                 <form method="GET" style="display: flex; gap: 10px; align-items: center;">
                     <label style="font-size: 12px; color: #5f6368;">VISUALIZAR MÊS:</label>
-                    <input type="month" value="{{ ano }}-{{ '%02d' % mes }}" 
+                    <input type="month" value="{{ ano }}-{{ '%02d' % mes }}"
                            onchange="const [a,m] = this.value.split('-'); window.location.href='/relatorio_mensal/' + a + '/' + parseInt(m);">
                 </form>
-                <a href="/" class="btn btn-voltar">← VOLTAR AO MAPA</a>
             </div>
-        </div>
         <table>
             <thead>
                 <tr>
