@@ -225,16 +225,17 @@
     .pagina:last-child { page-break-after: auto; }
     table {
         width: 100%;
+        height: 100%;  /* ADICIONEI: força tabela a ocupar 100% da .pagina */
         border-collapse: collapse;
         table-layout: fixed;
     }
     tr {
-        height: ${alturaLinha};
+        height: 12.5%;  /* MUDEI: 100% / 8 linhas = 12.5% pra retrato */
         page-break-inside: avoid !important;
     }
     td {
         width: ${100/colunas}%;
-        height: ${alturaLinha};
+        height: 100%;  /* MUDEI: deixa a tr controlar a altura */
         padding: 0.5mm;
         vertical-align: top;
         border: 0.5pt solid #000;
@@ -242,7 +243,7 @@
     }
     .card {
         width: 100%;
-        height: ${alturaCard};
+        height: 100%;  /* MUDEI: ocupa a td inteira */
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -250,10 +251,10 @@
     .header {
         background: #4a90e2 !important;
         color: white !important;
-        font-size: 7pt;        /* AUMENTEI: era 5pt */
+        font-size: 7pt;
         font-weight: bold;
         text-align: center;
-        height: 4.5mm;         /* AUMENTEI: era 3.5mm */
+        height: 4.5mm;
         line-height: 4.5mm;
         flex-shrink: 0;
     }
@@ -261,14 +262,14 @@
         flex: 1;
         overflow: hidden;
         min-height: 0;
-        padding: 0.5mm;  /* ADICIONEI: cria uma borda interna */
+        padding: 0.5mm;
     }
     .foto img {
         width: 100%;
         height: 100%;
-        object-fit: contain;              /* MUDEI: era cover */
-        object-position: center 30%;      /* MUDEI: era 45% */
-        background: #f0f0f0;              /* ADICIONEI: fundo caso sobre espaço */
+        object-fit: contain;
+        object-position: center 30%;
+        background: #f0f0f0;
     }
     .sem-foto {
         width: 100%;
@@ -282,17 +283,24 @@
     }
     .nome {
         background: #f8f9fa !important;
-        font-size: 7.5pt;      /* AUMENTEI: era 5pt */
+        font-size: 7.5pt;
         font-weight: bold;
         text-align: center;
-        padding: 1mm;          /* AUMENTEI: era 0.5mm */
-        height: 11mm;          /* AUMENTEI: era 9mm */
+        padding: 1mm;
+        height: 11mm;
         display: flex;
         align-items: center;
         justify-content: center;
         line-height: 1.1;
         flex-shrink: 0;
         overflow: hidden;
+    }
+    
+    /* AJUSTE PRO PAISAGEM TAMBÉM */
+    @media print {
+        body[orientacao="paisagem"] tr {
+            height: 20%; /* 100% / 5 linhas = 20% */
+        }
     }
 </style>
             </head>
