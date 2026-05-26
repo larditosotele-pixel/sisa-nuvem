@@ -6,10 +6,52 @@
     <title>Cadastrar Convivente - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-     .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+
+        /* NAVBAR - ADICIONADO */
+       .navbar {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+       .logo-img {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+       .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+       .navbar-info h2 { font-size: 22px; margin: 0; }
+       .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
+        /* BOTÃO VOLTAR - ADICIONADO */
+       .header-nav {
+            background: white;
+            padding: 15px 20px;
+            margin: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+       .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
+
+       .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
         h1 { margin-bottom: 20px; color: #2e7d32; }
-     .form-group { margin-bottom: 15px; }
+       .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
         input[type="text"], input[type="file"], select {
             width: 100%;
@@ -18,7 +60,7 @@
             border-radius: 5px;
             font-size: 14px;
         }
-     .btn {
+       .btn {
             padding: 12px 24px;
             border: none;
             border-radius: 5px;
@@ -27,11 +69,27 @@
             font-size: 16px;
             margin-right: 10px;
         }
-     .btn-salvar { background: #2e7d32; color: white; }
-     .btn-cancelar { background: #ccc; color: #333; text-decoration: none; display: inline-block; }
+       .btn-salvar { background: #2e7d32; color: white; }
+       .btn-cancelar { background: #ccc; color: #333; text-decoration: none; display: inline-block; }
     </style>
 </head>
 <body>
+    <!-- NAVBAR - ADICIONADO -->
+    <div class="navbar">
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+        </div>
+        <div class="navbar-info">
+            <h2>SISA</h2>
+            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
+        </div>
+    </div>
+
+    <!-- BOTÃO VOLTAR - ADICIONADO -->
+    <div class="header-nav">
+        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+    </div>
+
     <div class="container">
         <h1>Cadastrar Convivente</h1>
         <form method="POST" enctype="multipart/form-data">
