@@ -6,7 +6,7 @@
     <title>Relatório em Branco - SISA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: white; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: white; }
         
         .navbar {
             background: #2e7d32;
@@ -34,12 +34,13 @@
         .header-nav {
             background: white;
             padding: 15px 20px;
-            margin-bottom: 20px;
+            margin: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
-        .container { max-width: 100%; margin: 0 auto; overflow-x: auto; }
+        
+        .container { max-width: 100%; margin: 0 auto; overflow-x: auto; padding: 0 20px 20px; }
         h1 { text-align: center; margin-bottom: 5px; color: #333; }
         .subtitulo { text-align: center; margin-bottom: 20px; color: #666; font-size: 18px; }
         .controles { text-align: center; margin-bottom: 20px; }
@@ -103,6 +104,7 @@
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .navbar, .header-nav, .controles, .btn-imprimir { display: none; }
             body { padding: 0; }
+            .container { padding: 0; }
             table { font-size: 9px; }
             .nome { font-size: 10px; }
             .dia-col { width: 18px; }
@@ -142,11 +144,11 @@
         </div>
     </div>
 
-    <div class="container">
-        <div class="header-nav">
-            <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
-        </div>
+    <div class="header-nav">
+        <a href="{{ url_for('index') }}">← Voltar ao Menu Principal</a>
+    </div>
 
+    <div class="container">
         <h1>Relatório de Chamada - Preenchimento Manual</h1>
         <div class="subtitulo">{{ mes_nome }} / {{ ano }}</div>
 
@@ -231,7 +233,6 @@
                             <div class="campo">Resp:</div>
                             <div class="campo">Ass:</div>
                         </div>
-                    </div>
                     {% endfor %}
                 </div>
             </div>
