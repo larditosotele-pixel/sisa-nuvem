@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carômetro - SISA</title>
-    <style>
+    <style id="estilo-base">
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: Arial, sans-serif;
@@ -107,105 +107,20 @@
         @media (max-width: 768px) {
          .grid { grid-template-columns: repeat(5, 1fr); }
         }
-
-        /* IMPRESSÃO PAISAGEM - 9x4 = 36 por folha = 3 FOLHAS */
-        @media print {
-            body { background: white; padding: 0; }
-         .header, .botoes { display: none; }
-         .container { padding: 0; border-radius: 0; }
-         
-            /* PAISAGEM */
-         body.paisagem { }
-         body.paisagem @page { size: A4 landscape; margin: 4mm; }
-         body.paisagem .grid {
-                display: grid;
-                grid-template-columns: repeat(9, 1fr);
-                grid-auto-rows: 44mm;
-                gap: 1.5mm;
-                page-break-inside: avoid;
-            }
-
-            /* RETRATO */
-         body.retrato { }
-         body.retrato @page { size: A4 portrait; margin: 4mm; }
-         body.retrato .grid {
-                display: grid;
-                grid-template-columns: repeat(6, 1fr); /* 6 colunas em retrato */
-                grid-auto-rows: 44mm;
-                gap: 1.5mm;
-                page-break-inside: avoid;
-            }
-
-         .card {
-                border: 0.5pt solid #000;
-                page-break-inside: avoid;
-                display: flex;
-                flex-direction: column;
-            }
-         .card-header {
-                background: #4a90e2 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                color: white;
-                font-size: 7pt;
-                font-weight: bold;
-                text-align: center;
-                padding: 0.5mm 0;
-                height: 5mm;
-                flex-shrink: 0;
-            }
-         .card-foto {
-                padding: 0;
-                flex: 1;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background: #fff;
-                min-height: 0;
-            }
-         .card-foto img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                object-position: center 45%;
-            }
-         .sem-foto {
-                width: 100%;
-                height: 100%;
-                background: #e9ecef;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #6c757d;
-                font-size: 6pt;
-            }
-         .card-nome {
-                font-size: 7pt;
-                font-weight: bold;
-                text-align: center;
-                padding: 0.5mm;
-                background: #f8f9fa !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                height: 11mm;
-                flex-shrink: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                line-height: 1.1;
-            }
-        }
     </style>
+    
+    <!-- ESTILO DE IMPRESSÃO SERÁ INJETADO AQUI PELO JS -->
+    <style id="estilo-impressao"></style>
 </head>
-<body class="paisagem">
+<body>
     <div class="header">
         <h1>Carômetro - Conviventes | Total: {{ conviventes|length }} / 100</h1>
         <div class="botoes">
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
             <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="imprimir('retrato')" class="btn btn-imprimir">📄 PDF Retrato</button>
-            <button onclick="imprimir('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem</button>
+            <button onclick="imprimir('retrato')" class="btn btn-imprimir">📄 PDF Retrato - 3 Folhas</button>
+            <button onclick="imprimir('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem - 3 Folhas</button>
         </div>
     </div>
 
@@ -228,10 +143,160 @@
     </div>
 
     <script>
+        const cssRetrato = `
+            @page { size: A4 portrait; margin: 4mm; }
+            @media print {
+                body { background: white; padding: 0; }
+             .header, .botoes { display: none; }
+             .container { padding: 0; border-radius: 0; }
+             .grid {
+                    display: grid;
+                    grid-template-columns: repeat(6, 1fr);
+                    grid-auto-rows: 47mm;
+                    gap: 1.5mm;
+                    page-break-inside: avoid;
+                }
+             .card {
+                    border: 0.5pt solid #000;
+                    page-break-inside: avoid;
+                    display: flex;
+                    flex-direction: column;
+                }
+             .card-header {
+                    background: #4a90e2 !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                    color: white;
+                    font-size: 7pt;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 0.5mm 0;
+                    height: 5mm;
+                    flex-shrink: 0;
+                }
+             .card-foto {
+                    padding: 0;
+                    flex: 1;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background: #fff;
+                    min-height: 0;
+                }
+             .card-foto img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: center 45%;
+                }
+             .sem-foto {
+                    width: 100%;
+                    height: 100%;
+                    background: #e9ecef;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #6c757d;
+                    font-size: 6pt;
+                }
+             .card-nome {
+                    font-size: 7pt;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 0.5mm;
+                    background: #f8f9fa !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                    height: 11mm;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    line-height: 1.1;
+                }
+            }
+        `;
+
+        const cssPaisagem = `
+            @page { size: A4 landscape; margin: 4mm; }
+            @media print {
+                body { background: white; padding: 0; }
+             .header, .botoes { display: none; }
+             .container { padding: 0; border-radius: 0; }
+             .grid {
+                    display: grid;
+                    grid-template-columns: repeat(9, 1fr);
+                    grid-auto-rows: 44mm;
+                    gap: 1.5mm;
+                    page-break-inside: avoid;
+                }
+             .card {
+                    border: 0.5pt solid #000;
+                    page-break-inside: avoid;
+                    display: flex;
+                    flex-direction: column;
+                }
+             .card-header {
+                    background: #4a90e2 !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                    color: white;
+                    font-size: 7pt;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 0.5mm 0;
+                    height: 5mm;
+                    flex-shrink: 0;
+                }
+             .card-foto {
+                    padding: 0;
+                    flex: 1;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background: #fff;
+                    min-height: 0;
+                }
+             .card-foto img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: center 45%;
+                }
+             .sem-foto {
+                    width: 100%;
+                    height: 100%;
+                    background: #e9ecef;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #6c757d;
+                    font-size: 6pt;
+                }
+             .card-nome {
+                    font-size: 7pt;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 0.5mm;
+                    background: #f8f9fa !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                    height: 11mm;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    line-height: 1.1;
+                }
+            }
+        `;
+
         function imprimir(orientacao) {
-            document.body.className = orientacao;
+            const styleTag = document.getElementById('estilo-impressao');
+            styleTag.innerHTML = orientacao === 'retrato' ? cssRetrato : cssPaisagem;
             setTimeout(() => {
                 window.print();
+                setTimeout(() => { styleTag.innerHTML = ''; }, 500);
             }, 100);
         }
     </script>
