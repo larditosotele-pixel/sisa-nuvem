@@ -180,103 +180,117 @@
         </div>
     </div>
 
-    <script>
+        <script>
         function imprimir(orientacao) {
             const cards = Array.from(document.querySelectorAll('.card'));
-            const colunas = orientacao === 'retrato' ? 5 : 8;
-            const linhasPorPagina = orientacao === 'retrato' ? 8 : 5;
-            
-            // Cria estrutura de tabela pra impressão
-            let tabelaHTML = '<div class="pagina-impressao">';
-            let contadorLinha = 0;
-            
-            for (let i = 0; i < cards.length; i += colunas) {
-                if (contadorLinha % linhasPorPagina === 0 && i > 0) {
-                    tabelaHTML += '</tbody></table><div class="quebra-pagina"></div><table class="tabela-carometro"><tbody>';
-                } else if (i === 0) {
-                    tabelaHTML += '<table class="tabela-carometro"><tbody>';
+            const colunas = orientacao === 'retrato'? 5 : 8;
+            const linhas = orientacao === 'retrato'? 8 : 5;
+            const cardsPorPagina = colunas * linhas; // 40
+
+            // Remove conteúdo antigo de impressão
+            const antigo = document.querySelector('.container-impressao');
+            if (antigo) antigo.remove();
+
+            // Cria container de impressão
+            let html = '<div class="container-impressao">';
+
+            for (let p = 0; p < Math.ceil(cards.length / cardsPorPagina); p++) {
+                html += '<div class="pagina-a4">';
+                html += '<table class="tabela-fixa"><tbody>';
+
+                const inicio = p * cardsPorPagina;
+                const fim = inicio + cardsPorPagina;
+                const cardsPagina = cards.slice(inicio, fim);
+
+                for (let l = 0; l < linhas; l++) {
+                    html += '<tr>';
+                    for (let c = 0; c < colunas; c++) {
+                        const idx = l * colunas + c;
+                        if (idx < cardsPagina.length) {
+                            const card = cardsPagina[idx];
+                            const quarto = card.querySelector('.card-header').textContent;
+                            const foto = card.querySelector('.card-foto').innerHTML;
+                            const nome = card.querySelector('.card-nome').textContent;
+
+                            html += `
+                                <td>
+                                    <div class="card-impresso">
+                                        <div class="header-impresso">${quarto}</div>
+                                        <div class="foto-impresso">${foto}</div>
+                                        <div class="nome-impresso">${nome}</div>
+                                    </div>
+                                </td>
+                            `;
+                        } else {
+                            html += '<td></td>'; // Célula vazia pra completar
+                        }
+                    }
+                    html += '</tr>';
                 }
-                
-                tabelaHTML += '<tr class="linha-carometro">';
-                const cardsLinha = cards.slice(i, i + colunas);
-                
-                cardsLinha.forEach(card => {
-                    const quarto = card.querySelector('.card-header').textContent;
-                    const foto = card.querySelector('.card-foto').innerHTML;
-                    const nome = card.querySelector('.card-nome').textContent;
-                    
-                    tabelaHTML += `
-                        <td class="celula-card">
-                            <div class="card-print">
-                                <div class="card-header-print">${quarto}</div>
-                                <div class="card-foto-print">${foto}</div>
-                                <div class="card-nome-print">${nome}</div>
-                            </div>
-                        </td>
-                    `;
-                });
-                
-                // Completa com células vazias se faltar card na linha
-                for (let j = cardsLinha.length; j < colunas; j++) {
-                    tabelaHTML += '<td class="celula-card vazia"></td>';
-                }
-                
-                tabelaHTML += '</tr>';
-                contadorLinha++;
+                html += '</tbody></table></div>';
             }
-            tabelaHTML += '</tbody></table></div>';
+            html += '</div>';
+
+            document.body.insertAdjacentHTML('beforeend', html);
 
             const cssRetrato = `
-                @page { size: A4 portrait; margin: 4mm; }
+                @page { size: A4 portrait; margin: 0; }
                 @media print {
-                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
-                    .navbar, .header, .container { display: none !important; }
-                    .pagina-impressao { display: block !important; }
-                    .tabela-carometro {
+                    * { -webkit-print-color-adjust: exact!important; print-color-adjust: exact!important; }
+                    html, body { margin: 0!important; padding: 0!important; }
+                   .navbar,.header,.container { display: none!important; }
+                   .container-impressao { display: block!important; }
+                   .pagina-a4 {
+                        width: 210mm;
+                        height: 297mm;
+                        padding: 4mm;
+                        box-sizing: border-box;
+                        page-break-after: always;
+                        break-after: page;
+                    }
+                   .pagina-a4:last-child {
+                        page-break-after: auto;
+                    }
+                   .tabela-fixa {
                         width: 100%;
+                        height: 100%;
                         border-collapse: collapse;
-                        page-break-inside: avoid !important;
+                        table-layout: fixed;
                     }
-                    .quebra-pagina {
-                        page-break-after: always !important;
-                        break-after: page !important;
-                    }
-                    .linha-carometro {
-                        page-break-inside: avoid !important;
-                        break-inside: avoid-page !important;
-                    }
-                    .celula-card {
+                   .tabela-fixa td {
                         width: 20%;
+                        height: 12.5%;
                         padding: 0.5mm;
                         vertical-align: top;
                         border: 0.5pt solid #000;
                     }
-                    .celula-card.vazia { border: 0.5pt solid #ccc; }
-                    .card-print {
-                        height: 34mm;
-                        display: block;
+                   .card-impresso {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
                     }
-                    .card-header-print {
-                        background: #4a90e2 !important;
-                        color: white !important;
-                        font-size: 5.5pt;
+                   .header-impresso {
+                        background: #4a90e2!important;
+                        color: white!important;
+                        font-size: 5pt;
                         font-weight: bold;
                         text-align: center;
                         height: 3.5mm;
                         line-height: 3.5mm;
+                        flex-shrink: 0;
                     }
-                    .card-foto-print {
-                        height: 20.5mm;
+                   .foto-impresso {
+                        flex: 1;
                         display: block;
                     }
-                    .card-foto-print img {
+                   .foto-impresso img {
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
                         object-position: center 45%;
                     }
-                    .sem-foto {
+                   .sem-foto {
                         width: 100%;
                         height: 100%;
                         background: #e9ecef;
@@ -286,72 +300,80 @@
                         color: #6c757d;
                         font-size: 5pt;
                     }
-                    .card-nome-print {
-                        font-size: 5.5pt;
+                   .nome-impresso {
+                        background: #f8f9fa!important;
+                        font-size: 5pt;
                         font-weight: bold;
                         text-align: center;
                         padding: 0.5mm;
-                        background: #f8f9fa !important;
-                        height: 10mm;
+                        height: 9mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         line-height: 1;
+                        flex-shrink: 0;
                     }
                 }
             `;
 
             const cssPaisagem = `
-                @page { size: A4 landscape; margin: 4mm; }
+                @page { size: A4 landscape; margin: 0; }
                 @media print {
-                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
-                    .navbar, .header, .container { display: none !important; }
-                    .pagina-impressao { display: block !important; }
-                    .tabela-carometro {
+                    * { -webkit-print-color-adjust: exact!important; print-color-adjust: exact!important; }
+                    html, body { margin: 0!important; padding: 0!important; }
+                   .navbar,.header,.container { display: none!important; }
+                   .container-impressao { display: block!important; }
+                   .pagina-a4 {
+                        width: 297mm;
+                        height: 210mm;
+                        padding: 4mm;
+                        box-sizing: border-box;
+                        page-break-after: always;
+                        break-after: page;
+                    }
+                   .pagina-a4:last-child {
+                        page-break-after: auto;
+                    }
+                   .tabela-fixa {
                         width: 100%;
+                        height: 100%;
                         border-collapse: collapse;
-                        page-break-inside: avoid !important;
+                        table-layout: fixed;
                     }
-                    .quebra-pagina {
-                        page-break-after: always !important;
-                        break-after: page !important;
-                    }
-                    .linha-carometro {
-                        page-break-inside: avoid !important;
-                        break-inside: avoid-page !important;
-                    }
-                    .celula-card {
+                   .tabela-fixa td {
                         width: 12.5%;
+                        height: 20%;
                         padding: 0.5mm;
                         vertical-align: top;
                         border: 0.5pt solid #000;
                     }
-                    .celula-card.vazia { border: 0.5pt solid #ccc; }
-                    .card-print {
-                        height: 37mm;
-                        display: block;
+                   .card-impresso {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
                     }
-                    .card-header-print {
-                        background: #4a90e2 !important;
-                        color: white !important;
-                        font-size: 5.5pt;
+                   .header-impresso {
+                        background: #4a90e2!important;
+                        color: white!important;
+                        font-size: 5pt;
                         font-weight: bold;
                         text-align: center;
                         height: 3.5mm;
                         line-height: 3.5mm;
+                        flex-shrink: 0;
                     }
-                    .card-foto-print {
-                        height: 23.5mm;
+                   .foto-impresso {
+                        flex: 1;
                         display: block;
                     }
-                    .card-foto-print img {
+                   .foto-impresso img {
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
                         object-position: center 45%;
                     }
-                    .sem-foto {
+                   .sem-foto {
                         width: 100%;
                         height: 100%;
                         background: #e9ecef;
@@ -361,31 +383,30 @@
                         color: #6c757d;
                         font-size: 5pt;
                     }
-                    .card-nome-print {
-                        font-size: 5.5pt;
+                   .nome-impresso {
+                        background: #f8f9fa!important;
+                        font-size: 5pt;
                         font-weight: bold;
                         text-align: center;
                         padding: 0.5mm;
-                        background: #f8f9fa !important;
-                        height: 10mm;
+                        height: 9mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         line-height: 1;
+                        flex-shrink: 0;
                     }
                 }
             `;
 
-            // Esconde o conteúdo normal e injeta a tabela
-            document.body.insertAdjacentHTML('beforeend', tabelaHTML);
             const styleTag = document.getElementById('estilo-impressao');
-            styleTag.innerHTML = orientacao === 'retrato' ? cssRetrato : cssPaisagem;
-            
+            styleTag.innerHTML = orientacao === 'retrato'? cssRetrato : cssPaisagem;
+
             setTimeout(() => {
                 window.print();
-                setTimeout(() => { 
-                    document.querySelector('.pagina-impressao').remove();
-                    styleTag.innerHTML = ''; 
+                setTimeout(() => {
+                    document.querySelector('.container-impressao').remove();
+                    styleTag.innerHTML = '';
                 }, 500);
             }, 100);
         }
