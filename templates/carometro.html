@@ -183,24 +183,25 @@
 
 <script>
     function imprimir(orientacao) {
-        // Tenta 3 seletores diferentes pra achar os cards de qualquer jeito
         let cards = Array.from(document.querySelectorAll('.grid.card'));
-        if (cards.length === 0) cards = Array.from(document.querySelectorAll('.container.card'));
         if (cards.length === 0) cards = Array.from(document.querySelectorAll('.card'));
-
-        console.log('Cards encontrados:', cards.length); // Isso vai mostrar no F12 quantos achou
-
+        
+        console.log('Cards encontrados:', cards.length);
         if (cards.length === 0) {
-            alert('Nenhum card encontrado! Abre o F12 > Console e me manda print do que apareceu.');
+            alert('Nenhum card encontrado! Abre o F12 > Console e me manda print.');
             return;
         }
 
-        // REGRA FIXA: 35 por página pra caber 100 em 3 folhas
-        const colunas = orientacao === 'retrato'? 5 : 7;
-        const linhas = orientacao === 'retrato'? 7 : 5;
-        const cardsPorPagina = 35; // TRAVADO EM 35
+        // REGRA FIXA: 35 por página
+        const colunas = orientacao === 'retrato' ? 5 : 7;
+        const linhas = orientacao === 'retrato' ? 7 : 5;
+        const cardsPorPagina = 35;
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
+        
+        // Altura total da página A4 menos margem e rodapé
+        const alturaUtil = orientacao === 'retrato' ? '285mm' : '198mm';
+        const alturaLinha = `${100 / linhas}%`; // 20% pra 5 linhas
 
         let html = `
             <!DOCTYPE html>
@@ -221,37 +222,36 @@
                         padding: 0;
                     }
                     html, body {
+                        width: 100%;
                         height: 100%;
                         background: white;
                     }
-               .pagina {
+                   .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
-                        padding: 3mm;
+                        padding: 3mm 3mm 0 3mm;
                         page-break-after: always;
-                        display: flex;
-                        flex-direction: column;
-                        overflow: hidden;
+                        position: relative;
                     }
-               .pagina:last-child { page-break-after: auto; }
-               .rodape-pagina {
+                   .pagina:last-child { page-break-after: auto; }
+                   .rodape-pagina {
+                        position: absolute;
+                        bottom: 1mm;
+                        left: 0;
+                        right: 0;
                         text-align: center;
                         font-size: 8pt;
                         color: #666;
-                        padding: 1mm 0;
-                        flex-shrink: 0;
+                        height: 5mm;
                     }
                     table {
                         width: 100%;
-                        flex: 1;
+                        height: ${alturaUtil};
                         border-collapse: collapse;
                         table-layout: fixed;
                     }
-                    tbody {
-                        height: 100%;
-                    }
                     tr {
-                        height: 20%;
+                        height: ${alturaLinha};
                         page-break-inside: avoid!important;
                     }
                     td {
@@ -261,37 +261,37 @@
                         border: 0.8pt solid #000;
                         overflow: hidden;
                     }
-               .card {
+                   .card {
                         width: 100%;
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
                     }
-               .header {
+                   .header {
                         background: #4a90e2!important;
                         color: white!important;
-                        font-size: 8pt;
+                        font-size: 7pt;
                         font-weight: bold;
                         text-align: center;
-                        height: 5mm;
-                        line-height: 5mm;
+                        height: 4.5mm;
+                        line-height: 4.5mm;
                         flex-shrink: 0;
                     }
-               .foto {
+                   .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
                         padding: 1mm;
                         background: white;
                     }
-               .foto img {
+                   .foto img {
                         width: 100%;
                         height: 100%;
                         object-fit: contain;
                         object-position: center 30%;
                     }
-               .sem-foto {
+                   .sem-foto {
                         width: 100%;
                         height: 100%;
                         background: #e9ecef;
@@ -301,17 +301,17 @@
                         color: #6c757d;
                         font-size: 7pt;
                     }
-               .nome {
+                   .nome {
                         background: #f8f9fa!important;
-                        font-size: 8.5pt;
+                        font-size: 8pt;
                         font-weight: bold;
                         text-align: center;
-                        padding: 1.5mm;
-                        min-height: 14mm;
+                        padding: 1mm;
+                        min-height: 12mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        line-height: 1.2;
+                        line-height: 1.1;
                         flex-shrink: 0;
                         word-break: break-word;
                     }
@@ -325,7 +325,7 @@
             const fim = Math.min((p + 1) * cardsPorPagina, cards.length);
             const cardsPagina = cards.slice(p * cardsPorPagina, (p + 1) * cardsPorPagina);
 
-            html += '<div class="pagina"><table><tbody>';
+            html += '<div class="pagina"><table>';
 
             for (let l = 0; l < linhas; l++) {
                 html += '<tr>';
@@ -351,7 +351,7 @@
                 }
                 html += '</tr>';
             }
-            html += `</tbody></table>
+            html += `</table>
                      <div class="rodape-pagina">Página ${p + 1} de ${totalPaginas} | Cards ${inicio} ao ${fim} | Total: ${cards.length}</div>
                      </div>`;
         }
