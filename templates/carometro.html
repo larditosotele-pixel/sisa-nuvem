@@ -192,15 +192,11 @@
             return;
         }
 
-        // PADRONIZADO: 5 COLUNAS X 7 LINHAS = 35 CARDS PRA TUDO
         const colunas = 5;
         const linhasMax = 7;
         const cardsPorPagina = 35;
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
-
-        // ALTURA: VERTICAL 40mm | HORIZONTAL 28mm
-        const alturaLinha = orientacao === 'retrato'? '40mm' : '28mm';
 
         let html = `
             <!DOCTYPE html>
@@ -235,30 +231,34 @@
                         overflow: hidden;
                     }
                  .pagina:last-child { page-break-after: auto; }
-                 .conteudo {
+                .conteudo {
                         flex: 1;
+                        display: flex;
+                        flex-direction: column;
                     }
+                    /* FORÇA A TABELA A OCUPAR 100% DA ALTURA */
                     table {
                         width: 100%;
+                        height: calc(100% - 4mm); /* DESCONTA SÓ O RODAPÉ */
                         border-collapse: collapse;
                         table-layout: fixed;
+                        flex: 1;
                     }
+                    /* CADA LINHA VAI TER 1/7 DA ALTURA */
                     tr {
-                        height: ${alturaLinha};
+                        height: calc(100% / 7);
                         page-break-inside: avoid!important;
                     }
                     td {
-                        width: 20%; /* 100% / 5 colunas */
-                        padding: 1.5mm; /* RESPIRO ENTRE OS CARDS */
+                        width: 20%;
+                        padding: 1.5mm;
                         vertical-align: top;
                         page-break-inside: avoid!important;
-                        height: ${alturaLinha};
                     }
-                  /* CARD ESTILO SISA - MAIOR E MAIS LEGÍVEL */
                  .card {
                         width: 100%;
                         height: 100%;
-                        border: 1.5pt solid #E67E22; /* BORDA LARANJA MAIS GROSSA */
+                        border: 1.5pt solid #E67E22;
                         border-radius: 2mm;
                         display: flex;
                         flex-direction: column;
@@ -271,7 +271,7 @@
                         position: absolute;
                         top: 1mm;
                         left: 1mm;
-                        background: #3498DB!important; /* ETIQUETA AZUL L1/L2 */
+                        background: #3498DB!important;
                         color: white!important;
                         font-size: ${orientacao === 'retrato'? '9pt' : '8pt'};
                         font-weight: bold;
@@ -308,7 +308,7 @@
                     }
                  .nome {
                         background: white!important;
-                        font-size: ${orientacao === 'retrato'? '10pt' : '9pt'}; /* FONTE MAIOR */
+                        font-size: ${orientacao === 'retrato'? '10pt' : '9pt'};
                         font-weight: bold;
                         text-align: center;
                         padding: 1.5mm 1mm;
@@ -339,11 +339,11 @@
             const inicio = p * cardsPorPagina + 1;
             const fim = Math.min((p + 1) * cardsPorPagina, cards.length);
             const cardsPagina = cards.slice(p * cardsPorPagina, (p + 1) * cardsPorPagina);
-            const linhasNecessarias = Math.ceil(cardsPagina.length / colunas);
 
             html += '<div class="pagina"><div class="conteudo"><table>';
 
-            for (let l = 0; l < linhasNecessarias; l++) {
+            // SEMPRE GERA 7 LINHAS PRA PREENCHER A FOLHA
+            for (let l = 0; l < linhasMax; l++) {
                 html += '<tr>';
                 for (let c = 0; c < colunas; c++) {
                     const idx = l * colunas + c;
@@ -363,7 +363,7 @@
                             </td>
                         `;
                     } else {
-                        break;
+                        html += '<td></td>'; // CÉLULA VAZIA PRA MANTER O GRID
                     }
                 }
                 html += '</tr>';
