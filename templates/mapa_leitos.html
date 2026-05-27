@@ -46,7 +46,12 @@
         }
         .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 30px; }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 15px 30px;
+            display: block;
+        }
 
         .quarto-bloco {
             background: white;
@@ -54,7 +59,15 @@
             padding: 15px;
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flow-root; /* NOVO: força criar bloco novo, sem sobrepor */
+            position: relative;
+            top: auto;
+            left: auto;
+            transform: none;
+            display: block;
+            width: 100%;
+            clear: none;
+            float: none;
+            isolation: isolate;
         }
         .quarto-header {
             display: flex;
@@ -71,7 +84,9 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 10px;
-            grid-auto-rows: 220px; /* NOVO: trava altura da linha. Fim da pirâmide */
+            grid-auto-rows: 220px;
+            width: 100%;
+            align-items: start;
         }
         .card-leito {
             border: 2px solid #ddd;
@@ -80,10 +95,11 @@
             text-align: center;
             position: relative;
             background: white;
-            height: 220px; /* NOVO: altura fixa total do card */
+            height: 220px;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* NOVO: nada vaza pra fora */
+            overflow: hidden;
+            align-self: start;
         }
         .card-leito.ocupado { 
             border-color: #e67e22; 
@@ -113,7 +129,7 @@
         }
         .card-leito img {
             width: 100%;
-            height: 150px; /* NOVO: altura fixa pra foto */
+            height: 150px;
             border-radius: 6px;
             object-fit: contain;
             background: #f0f0f0;
@@ -124,7 +140,7 @@
             font-weight: bold; 
             font-size: 11px; 
             color: #333; 
-            flex: 1; /* NOVO: ocupa resto do espaço */
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -137,14 +153,14 @@
             .grid-leitos {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 6px;
-                grid-auto-rows: 160px; /* NOVO: altura menor no mobile */
+                grid-auto-rows: 160px;
             }
             .card-leito {
                 padding: 6px;
-                height: 160px; /* NOVO: altura fixa mobile */
+                height: 160px;
             }
             .card-leito img {
-                height: 100px; /* NOVO: foto menor mobile */
+                height: 100px;
             }
             .card-leito .nome {
                 font-size: 9px;
