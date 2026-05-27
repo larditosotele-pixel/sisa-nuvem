@@ -197,7 +197,8 @@
         const cardsPorPagina = orientacao === 'retrato'? 35 : 42;
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
-        const alturaLinha = orientacao === 'retrato'? '39mm' : '32mm';
+        // USANDO 100% DA ALTURA ÚTIL: 33.5mm x 6 = 201mm
+        const alturaLinha = orientacao === 'retrato'? '39mm' : '33.5mm';
 
         let html = `
             <!DOCTYPE html>
@@ -225,7 +226,7 @@
                   .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
-                        padding: 3mm;
+                        padding: 1.5mm 2mm 0 2mm; /* MARGEM MÍNIMA */
                         page-break-after: always;
                         display: flex;
                         flex-direction: column;
@@ -240,7 +241,7 @@
                     table {
                         width: 100%;
                         border-collapse: separate;
-                        border-spacing: 2mm;
+                        border-spacing: 1.5mm; /* DIMINUÍ O ESPAÇO ENTRE CARDS */
                         table-layout: fixed;
                     }
                     tr {
@@ -257,8 +258,8 @@
                   .card {
                         width: 100%;
                         height: ${alturaLinha};
-                        border: 1.5pt solid #E67E22;
-                        border-radius: 2mm;
+                        border: 1.2pt solid #E67E22;
+                        border-radius: 1.5mm;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
@@ -272,13 +273,13 @@
                         left: 0.5mm;
                         background: #3498DB!important;
                         color: white!important;
-                        font-size: 7pt;
+                        font-size: 6.5pt;
                         font-weight: bold;
-                        padding: 0.5mm 1.5mm;
-                        border-radius: 1mm;
+                        padding: 0.3mm 1.2mm;
+                        border-radius: 0.8mm;
                         z-index: 2;
                     }
-                  /* FOTO MAIOR: TIREI O PADDING E SUBI PRA ENCOSTAR NO TOPO */
+                  /* FOTO EQUILIBRADA: PROPORCIONAL E MAIOR */
                   .foto {
                         flex: 1;
                         overflow: hidden;
@@ -287,14 +288,14 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 0.5mm; /* ERA 2mm - REDUZI */
-                        margin-top: 0; /* ERA 4mm - TIREI */
+                        padding: 1mm; /* RESPIRO MÍNIMO */
+                        margin-top: 0;
                     }
                   .foto img {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover; /* ERA CONTAIN - AGORA PREENCHE TUDO */
-                        object-position: center 20%; /* SOBE O ROSTO */
+                        max-width: 100%;
+                        max-height: 100%;
+                        object-fit: contain; /* VOLTEI PRO CONTAIN PRA NÃO CORTAR */
+                        object-position: center 15%; /* SOBE POUCO O ROSTO */
                     }
                   .sem-foto {
                         width: 100%;
@@ -304,32 +305,32 @@
                         align-items: center;
                         justify-content: center;
                         color: #7f8c8d;
-                        font-size: 7pt;
+                        font-size: 6.5pt;
                     }
                   .nome {
                         background: white!important;
-                        font-size: 8.5pt;
+                        font-size: 8pt;
                         font-weight: bold;
                         text-align: center;
-                        padding: 1mm 1mm 1.5mm;
-                        height: 9mm; /* DIMINUÍ 1MM PRA DAR ESPAÇO PRA FOTO */
+                        padding: 0.5mm 1mm 1mm;
+                        height: 8mm; /* DIMINUÍ PRA DAR ESPAÇO PRA FOTO */
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        line-height: 1.1;
+                        line-height: 1;
                         flex-shrink: 0;
                         word-break: break-word;
                         color: #2c3e50;
-                        border-top: 0.5pt solid #E67E22; /* LINHA LARANJA SEPARANDO */
+                        border-top: 0.5pt solid #E67E22;
                     }
                   .rodape-pagina {
                         text-align: center;
-                        font-size: 7pt;
+                        font-size: 6.5pt;
                         color: #666;
-                        height: 5mm;
-                        line-height: 5mm;
+                        height: 4mm;
+                        line-height: 4mm;
                         flex-shrink: 0;
-                        margin-top: 1mm;
+                        margin-top: 0.5mm;
                     }
                 </style>
             </head>
