@@ -198,8 +198,8 @@
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
 
-        // Altura da linha: A4 paisagem 210mm - margem 4mm - rodapé 6mm = 200mm / 6 linhas
-        const alturaLinha = orientacao === 'retrato'? '40mm' : '33mm';
+        // DIMINUÍ 1MM POR LINHA PRA DAR FOLGA E NÃO ENCAvALAR
+        const alturaLinha = orientacao === 'retrato'? '39mm' : '32mm';
 
         let html = `
             <!DOCTYPE html>
@@ -231,6 +231,7 @@
                         page-break-after: always;
                         display: flex;
                         flex-direction: column;
+                        overflow: hidden;
                     }
                   .pagina:last-child { page-break-after: auto; }
                   .conteudo {
@@ -247,13 +248,13 @@
                     tr {
                         height: ${alturaLinha};
                         page-break-inside: avoid!important;
-                        page-break-after: auto!important;
+                        page-break-after: avoid!important;
                     }
                     td {
                         width: ${100/colunas}%;
                         padding: 0;
                         vertical-align: top;
-                        border: 0.6pt solid #000;
+                        border: 0.8pt solid #000;
                         overflow: hidden;
                         page-break-inside: avoid!important;
                         height: ${alturaLinha};
@@ -269,13 +270,13 @@
                   .header {
                         background: #4a90e2!important;
                         color: white!important;
-                        font-size: 6.5pt;
+                        font-size: 8pt; /* AUMENTEI */
                         font-weight: bold;
                         text-align: center;
-                        height: 4mm;
-                        line-height: 4mm;
+                        height: 5mm;
+                        line-height: 5mm;
                         flex-shrink: 0;
-                        border-bottom: 0.6pt solid #000;
+                        border-bottom: 0.8pt solid #000;
                     }
                   .foto {
                         flex: 1;
@@ -285,6 +286,7 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        padding: 0.5mm;
                     }
                   .foto img {
                         max-width: 100%;
@@ -300,22 +302,22 @@
                         align-items: center;
                         justify-content: center;
                         color: #6c757d;
-                        font-size: 6pt;
+                        font-size: 7pt;
                     }
                   .nome {
                         background: #f8f9fa!important;
-                        font-size: 7pt;
+                        font-size: 9pt; /* AUMENTEI */
                         font-weight: bold;
                         text-align: center;
-                        padding: 0.5mm;
-                        height: 9mm;
+                        padding: 1mm;
+                        height: 11mm; /* AUMENTEI */
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        line-height: 1;
+                        line-height: 1.1;
                         flex-shrink: 0;
                         word-break: break-word;
-                        border-top: 0.6pt solid #000;
+                        border-top: 0.8pt solid #000;
                     }
                   .rodape-pagina {
                         text-align: center;
