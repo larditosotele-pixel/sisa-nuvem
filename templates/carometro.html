@@ -6,10 +6,7 @@
     <title>Carômetro - SISA</title>
     <style id="estilo-base">
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-        }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
         .navbar {
             background: #2e7d32;
             color: white;
@@ -71,8 +68,8 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 2px;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
         }
 
         .card {
@@ -84,20 +81,20 @@
         .card-header {
             background: #4a90e2;
             color: white;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
             text-align: center;
-            padding: 2px 0;
+            padding: 3px 0;
             line-height: 1.1;
             white-space: nowrap;
         }
         .card-foto {
-            padding: 1px;
+            padding: 2px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: #fff;
-            height: 60px;
+            height: 80px;
         }
         .card-foto img {
             max-width: 100%;
@@ -114,22 +111,25 @@
             align-items: center;
             justify-content: center;
             color: #6c757d;
-            font-size: 8px;
+            font-size: 9px;
             border: 1px solid #ccc;
         }
         .card-nome {
-            font-size: 9px;
+            font-size: 10px;
             font-weight: bold;
             text-align: center;
-            padding: 2px 1px;
-            line-height: 1.1;
+            padding: 3px 2px;
+            line-height: 1.2;
             word-break: break-word;
-            min-height: 24px;
+            min-height: 32px;
             background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         @media (max-width: 768px) {
-            .grid { grid-template-columns: repeat(5, 1fr); }
+            .grid { grid-template-columns: repeat(4, 1fr); }
             .navbar { padding: 12px 15px; }
             .navbar-info h2 { font-size: 18px; }
             .navbar-info p { font-size: 10px; }
@@ -157,8 +157,8 @@
             <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
             <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
             <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="imprimir('retrato')" class="btn btn-imprimir">📄 PDF Retrato - 3 Folhas</button>
-            <button onclick="imprimir('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem - 3 Folhas</button>
+            <button onclick="imprimir('retrato')" class="btn btn-imprimir">📄 PDF Retrato</button>
+            <button onclick="imprimir('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem</button>
         </div>
     </div>
 
@@ -166,7 +166,7 @@
         <div class="grid">
             {% for conv in conviventes %}
                 <div class="card">
-                    <div class="card-header">Q{{ conv.quarto_numero }} L{{ conv.numero_leito }}</div>
+                    <div class="card-header">Q{{ conv.quarto_numero }} - L{{ conv.numero_leito }}</div>
                     <div class="card-foto">
                         {% if conv.foto_base64 %}
                             <img src="{{ conv.foto_base64 }}" alt="{{ conv.nome }}">
@@ -188,8 +188,8 @@
             return;
         }
 
-        const colunas = orientacao === 'retrato' ? 5 : 8;
-        const linhas = orientacao === 'retrato' ? 8 : 5;
+        const colunas = orientacao === 'retrato' ? 5 : 7;
+        const linhas = orientacao === 'retrato' ? 7 : 5;
         const cardsPorPagina = colunas * linhas;
 
         let html = `
@@ -217,16 +217,16 @@
                     .pagina {
                         width: ${orientacao === 'retrato' ? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato' ? '297mm' : '210mm'};
-                        padding: 4mm;
+                        padding: 3mm;
                         page-break-after: always;
-                        display: flex;              /* MUDEI: força conteúdo a esticar */
-                        flex-direction: column;     /* MUDEI: organiza em coluna */
+                        display: flex;
+                        flex-direction: column;
                         overflow: hidden;
                     }
                     .pagina:last-child { page-break-after: auto; }
                     table {
                         width: 100%;
-                        flex: 1;                    /* MUDEI: tabela ocupa todo espaço livre */
+                        flex: 1;
                         border-collapse: collapse;
                         table-layout: fixed;
                     }
@@ -234,14 +234,14 @@
                         height: 100%;
                     }
                     tr {
-                        height: ${100/linhas}%;     /* MUDEI: divide igual entre as linhas */
+                        height: ${100/linhas}%;
                         page-break-inside: avoid !important;
                     }
                     td {
                         width: ${100/colunas}%;
-                        padding: 0.5mm;
+                        padding: 0.8mm;
                         vertical-align: top;
-                        border: 0.5pt solid #000;
+                        border: 0.8pt solid #000;
                         overflow: hidden;
                     }
                     .card {
@@ -254,25 +254,25 @@
                     .header {
                         background: #4a90e2 !important;
                         color: white !important;
-                        font-size: 7pt;
+                        font-size: 8pt;
                         font-weight: bold;
                         text-align: center;
-                        height: 4.5mm;
-                        line-height: 4.5mm;
+                        height: 5mm;
+                        line-height: 5mm;
                         flex-shrink: 0;
                     }
                     .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
-                        padding: 0.5mm;
+                        padding: 1mm;
+                        background: white;
                     }
                     .foto img {
                         width: 100%;
                         height: 100%;
                         object-fit: contain;
                         object-position: center 30%;
-                        background: #f0f0f0;
                     }
                     .sem-foto {
                         width: 100%;
@@ -282,21 +282,21 @@
                         align-items: center;
                         justify-content: center;
                         color: #6c757d;
-                        font-size: 6pt;
+                        font-size: 7pt;
                     }
                     .nome {
                         background: #f8f9fa !important;
-                        font-size: 7.5pt;
+                        font-size: 8.5pt;
                         font-weight: bold;
                         text-align: center;
-                        padding: 1mm;
-                        height: 11mm;
+                        padding: 1.5mm;
+                        min-height: 13mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        line-height: 1.1;
+                        line-height: 1.2;
                         flex-shrink: 0;
-                        overflow: hidden;
+                        word-break: break-word;
                     }
                 </style>
             </head>
@@ -350,3 +350,5 @@
         };
     }
 </script>
+</body>
+</html>
