@@ -111,16 +111,22 @@
             border-color: #e67e22; 
             background: #fff8f0; 
             cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .card-leito.ocupado:hover { 
-            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
         .card-leito.vago { 
             border-color: #95a5a6; 
             background: #f8f9fa; 
-            cursor: pointer; 
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
         }
-        .card-leito.vago:hover { background: #e8f5e9; }
+        .card-leito.vago:hover { 
+            background: #e8f5e9;
+            transform: translateY(-3px);
+        }
         .num-leito {
             position: absolute;
             top: 4px;
