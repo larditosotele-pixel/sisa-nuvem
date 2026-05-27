@@ -192,13 +192,15 @@
             return;
         }
 
+        // CORRIGIDO: VERTICAL = 5x7=35, HORIZONTAL = 7x6=42
         const colunas = orientacao === 'retrato'? 5 : 7;
         const linhasMax = orientacao === 'retrato'? 7 : 6;
         const cardsPorPagina = orientacao === 'retrato'? 35 : 42;
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
-        // USANDO 100% DA ALTURA ÚTIL: 33.5mm x 6 = 201mm
-        const alturaLinha = orientacao === 'retrato'? '39mm' : '33.5mm';
+        
+        // ALTURA DA LINHA: VERTICAL 40mm, HORIZONTAL 33.5mm
+        const alturaLinha = orientacao === 'retrato'? '40mm' : '33.5mm';
 
         let html = `
             <!DOCTYPE html>
@@ -226,11 +228,12 @@
                   .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
-                        padding: 1.5mm 2mm 0 2mm; /* MARGEM MÍNIMA */
+                        padding: 2mm;
                         page-break-after: always;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
+                        justify-content: flex-start; /* JOGA PRA CIMA, SEM ESPAÇO EM BRANCO */
                     }
                   .pagina:last-child { page-break-after: auto; }
                   .conteudo {
@@ -241,7 +244,7 @@
                     table {
                         width: 100%;
                         border-collapse: separate;
-                        border-spacing: 1.5mm; /* DIMINUÍ O ESPAÇO ENTRE CARDS */
+                        border-spacing: ${orientacao === 'retrato'? '2mm' : '1.5mm'};
                         table-layout: fixed;
                     }
                     tr {
@@ -273,13 +276,12 @@
                         left: 0.5mm;
                         background: #3498DB!important;
                         color: white!important;
-                        font-size: 6.5pt;
+                        font-size: ${orientacao === 'retrato'? '7.5pt' : '6.5pt'};
                         font-weight: bold;
-                        padding: 0.3mm 1.2mm;
+                        padding: 0.5mm 1.5mm;
                         border-radius: 0.8mm;
                         z-index: 2;
                     }
-                  /* FOTO EQUILIBRADA: PROPORCIONAL E MAIOR */
                   .foto {
                         flex: 1;
                         overflow: hidden;
@@ -288,14 +290,14 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 1mm; /* RESPIRO MÍNIMO */
+                        padding: 1mm;
                         margin-top: 0;
                     }
                   .foto img {
                         max-width: 100%;
                         max-height: 100%;
-                        object-fit: contain; /* VOLTEI PRO CONTAIN PRA NÃO CORTAR */
-                        object-position: center 15%; /* SOBE POUCO O ROSTO */
+                        object-fit: contain;
+                        object-position: center 15%;
                     }
                   .sem-foto {
                         width: 100%;
@@ -305,15 +307,15 @@
                         align-items: center;
                         justify-content: center;
                         color: #7f8c8d;
-                        font-size: 6.5pt;
+                        font-size: 7pt;
                     }
                   .nome {
                         background: white!important;
-                        font-size: 8pt;
+                        font-size: ${orientacao === 'retrato'? '9pt' : '8pt'};
                         font-weight: bold;
                         text-align: center;
-                        padding: 0.5mm 1mm 1mm;
-                        height: 8mm; /* DIMINUÍ PRA DAR ESPAÇO PRA FOTO */
+                        padding: 1mm;
+                        height: ${orientacao === 'retrato'? '11mm' : '8mm'};
                         display: flex;
                         align-items: center;
                         justify-content: center;
