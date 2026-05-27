@@ -191,7 +191,10 @@
             return;
         }
 
-        const cardsPorPagina = 35;
+        // VOLTEI PRO QUE FUNCIONA: 4 COLUNAS X 10 LINHAS = 40 CARDS
+        const colunas = 4;
+        const linhas = 10;
+        const cardsPorPagina = 40;
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
 
         let html = `
@@ -227,12 +230,12 @@
                     }
                   .pagina:last-child { page-break-after: auto; }
                   
-                    /* GRID ABSOLUTO OCUPANDO A PÁGINA TODA */
+                    /* GRID 4X10 FIXO - IGUAL AO PRINT */
                   .grid-cards {
                         display: grid;
-                        grid-template-columns: repeat(5, 1fr);
-                        grid-template-rows: repeat(7, 1fr);
-                        gap: 3mm;
+                        grid-template-columns: repeat(4, 1fr);
+                        grid-template-rows: repeat(10, 1fr);
+                        gap: 2mm;
                         width: 100%;
                         height: calc(100% - 5mm);
                         position: absolute;
@@ -243,24 +246,25 @@
                   .card {
                         width: 100%;
                         height: 100%;
-                        border: 1.5pt solid #E67E22;
-                        border-radius: 2mm;
+                        border: 1.2pt solid #E67E22;
+                        border-radius: 1.5mm;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
                         position: relative;
                         background: white;
+                        page-break-inside: avoid;
                     }
                  .leito {
                         position: absolute;
-                        top: 1mm;
-                        left: 1mm;
+                        top: 0.5mm;
+                        left: 0.5mm;
                         background: #3498DB!important;
                         color: white!important;
-                        font-size: 9pt;
+                        font-size: 7.5pt;
                         font-weight: bold;
-                        padding: 0.5mm 2mm;
-                        border-radius: 1mm;
+                        padding: 0.3mm 1.5mm;
+                        border-radius: 0.8mm;
                         z-index: 2;
                     }
                  .foto {
@@ -271,7 +275,7 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 1.5mm;
+                        padding: 1mm;
                     }
                  .foto img {
                         max-width: 100%;
@@ -287,23 +291,23 @@
                         align-items: center;
                         justify-content: center;
                         color: #7f8c8d;
-                        font-size: 8pt;
+                        font-size: 7pt;
                     }
                  .nome {
                         background: white!important;
-                        font-size: 10pt;
+                        font-size: 8.5pt;
                         font-weight: bold;
                         text-align: center;
-                        padding: 1.5mm 1mm;
-                        min-height: 12mm;
+                        padding: 1mm;
+                        min-height: 9mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        line-height: 1.1;
+                        line-height: 1;
                         flex-shrink: 0;
                         word-break: break-word;
                         color: #2c3e50;
-                        border-top: 1pt solid #E67E22;
+                        border-top: 0.8pt solid #E67E22;
                     }
                  .rodape-pagina {
                         position: absolute;
@@ -311,7 +315,7 @@
                         left: 0;
                         right: 0;
                         text-align: center;
-                        font-size: 7pt;
+                        font-size: 6.5pt;
                         color: #666;
                         height: 4mm;
                         line-height: 4mm;
@@ -328,8 +332,8 @@
 
             html += '<div class="pagina"><div class="grid-cards">';
 
-            // FORÇA 35 POSIÇÕES SEMPRE - 7 LINHAS X 5 COLUNAS
-            for (let i = 0; i < 35; i++) {
+            // SEMPRE 40 POSIÇÕES - 10 LINHAS X 4 COLUNAS
+            for (let i = 0; i < 40; i++) {
                 if (i < cardsPagina.length) {
                     const card = cardsPagina[i];
                     const textoCompleto = card.querySelector('.card-header')?.textContent || '';
@@ -344,8 +348,7 @@
                         </div>
                     `;
                 } else {
-                    // ESSA DIV VAZIA É OBRIGATÓRIA PRA OCUPAR O ESPAÇO
-                    html += '<div style="border: 1pt dashed #ddd;"></div>';
+                    html += '<div></div>'; // CÉLULA VAZIA PRA MANTER O GRID
                 }
             }
             html += `</div>
