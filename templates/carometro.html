@@ -192,14 +192,15 @@
             return;
         }
 
-        const colunas = orientacao === 'retrato'? 5 : 7;
-        const linhasMax = orientacao === 'retrato'? 7 : 6;
-        const cardsPorPagina = orientacao === 'retrato'? 35 : 42;
+        // PADRONIZADO: 5 COLUNAS X 7 LINHAS = 35 CARDS PRA TUDO
+        const colunas = 5;
+        const linhasMax = 7;
+        const cardsPorPagina = 35;
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
-        
-        // ALTURA CRAVADA: 297mm - 4mm margem - 4mm rodapé = 289mm / 7 = 41.2mm
-        const alturaLinha = orientacao === 'retrato'? '41mm' : '33.5mm';
+
+        // ALTURA: VERTICAL 40mm | HORIZONTAL 28mm
+        const alturaLinha = orientacao === 'retrato'? '40mm' : '28mm';
 
         let html = `
             <!DOCTYPE html>
@@ -224,23 +225,22 @@
                         height: 100%;
                         background: white;
                     }
-                  .pagina {
+                 .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
-                        padding: 2mm 2mm 0 2mm;
+                        padding: 2mm;
                         page-break-after: always;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
                     }
-                  .pagina:last-child { page-break-after: auto; }
-                  .conteudo {
+                 .pagina:last-child { page-break-after: auto; }
+                 .conteudo {
                         flex: 1;
                     }
-                    /* TIREI O BORDER-SPACING PRA NÃO SOBRAR ESPAÇO */
                     table {
                         width: 100%;
-                        border-collapse: collapse; /* MUDEI PRA COLLAPSE */
+                        border-collapse: collapse;
                         table-layout: fixed;
                     }
                     tr {
@@ -248,18 +248,18 @@
                         page-break-inside: avoid!important;
                     }
                     td {
-                        width: ${100/colunas}%;
-                        padding: 1mm; /* ESPAÇO ENTRE OS CARDS AGORA É NO PADDING */
+                        width: 20%; /* 100% / 5 colunas */
+                        padding: 1.5mm; /* RESPIRO ENTRE OS CARDS */
                         vertical-align: top;
                         page-break-inside: avoid!important;
                         height: ${alturaLinha};
                     }
-                  /* CARD IGUAL AO MAPA DE LEITOS */
-                  .card {
+                  /* CARD ESTILO SISA - MAIOR E MAIS LEGÍVEL */
+                 .card {
                         width: 100%;
                         height: 100%;
-                        border: 1.2pt solid #E67E22; /* BORDA LARANJA */
-                        border-radius: 1.5mm;
+                        border: 1.5pt solid #E67E22; /* BORDA LARANJA MAIS GROSSA */
+                        border-radius: 2mm;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
@@ -267,19 +267,19 @@
                         position: relative;
                         background: white;
                     }
-                  .leito {
+                 .leito {
                         position: absolute;
-                        top: 0.5mm;
-                        left: 0.5mm;
-                        background: #3498DB!important; /* ETIQUETA AZUL L1/L2/L3 */
+                        top: 1mm;
+                        left: 1mm;
+                        background: #3498DB!important; /* ETIQUETA AZUL L1/L2 */
                         color: white!important;
-                        font-size: ${orientacao === 'retrato'? '8pt' : '6.5pt'};
+                        font-size: ${orientacao === 'retrato'? '9pt' : '8pt'};
                         font-weight: bold;
-                        padding: 0.5mm 1.5mm;
-                        border-radius: 0.8mm;
+                        padding: 0.5mm 2mm;
+                        border-radius: 1mm;
                         z-index: 2;
                     }
-                  .foto {
+                 .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
@@ -287,15 +287,16 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 1mm;
+                        padding: 1.5mm;
+                        margin-top: 0;
                     }
-                  .foto img {
+                 .foto img {
                         max-width: 100%;
                         max-height: 100%;
                         object-fit: contain;
                         object-position: center 15%;
                     }
-                  .sem-foto {
+                 .sem-foto {
                         width: 100%;
                         height: 100%;
                         background: #ecf0f1;
@@ -303,27 +304,27 @@
                         align-items: center;
                         justify-content: center;
                         color: #7f8c8d;
-                        font-size: 7pt;
+                        font-size: 8pt;
                     }
-                  .nome {
+                 .nome {
                         background: white!important;
-                        font-size: ${orientacao === 'retrato'? '9.5pt' : '8pt'}; /* AUMENTEI MAIS */
+                        font-size: ${orientacao === 'retrato'? '10pt' : '9pt'}; /* FONTE MAIOR */
                         font-weight: bold;
                         text-align: center;
-                        padding: 1mm;
-                        min-height: ${orientacao === 'retrato'? '11mm' : '8mm'};
+                        padding: 1.5mm 1mm;
+                        min-height: ${orientacao === 'retrato'? '12mm' : '10mm'};
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        line-height: 1;
+                        line-height: 1.1;
                         flex-shrink: 0;
                         word-break: break-word;
                         color: #2c3e50;
-                        border-top: 0.8pt solid #E67E22;
+                        border-top: 1pt solid #E67E22;
                     }
-                  .rodape-pagina {
+                 .rodape-pagina {
                         text-align: center;
-                        font-size: 6.5pt;
+                        font-size: 7pt;
                         color: #666;
                         height: 4mm;
                         line-height: 4mm;
