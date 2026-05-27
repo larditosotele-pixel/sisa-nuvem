@@ -98,7 +98,13 @@
             font-size: 11px;
         }
         .dia-campos { flex: 1; display: flex; gap: 15px; }
-        .campo { flex: 1; border-bottom: 1px solid #999; padding-bottom: 2px; font-size: 10px; }
+        .campo { 
+            flex: 1; 
+            border-bottom: 1px solid #999; 
+            padding-bottom: 2px; 
+            font-size: 10px;
+            min-height: 14px;
+        }
 
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -233,6 +239,7 @@
                             <div class="campo">Resp:</div>
                             <div class="campo">Ass:</div>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
