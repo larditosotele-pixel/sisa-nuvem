@@ -1,181 +1,183 @@
-function imprimir(orientacao) {
-    const cards = Array.from(document.querySelectorAll('.grid.card'));
-    if (cards.length === 0) {
-        alert('Nenhum card encontrado na página!');
-        return;
-    }
-
-    // REGRA FIXA: 35 por página pra caber 100 em 3 folhas
-    const colunas = orientacao === 'retrato'? 5 : 7;
-    const linhas = orientacao === 'retrato'? 7 : 5;
-    const cardsPorPagina = 35; // TRAVADO EM 35
-
-    // Calcula quantas páginas vai precisar
-    const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
-
-    let html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Carômetro - Impressão</title>
-            <style>
-                @page {
-                    size: A4 ${orientacao};
-                    margin: 0;
-                }
-                * {
-                    -webkit-print-color-adjust: exact!important;
-                    print-color-adjust: exact!important;
-                    box-sizing: border-box;
-                    margin: 0;
-                    padding: 0;
-                }
-                html, body {
-                    height: 100%;
-                    background: white;
-                }
-               .pagina {
-                    width: ${orientacao === 'retrato'? '210mm' : '297mm'};
-                    height: ${orientacao === 'retrato'? '297mm' : '210mm'};
-                    padding: 3mm;
-                    page-break-after: always;
-                    display: flex;
-                    flex-direction: column;
-                    overflow: hidden;
-                }
-               .pagina:last-child { page-break-after: auto; }
-               .rodape-pagina {
-                    text-align: center;
-                    font-size: 8pt;
-                    color: #666;
-                    padding: 1mm 0;
-                    flex-shrink: 0;
-                }
-                table {
-                    width: 100%;
-                    flex: 1;
-                    border-collapse: collapse;
-                    table-layout: fixed;
-                }
-                tbody {
-                    height: 100%;
-                }
-                tr {
-                    height: 20%; /* 5 linhas = 20% cada. Sempre ocupa altura total */
-                    page-break-inside: avoid!important;
-                }
-                td {
-                    width: ${100/colunas}%;
-                    padding: 0.8mm;
-                    vertical-align: top;
-                    border: 0.8pt solid #000;
-                    overflow: hidden;
-                }
-               .card {
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    overflow: hidden;
-                }
-               .header {
-                    background: #4a90e2!important;
-                    color: white!important;
-                    font-size: 8pt;
-                    font-weight: bold;
-                    text-align: center;
-                    height: 5mm;
-                    line-height: 5mm;
-                    flex-shrink: 0;
-                }
-               .foto {
-                    flex: 1;
-                    overflow: hidden;
-                    min-height: 0;
-                    padding: 1mm;
-                    background: white;
-                }
-               .foto img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: contain;
-                    object-position: center 30%;
-                }
-               .sem-foto {
-                    width: 100%;
-                    height: 100%;
-                    background: #e9ecef;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #6c757d;
-                    font-size: 7pt;
-                }
-               .nome {
-                    background: #f8f9fa!important;
-                    font-size: 8.5pt;
-                    font-weight: bold;
-                    text-align: center;
-                    padding: 1.5mm;
-                    min-height: 14mm;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    line-height: 1.2;
-                    flex-shrink: 0;
-                    word-break: break-word;
-                }
-            </style>
-        </head>
-        <body>
-    `;
-
-    for (let p = 0; p < totalPaginas; p++) {
-        const inicio = p * cardsPorPagina + 1;
-        const fim = Math.min((p + 1) * cardsPorPagina, cards.length);
-        const cardsPagina = cards.slice(p * cardsPorPagina, (p + 1) * cardsPorPagina);
-
-        html += '<div class="pagina"><table><tbody>';
-
-        for (let l = 0; l < linhas; l++) {
-            html += '<tr>';
-            for (let c = 0; c < colunas; c++) {
-                const idx = l * colunas + c;
-                if (idx < cardsPagina.length) {
-                    const card = cardsPagina[idx];
-                    const quarto = card.querySelector('.card-header')?.textContent || '';
-                    const foto = card.querySelector('.card-foto')?.innerHTML || '<div class="sem-foto">Sem Foto</div>';
-                    const nome = card.querySelector('.card-nome')?.textContent || '';
-                    html += `
-                        <td>
-                            <div class="card">
-                                <div class="header">${quarto}</div>
-                                <div class="foto">${foto}</div>
-                                <div class="nome">${nome}</div>
-                            </div>
-                        </td>
-                    `;
-                } else {
-                    html += '<td></td>';
-                }
-            }
-            html += '</tr>';
+<script>
+    function imprimir(orientacao) {
+        const cards = Array.from(document.querySelectorAll('.grid.card'));
+        if (cards.length === 0) {
+            alert('Nenhum card encontrado na página!');
+            return;
         }
-        html += `</tbody></table>
-                 <div class="rodape-pagina">Página ${p + 1} de ${totalPaginas} | Cards ${inicio} ao ${fim} | Total: ${cards.length}</div>
-                 </div>`;
+
+        // REGRA FIXA: 35 por página pra caber 100 em 3 folhas
+        const colunas = orientacao === 'retrato'? 5 : 7;
+        const linhas = orientacao === 'retrato'? 7 : 5;
+        const cardsPorPagina = 35; // TRAVADO EM 35
+
+        // Calcula quantas páginas vai precisar
+        const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
+
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Carômetro - Impressão</title>
+                <style>
+                    @page {
+                        size: A4 ${orientacao};
+                        margin: 0;
+                    }
+                    * {
+                        -webkit-print-color-adjust: exact!important;
+                        print-color-adjust: exact!important;
+                        box-sizing: border-box;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    html, body {
+                        height: 100%;
+                        background: white;
+                    }
+                   .pagina {
+                        width: ${orientacao === 'retrato'? '210mm' : '297mm'};
+                        height: ${orientacao === 'retrato'? '297mm' : '210mm'};
+                        padding: 3mm;
+                        page-break-after: always;
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+                    }
+                   .pagina:last-child { page-break-after: auto; }
+                   .rodape-pagina {
+                        text-align: center;
+                        font-size: 8pt;
+                        color: #666;
+                        padding: 1mm 0;
+                        flex-shrink: 0;
+                    }
+                    table {
+                        width: 100%;
+                        flex: 1;
+                        border-collapse: collapse;
+                        table-layout: fixed;
+                    }
+                    tbody {
+                        height: 100%;
+                    }
+                    tr {
+                        height: 20%;
+                        page-break-inside: avoid!important;
+                    }
+                    td {
+                        width: ${100/colunas}%;
+                        padding: 0.8mm;
+                        vertical-align: top;
+                        border: 0.8pt solid #000;
+                        overflow: hidden;
+                    }
+                   .card {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+                    }
+                   .header {
+                        background: #4a90e2!important;
+                        color: white!important;
+                        font-size: 8pt;
+                        font-weight: bold;
+                        text-align: center;
+                        height: 5mm;
+                        line-height: 5mm;
+                        flex-shrink: 0;
+                    }
+                   .foto {
+                        flex: 1;
+                        overflow: hidden;
+                        min-height: 0;
+                        padding: 1mm;
+                        background: white;
+                    }
+                   .foto img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                        object-position: center 30%;
+                    }
+                   .sem-foto {
+                        width: 100%;
+                        height: 100%;
+                        background: #e9ecef;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #6c757d;
+                        font-size: 7pt;
+                    }
+                   .nome {
+                        background: #f8f9fa!important;
+                        font-size: 8.5pt;
+                        font-weight: bold;
+                        text-align: center;
+                        padding: 1.5mm;
+                        min-height: 14mm;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        line-height: 1.2;
+                        flex-shrink: 0;
+                        word-break: break-word;
+                    }
+                </style>
+            </head>
+            <body>
+        `;
+
+        for (let p = 0; p < totalPaginas; p++) {
+            const inicio = p * cardsPorPagina + 1;
+            const fim = Math.min((p + 1) * cardsPorPagina, cards.length);
+            const cardsPagina = cards.slice(p * cardsPorPagina, (p + 1) * cardsPorPagina);
+
+            html += '<div class="pagina"><table><tbody>';
+
+            for (let l = 0; l < linhas; l++) {
+                html += '<tr>';
+                for (let c = 0; c < colunas; c++) {
+                    const idx = l * colunas + c;
+                    if (idx < cardsPagina.length) {
+                        const card = cardsPagina[idx];
+                        const quarto = card.querySelector('.card-header')?.textContent || '';
+                        const foto = card.querySelector('.card-foto')?.innerHTML || '<div class="sem-foto">Sem Foto</div>';
+                        const nome = card.querySelector('.card-nome')?.textContent || '';
+                        html += `
+                            <td>
+                                <div class="card">
+                                    <div class="header">${quarto}</div>
+                                    <div class="foto">${foto}</div>
+                                    <div class="nome">${nome}</div>
+                                </div>
+                            </td>
+                        `;
+                    } else {
+                        html += '<td></td>';
+                    }
+                }
+                html += '</tr>';
+            }
+            html += `</tbody></table>
+                     <div class="rodape-pagina">Página ${p + 1} de ${totalPaginas} | Cards ${inicio} ao ${fim} | Total: ${cards.length}</div>
+                     </div>`;
+        }
+        html += '</body></html>';
+
+        const janela = window.open('', '_blank');
+        janela.document.write(html);
+        janela.document.close();
+
+        janela.onload = function() {
+            setTimeout(() => {
+                janela.focus();
+                janela.print();
+            }, 500);
+        };
     }
-    html += '</body></html>';
-
-    const janela = window.open('', '_blank');
-    janela.document.write(html);
-    janela.document.close();
-
-    janela.onload = function() {
-        setTimeout(() => {
-            janela.focus();
-            janela.print();
-        }, 500);
-    };
-}
+</script>
