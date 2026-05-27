@@ -186,7 +186,6 @@
         let cards = Array.from(document.querySelectorAll('.grid.card'));
         if (cards.length === 0) cards = Array.from(document.querySelectorAll('.card'));
 
-        console.log('Cards encontrados:', cards.length);
         if (cards.length === 0) {
             alert('Nenhum card encontrado!');
             return;
@@ -202,7 +201,6 @@
                 <meta charset="UTF-8">
                 <title>Carômetro - Impressão</title>
                 <style>
-                    /* TRAVA O CHROME: SEM MARGEM E SEM ESCALA */
                     @page {
                         size: A4 ${orientacao};
                         margin: 0;
@@ -218,26 +216,29 @@
                         width: 100%;
                         height: 100%;
                         background: white;
+                        overflow: hidden;
                     }
                   .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
                         padding: 2mm;
                         page-break-after: always;
-                        display: flex;
-                        flex-direction: column;
+                        position: relative;
                     }
                   .pagina:last-child { page-break-after: auto; }
                   
-                    /* GRID TRAVA AS 7 LINHAS EM 100% DA ALTURA - CHROME NÃO MUDA */
+                    /* GRID ABSOLUTO OCUPANDO A PÁGINA TODA */
                   .grid-cards {
                         display: grid;
                         grid-template-columns: repeat(5, 1fr);
                         grid-template-rows: repeat(7, 1fr);
                         gap: 3mm;
-                        flex: 1;
-                        height: calc(100% - 5mm); /* Desconta rodapé */
-                        page-break-inside: avoid;
+                        width: 100%;
+                        height: calc(100% - 5mm);
+                        position: absolute;
+                        top: 2mm;
+                        left: 2mm;
+                        right: 2mm;
                     }
                   .card {
                         width: 100%;
@@ -249,7 +250,6 @@
                         overflow: hidden;
                         position: relative;
                         background: white;
-                        page-break-inside: avoid;
                     }
                  .leito {
                         position: absolute;
@@ -306,12 +306,15 @@
                         border-top: 1pt solid #E67E22;
                     }
                  .rodape-pagina {
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
                         text-align: center;
                         font-size: 7pt;
                         color: #666;
                         height: 4mm;
                         line-height: 4mm;
-                        flex-shrink: 0;
                     }
                 </style>
             </head>
@@ -325,7 +328,7 @@
 
             html += '<div class="pagina"><div class="grid-cards">';
 
-            // SEMPRE 35 CÉLULAS - 7 LINHAS X 5 COLUNAS
+            // FORÇA 35 POSIÇÕES SEMPRE - 7 LINHAS X 5 COLUNAS
             for (let i = 0; i < 35; i++) {
                 if (i < cardsPagina.length) {
                     const card = cardsPagina[i];
@@ -341,7 +344,8 @@
                         </div>
                     `;
                 } else {
-                    html += '<div></div>'; // CÉLULA VAZIA PRA MANTER O GRID 5X7
+                    // ESSA DIV VAZIA É OBRIGATÓRIA PRA OCUPAR O ESPAÇO
+                    html += '<div style="border: 1pt dashed #ddd;"></div>';
                 }
             }
             html += `</div>
