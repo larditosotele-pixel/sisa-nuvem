@@ -188,20 +188,20 @@
         
         console.log('Cards encontrados:', cards.length);
         if (cards.length === 0) {
-            alert('Nenhum card encontrado! Abre o F12 > Console e me manda print.');
+            alert('Nenhum card encontrado!');
             return;
         }
 
-        // REGRA FIXA: 35 por página
+        // NOVA REGRA: 41 por página pra paisagem, 35 pra retrato
         const colunas = orientacao === 'retrato' ? 5 : 7;
-        const linhas = orientacao === 'retrato' ? 7 : 5;
-        const cardsPorPagina = 35;
+        const linhas = orientacao === 'retrato' ? 7 : 6; // 6 LINHAS NA PAISAGEM
+        const cardsPorPagina = orientacao === 'retrato' ? 35 : 41; // 41 CARDS
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
         
         // Altura total da página A4 menos margem e rodapé
         const alturaUtil = orientacao === 'retrato' ? '285mm' : '198mm';
-        const alturaLinha = `${100 / linhas}%`; // 20% pra 5 linhas
+        const alturaLinha = `${100 / linhas}%`; // Agora 16.66% pra 6 linhas
 
         let html = `
             <!DOCTYPE html>
@@ -229,20 +229,20 @@
                    .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
-                        padding: 3mm 3mm 0 3mm;
+                        padding: 2mm 2mm 0 2mm;
                         page-break-after: always;
                         position: relative;
                     }
                    .pagina:last-child { page-break-after: auto; }
                    .rodape-pagina {
                         position: absolute;
-                        bottom: 1mm;
+                        bottom: 0.5mm;
                         left: 0;
                         right: 0;
                         text-align: center;
-                        font-size: 8pt;
+                        font-size: 7pt;
                         color: #666;
-                        height: 5mm;
+                        height: 4mm;
                     }
                     table {
                         width: 100%;
@@ -256,9 +256,9 @@
                     }
                     td {
                         width: ${100/colunas}%;
-                        padding: 0.8mm;
+                        padding: 0.5mm;
                         vertical-align: top;
-                        border: 0.8pt solid #000;
+                        border: 0.6pt solid #000;
                         overflow: hidden;
                     }
                    .card {
@@ -271,18 +271,18 @@
                    .header {
                         background: #4a90e2!important;
                         color: white!important;
-                        font-size: 7pt;
+                        font-size: 6.5pt;
                         font-weight: bold;
                         text-align: center;
-                        height: 4.5mm;
-                        line-height: 4.5mm;
+                        height: 4mm;
+                        line-height: 4mm;
                         flex-shrink: 0;
                     }
                    .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
-                        padding: 1mm;
+                        padding: 0.5mm;
                         background: white;
                     }
                    .foto img {
@@ -299,15 +299,15 @@
                         align-items: center;
                         justify-content: center;
                         color: #6c757d;
-                        font-size: 7pt;
+                        font-size: 6pt;
                     }
                    .nome {
                         background: #f8f9fa!important;
-                        font-size: 8pt;
+                        font-size: 7.5pt;
                         font-weight: bold;
                         text-align: center;
-                        padding: 1mm;
-                        min-height: 12mm;
+                        padding: 0.5mm;
+                        min-height: 10mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
