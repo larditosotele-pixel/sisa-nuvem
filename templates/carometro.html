@@ -185,23 +185,21 @@
     function imprimir(orientacao) {
         let cards = Array.from(document.querySelectorAll('.grid.card'));
         if (cards.length === 0) cards = Array.from(document.querySelectorAll('.card'));
-        
+
         console.log('Cards encontrados:', cards.length);
         if (cards.length === 0) {
             alert('Nenhum card encontrado!');
             return;
         }
 
-        // NOVA REGRA: 41 por página pra paisagem, 35 pra retrato
-        const colunas = orientacao === 'retrato' ? 5 : 7;
-        const linhas = orientacao === 'retrato' ? 7 : 6; // 6 LINHAS NA PAISAGEM
-        const cardsPorPagina = orientacao === 'retrato' ? 35 : 41; // 41 CARDS
+        // NOVA REGRA: 42 por página pra paisagem, 35 pra retrato
+        const colunas = orientacao === 'retrato'? 5 : 7;
+        const linhasMax = orientacao === 'retrato'? 7 : 6; // Máximo de linhas
+        const cardsPorPagina = orientacao === 'retrato'? 35 : 42; // 42 CARDS AGORA
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
-        
-        // Altura total da página A4 menos margem e rodapé
-        const alturaUtil = orientacao === 'retrato' ? '285mm' : '198mm';
-        const alturaLinha = `${100 / linhas}%`; // Agora 16.66% pra 6 linhas
+
+        const alturaUtil = orientacao === 'retrato'? '285mm' : '198mm';
 
         let html = `
             <!DOCTYPE html>
@@ -226,15 +224,15 @@
                         height: 100%;
                         background: white;
                     }
-                   .pagina {
+                  .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
                         padding: 2mm 2mm 0 2mm;
                         page-break-after: always;
                         position: relative;
                     }
-                   .pagina:last-child { page-break-after: auto; }
-                   .rodape-pagina {
+                  .pagina:last-child { page-break-after: auto; }
+                  .rodape-pagina {
                         position: absolute;
                         bottom: 0.5mm;
                         left: 0;
@@ -246,12 +244,10 @@
                     }
                     table {
                         width: 100%;
-                        height: ${alturaUtil};
                         border-collapse: collapse;
                         table-layout: fixed;
                     }
                     tr {
-                        height: ${alturaLinha};
                         page-break-inside: avoid!important;
                     }
                     td {
@@ -261,14 +257,14 @@
                         border: 0.6pt solid #000;
                         overflow: hidden;
                     }
-                   .card {
+                  .card {
                         width: 100%;
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
                     }
-                   .header {
+                  .header {
                         background: #4a90e2!important;
                         color: white!important;
                         font-size: 6.5pt;
@@ -278,20 +274,20 @@
                         line-height: 4mm;
                         flex-shrink: 0;
                     }
-                   .foto {
+                  .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
                         padding: 0.5mm;
                         background: white;
                     }
-                   .foto img {
+                  .foto img {
                         width: 100%;
                         height: 100%;
                         object-fit: contain;
                         object-position: center 30%;
                     }
-                   .sem-foto {
+                  .sem-foto {
                         width: 100%;
                         height: 100%;
                         background: #e9ecef;
@@ -301,7 +297,7 @@
                         color: #6c757d;
                         font-size: 6pt;
                     }
-                   .nome {
+                  .nome {
                         background: #f8f9fa!important;
                         font-size: 7.5pt;
                         font-weight: bold;
@@ -325,10 +321,14 @@
             const fim = Math.min((p + 1) * cardsPorPagina, cards.length);
             const cardsPagina = cards.slice(p * cardsPorPagina, (p + 1) * cardsPorPagina);
 
+            // CALCULA QUANTAS LINHAS REAIS ESSA PÁGINA PRECISA
+            const linhasNecessarias = Math.ceil(cardsPagina.length / colunas);
+            const alturaLinha = `${198 / linhasMax}mm`; // Altura fixa baseada em 6 linhas max
+
             html += '<div class="pagina"><table>';
 
-            for (let l = 0; l < linhas; l++) {
-                html += '<tr>';
+            for (let l = 0; l < linhasNecessarias; l++) {
+                html += `<tr style="height:${alturaLinha}">`;
                 for (let c = 0; c < colunas; c++) {
                     const idx = l * colunas + c;
                     if (idx < cardsPagina.length) {
@@ -346,7 +346,8 @@
                             </td>
                         `;
                     } else {
-                        html += '<td></td>';
+                        // NÃO CRIA MAIS TD VAZIO. Só fecha a linha.
+                        break;
                     }
                 }
                 html += '</tr>';
