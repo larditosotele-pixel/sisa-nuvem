@@ -183,10 +183,15 @@
 
 <script>
     function imprimir(orientacao) {
-        // CORRIGIDO: tem que ter espaço entre.grid e.card
-        const cards = Array.from(document.querySelectorAll('.grid.card'));
+        // Tenta 3 seletores diferentes pra achar os cards de qualquer jeito
+        let cards = Array.from(document.querySelectorAll('.grid.card'));
+        if (cards.length === 0) cards = Array.from(document.querySelectorAll('.container.card'));
+        if (cards.length === 0) cards = Array.from(document.querySelectorAll('.card'));
+
+        console.log('Cards encontrados:', cards.length); // Isso vai mostrar no F12 quantos achou
+
         if (cards.length === 0) {
-            alert('Nenhum card encontrado na página! Verifica se os conviventes carregaram.');
+            alert('Nenhum card encontrado! Abre o F12 > Console e me manda print do que apareceu.');
             return;
         }
 
@@ -195,7 +200,6 @@
         const linhas = orientacao === 'retrato'? 7 : 5;
         const cardsPorPagina = 35; // TRAVADO EM 35
 
-        // Calcula quantas páginas vai precisar
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
 
         let html = `
@@ -220,7 +224,7 @@
                         height: 100%;
                         background: white;
                     }
-                .pagina {
+               .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
                         padding: 3mm;
@@ -229,8 +233,8 @@
                         flex-direction: column;
                         overflow: hidden;
                     }
-                .pagina:last-child { page-break-after: auto; }
-                .rodape-pagina {
+               .pagina:last-child { page-break-after: auto; }
+               .rodape-pagina {
                         text-align: center;
                         font-size: 8pt;
                         color: #666;
@@ -257,14 +261,14 @@
                         border: 0.8pt solid #000;
                         overflow: hidden;
                     }
-                .card {
+               .card {
                         width: 100%;
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
                     }
-                .header {
+               .header {
                         background: #4a90e2!important;
                         color: white!important;
                         font-size: 8pt;
@@ -274,20 +278,20 @@
                         line-height: 5mm;
                         flex-shrink: 0;
                     }
-                .foto {
+               .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
                         padding: 1mm;
                         background: white;
                     }
-                .foto img {
+               .foto img {
                         width: 100%;
                         height: 100%;
                         object-fit: contain;
                         object-position: center 30%;
                     }
-                .sem-foto {
+               .sem-foto {
                         width: 100%;
                         height: 100%;
                         background: #e9ecef;
@@ -297,7 +301,7 @@
                         color: #6c757d;
                         font-size: 7pt;
                     }
-                .nome {
+               .nome {
                         background: #f8f9fa!important;
                         font-size: 8.5pt;
                         font-weight: bold;
@@ -365,5 +369,3 @@
         };
     }
 </script>
-</body>
-</html>
