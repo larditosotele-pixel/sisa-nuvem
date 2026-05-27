@@ -197,8 +197,6 @@
         const cardsPorPagina = orientacao === 'retrato'? 35 : 42;
 
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
-
-        // DIMINUÍ 1MM POR LINHA PRA DAR FOLGA E NÃO ENCAvALAR
         const alturaLinha = orientacao === 'retrato'? '39mm' : '32mm';
 
         let html = `
@@ -227,7 +225,7 @@
                   .pagina {
                         width: ${orientacao === 'retrato'? '210mm' : '297mm'};
                         height: ${orientacao === 'retrato'? '297mm' : '210mm'};
-                        padding: 2mm;
+                        padding: 3mm;
                         page-break-after: always;
                         display: flex;
                         flex-direction: column;
@@ -242,41 +240,44 @@
                     table {
                         width: 100%;
                         border-collapse: separate;
-                        border-spacing: 0;
+                        border-spacing: 2mm; /* ESPAÇO ENTRE OS CARDS */
                         table-layout: fixed;
                     }
                     tr {
                         height: ${alturaLinha};
                         page-break-inside: avoid!important;
-                        page-break-after: avoid!important;
                     }
                     td {
                         width: ${100/colunas}%;
                         padding: 0;
                         vertical-align: top;
-                        border: 0.8pt solid #000;
-                        overflow: hidden;
                         page-break-inside: avoid!important;
                         height: ${alturaLinha};
                     }
+                  /* CARD NO ESTILO MAPA DE LEITOS */
                   .card {
                         width: 100%;
                         height: ${alturaLinha};
+                        border: 1.5pt solid #E67E22; /* BORDA LARANJA */
+                        border-radius: 2mm; /* CANTOS ARREDONDADOS */
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
                         page-break-inside: avoid!important;
+                        position: relative;
+                        background: white;
                     }
-                  .header {
-                        background: #4a90e2!important;
+                  .leito {
+                        position: absolute;
+                        top: 1mm;
+                        left: 1mm;
+                        background: #3498DB!important; /* ETIQUETA AZUL */
                         color: white!important;
-                        font-size: 8pt; /* AUMENTEI */
+                        font-size: 7pt;
                         font-weight: bold;
-                        text-align: center;
-                        height: 5mm;
-                        line-height: 5mm;
-                        flex-shrink: 0;
-                        border-bottom: 0.8pt solid #000;
+                        padding: 0.5mm 1.5mm;
+                        border-radius: 1mm;
+                        z-index: 2;
                     }
                   .foto {
                         flex: 1;
@@ -286,38 +287,39 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 0.5mm;
+                        padding: 2mm 2mm 1mm 2mm; /* ESPAÇO BRANCO IGUAL AO SISA */
+                        margin-top: 4mm; /* ESPAÇO PRA ETIQUETA NÃO COBRIR A FOTO */
                     }
                   .foto img {
                         max-width: 100%;
                         max-height: 100%;
                         object-fit: contain;
-                        object-position: center 25%;
+                        object-position: center 30%;
                     }
                   .sem-foto {
                         width: 100%;
                         height: 100%;
-                        background: #e9ecef;
+                        background: #ecf0f1;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        color: #6c757d;
+                        color: #7f8c8d;
                         font-size: 7pt;
                     }
                   .nome {
-                        background: #f8f9fa!important;
-                        font-size: 9pt; /* AUMENTEI */
+                        background: white!important;
+                        font-size: 8.5pt; /* FONTE MAIOR */
                         font-weight: bold;
                         text-align: center;
-                        padding: 1mm;
-                        height: 11mm; /* AUMENTEI */
+                        padding: 1mm 2mm 2mm;
+                        min-height: 10mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         line-height: 1.1;
                         flex-shrink: 0;
                         word-break: break-word;
-                        border-top: 0.8pt solid #000;
+                        color: #2c3e50;
                     }
                   .rodape-pagina {
                         text-align: center;
@@ -326,7 +328,6 @@
                         height: 5mm;
                         line-height: 5mm;
                         flex-shrink: 0;
-                        border-top: 0.6pt solid #ccc;
                         margin-top: 1mm;
                     }
                 </style>
@@ -348,13 +349,15 @@
                     const idx = l * colunas + c;
                     if (idx < cardsPagina.length) {
                         const card = cardsPagina[idx];
-                        const quarto = card.querySelector('.card-header')?.textContent || '';
+                        // Pega só o L1, L2, L3, L4 do texto "Q1-L1", "Q1-L2"...
+                        const textoCompleto = card.querySelector('.card-header')?.textContent || '';
+                        const leito = textoCompleto.split('-')[1]?.trim() || textoCompleto;
                         const foto = card.querySelector('.card-foto')?.innerHTML || '<div class="sem-foto">Sem Foto</div>';
                         const nome = card.querySelector('.card-nome')?.textContent || '';
                         html += `
                             <td>
                                 <div class="card">
-                                    <div class="header">${quarto}</div>
+                                    <div class="leito">${leito}</div>
                                     <div class="foto">${foto}</div>
                                     <div class="nome">${nome}</div>
                                 </div>
