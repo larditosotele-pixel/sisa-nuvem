@@ -1,354 +1,181 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carômetro - SISA</title>
-    <style id="estilo-base">
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .navbar {
-            background: #2e7d32;
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .logo-img {
-            width: 45px;
-            height: 45px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-        .logo-img img { width: 35px; height: 35px; object-fit: contain; }
-        .navbar-info h2 { font-size: 22px; margin: 0; }
-        .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
-
-        .header {
-            background: white;
-            padding: 8px 15px;
-            border-radius: 4px;
-            margin: 5px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .header h1 { font-size: 16px; }
-        .botoes { display: flex; gap: 4px; flex-wrap: wrap; }
-        .btn {
-            padding: 5px 8px;
-            border: 1px solid #007bff;
-            background: white;
-            color: #007bff;
-            text-decoration: none;
-            border-radius: 3px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn.active { background: #007bff; color: white; }
-        .btn-imprimir { background: #28a745; color: white; border-color: #28a745; }
-        .btn-paisagem { background: #ffc107; color: #000; border-color: #ffc107; }
-
-        .container {
-            background: white;
-            padding: 5px 15px 15px;
-            margin: 0 15px 15px;
-            border-radius: 4px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-        }
-
-        .card {
-            border: 1px solid #000;
-            background: white;
-            display: flex;
-            flex-direction: column;
-        }
-        .card-header {
-            background: #4a90e2;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            text-align: center;
-            padding: 3px 0;
-            line-height: 1.1;
-            white-space: nowrap;
-        }
-        .card-foto {
-            padding: 2px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #fff;
-            height: 80px;
-        }
-        .card-foto img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border: 1px solid #ccc;
-        }
-        .sem-foto {
-            width: 100%;
-            height: 100%;
-            border-radius: 4px;
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-            font-size: 9px;
-            border: 1px solid #ccc;
-        }
-        .card-nome {
-            font-size: 10px;
-            font-weight: bold;
-            text-align: center;
-            padding: 3px 2px;
-            line-height: 1.2;
-            word-break: break-word;
-            min-height: 32px;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        @media (max-width: 768px) {
-            .grid { grid-template-columns: repeat(4, 1fr); }
-            .navbar { padding: 12px 15px; }
-            .navbar-info h2 { font-size: 18px; }
-            .navbar-info p { font-size: 10px; }
-            .header { margin: 5px; }
-            .container { margin: 0 5px 5px; padding: 5px; }
-        }
-    </style>
-    
-    <style id="estilo-impressao"></style>
-</head>
-<body>
-    <div class="navbar">
-        <div class="logo-img">
-            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
-        </div>
-        <div class="navbar-info">
-            <h2>SISA</h2>
-            <p>Sistema Integrado de Saúde e Acompanhamento - CAE Idoso Lar Ditoso</p>
-        </div>
-    </div>
-
-    <div class="header">
-        <h1>Carômetro - Conviventes | Total: {{ conviventes|length }} / 100</h1>
-        <div class="botoes">
-            <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
-            <a href="{{ url_for('carometro', ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
-            <a href="{{ url_for('carometro', ordem='alfabetica') }}" class="btn {% if ordem == 'alfabetica' %}active{% endif %}">A-Z</a>
-            <button onclick="imprimir('retrato')" class="btn btn-imprimir">📄 PDF Retrato</button>
-            <button onclick="imprimir('paisagem')" class="btn btn-paisagem">📄 PDF Paisagem</button>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="grid">
-            {% for conv in conviventes %}
-                <div class="card">
-                    <div class="card-header">Q{{ conv.quarto_numero }} - L{{ conv.numero_leito }}</div>
-                    <div class="card-foto">
-                        {% if conv.foto_base64 %}
-                            <img src="{{ conv.foto_base64 }}" alt="{{ conv.nome }}">
-                        {% else %}
-                            <div class="sem-foto">S/Foto</div>
-                        {% endif %}
-                    </div>
-                    <div class="card-nome">{{ conv.nome }}</div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-
-<script>
-    function imprimir(orientacao) {
-        const cards = Array.from(document.querySelectorAll('.grid .card'));
-        if (cards.length === 0) {
-            alert('Nenhum card encontrado na página!');
-            return;
-        }
-
-        const colunas = orientacao === 'retrato' ? 5 : 7;
-        const linhas = orientacao === 'retrato' ? 7 : 5;
-        const cardsPorPagina = colunas * linhas;
-
-        let html = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Carômetro - Impressão</title>
-                <style>
-                    @page { 
-                        size: A4 ${orientacao}; 
-                        margin: 0; 
-                    }
-                    * { 
-                        -webkit-print-color-adjust: exact !important; 
-                        print-color-adjust: exact !important;
-                        box-sizing: border-box;
-                        margin: 0;
-                        padding: 0;
-                    }
-                    html, body { 
-                        height: 100%; 
-                        background: white; 
-                    }
-                    .pagina {
-                        width: ${orientacao === 'retrato' ? '210mm' : '297mm'};
-                        height: ${orientacao === 'retrato' ? '297mm' : '210mm'};
-                        padding: 3mm;
-                        page-break-after: always;
-                        display: flex;
-                        flex-direction: column;
-                        overflow: hidden;
-                    }
-                    .pagina:last-child { page-break-after: auto; }
-                    table {
-                        width: 100%;
-                        flex: 1;
-                        border-collapse: collapse;
-                        table-layout: fixed;
-                    }
-                    tbody {
-                        height: 100%;
-                    }
-                    tr {
-                        height: ${100/linhas}%;
-                        page-break-inside: avoid !important;
-                    }
-                    td {
-                        width: ${100/colunas}%;
-                        padding: 0.8mm;
-                        vertical-align: top;
-                        border: 0.8pt solid #000;
-                        overflow: hidden;
-                    }
-                    .card {
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        flex-direction: column;
-                        overflow: hidden;
-                    }
-                    .header {
-                        background: #4a90e2 !important;
-                        color: white !important;
-                        font-size: 8pt;
-                        font-weight: bold;
-                        text-align: center;
-                        height: 5mm;
-                        line-height: 5mm;
-                        flex-shrink: 0;
-                    }
-                    .foto {
-                        flex: 1;
-                        overflow: hidden;
-                        min-height: 0;
-                        padding: 1mm;
-                        background: white;
-                    }
-                    .foto img {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
-                        object-position: center 30%;
-                    }
-                    .sem-foto {
-                        width: 100%;
-                        height: 100%;
-                        background: #e9ecef;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: #6c757d;
-                        font-size: 7pt;
-                    }
-                    .nome {
-                        background: #f8f9fa !important;
-                        font-size: 8.5pt;
-                        font-weight: bold;
-                        text-align: center;
-                        padding: 1.5mm;
-                        min-height: 13mm;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        line-height: 1.2;
-                        flex-shrink: 0;
-                        word-break: break-word;
-                    }
-                </style>
-            </head>
-            <body>
-        `;
-
-        const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
-        
-        for (let p = 0; p < totalPaginas; p++) {
-            html += '<div class="pagina"><table><tbody>';
-            const inicio = p * cardsPorPagina;
-            const cardsPagina = cards.slice(inicio, inicio + cardsPorPagina);
-
-            for (let l = 0; l < linhas; l++) {
-                html += '<tr>';
-                for (let c = 0; c < colunas; c++) {
-                    const idx = l * colunas + c;
-                    if (idx < cardsPagina.length) {
-                        const card = cardsPagina[idx];
-                        const quarto = card.querySelector('.card-header')?.textContent || '';
-                        const foto = card.querySelector('.card-foto')?.innerHTML || '<div class="sem-foto">Sem Foto</div>';
-                        const nome = card.querySelector('.card-nome')?.textContent || '';
-                        html += `
-                            <td>
-                                <div class="card">
-                                    <div class="header">${quarto}</div>
-                                    <div class="foto">${foto}</div>
-                                    <div class="nome">${nome}</div>
-                                </div>
-                            </td>
-                        `;
-                    } else {
-                        html += '<td></td>';
-                    }
-                }
-                html += '</tr>';
-            }
-            html += '</tbody></table></div>';
-        }
-        html += '</body></html>';
-
-        const janela = window.open('', '_blank');
-        janela.document.write(html);
-        janela.document.close();
-        
-        janela.onload = function() {
-            setTimeout(() => {
-                janela.focus();
-                janela.print();
-            }, 500);
-        };
+function imprimir(orientacao) {
+    const cards = Array.from(document.querySelectorAll('.grid.card'));
+    if (cards.length === 0) {
+        alert('Nenhum card encontrado na página!');
+        return;
     }
-</script>
-</body>
-</html>
+
+    // REGRA FIXA: 35 por página pra caber 100 em 3 folhas
+    const colunas = orientacao === 'retrato'? 5 : 7;
+    const linhas = orientacao === 'retrato'? 7 : 5;
+    const cardsPorPagina = 35; // TRAVADO EM 35
+
+    // Calcula quantas páginas vai precisar
+    const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
+
+    let html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Carômetro - Impressão</title>
+            <style>
+                @page {
+                    size: A4 ${orientacao};
+                    margin: 0;
+                }
+                * {
+                    -webkit-print-color-adjust: exact!important;
+                    print-color-adjust: exact!important;
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                }
+                html, body {
+                    height: 100%;
+                    background: white;
+                }
+               .pagina {
+                    width: ${orientacao === 'retrato'? '210mm' : '297mm'};
+                    height: ${orientacao === 'retrato'? '297mm' : '210mm'};
+                    padding: 3mm;
+                    page-break-after: always;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                }
+               .pagina:last-child { page-break-after: auto; }
+               .rodape-pagina {
+                    text-align: center;
+                    font-size: 8pt;
+                    color: #666;
+                    padding: 1mm 0;
+                    flex-shrink: 0;
+                }
+                table {
+                    width: 100%;
+                    flex: 1;
+                    border-collapse: collapse;
+                    table-layout: fixed;
+                }
+                tbody {
+                    height: 100%;
+                }
+                tr {
+                    height: 20%; /* 5 linhas = 20% cada. Sempre ocupa altura total */
+                    page-break-inside: avoid!important;
+                }
+                td {
+                    width: ${100/colunas}%;
+                    padding: 0.8mm;
+                    vertical-align: top;
+                    border: 0.8pt solid #000;
+                    overflow: hidden;
+                }
+               .card {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                }
+               .header {
+                    background: #4a90e2!important;
+                    color: white!important;
+                    font-size: 8pt;
+                    font-weight: bold;
+                    text-align: center;
+                    height: 5mm;
+                    line-height: 5mm;
+                    flex-shrink: 0;
+                }
+               .foto {
+                    flex: 1;
+                    overflow: hidden;
+                    min-height: 0;
+                    padding: 1mm;
+                    background: white;
+                }
+               .foto img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                    object-position: center 30%;
+                }
+               .sem-foto {
+                    width: 100%;
+                    height: 100%;
+                    background: #e9ecef;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #6c757d;
+                    font-size: 7pt;
+                }
+               .nome {
+                    background: #f8f9fa!important;
+                    font-size: 8.5pt;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 1.5mm;
+                    min-height: 14mm;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    line-height: 1.2;
+                    flex-shrink: 0;
+                    word-break: break-word;
+                }
+            </style>
+        </head>
+        <body>
+    `;
+
+    for (let p = 0; p < totalPaginas; p++) {
+        const inicio = p * cardsPorPagina + 1;
+        const fim = Math.min((p + 1) * cardsPorPagina, cards.length);
+        const cardsPagina = cards.slice(p * cardsPorPagina, (p + 1) * cardsPorPagina);
+
+        html += '<div class="pagina"><table><tbody>';
+
+        for (let l = 0; l < linhas; l++) {
+            html += '<tr>';
+            for (let c = 0; c < colunas; c++) {
+                const idx = l * colunas + c;
+                if (idx < cardsPagina.length) {
+                    const card = cardsPagina[idx];
+                    const quarto = card.querySelector('.card-header')?.textContent || '';
+                    const foto = card.querySelector('.card-foto')?.innerHTML || '<div class="sem-foto">Sem Foto</div>';
+                    const nome = card.querySelector('.card-nome')?.textContent || '';
+                    html += `
+                        <td>
+                            <div class="card">
+                                <div class="header">${quarto}</div>
+                                <div class="foto">${foto}</div>
+                                <div class="nome">${nome}</div>
+                            </div>
+                        </td>
+                    `;
+                } else {
+                    html += '<td></td>';
+                }
+            }
+            html += '</tr>';
+        }
+        html += `</tbody></table>
+                 <div class="rodape-pagina">Página ${p + 1} de ${totalPaginas} | Cards ${inicio} ao ${fim} | Total: ${cards.length}</div>
+                 </div>`;
+    }
+    html += '</body></html>';
+
+    const janela = window.open('', '_blank');
+    janela.document.write(html);
+    janela.document.close();
+
+    janela.onload = function() {
+        setTimeout(() => {
+            janela.focus();
+            janela.print();
+        }, 500);
+    };
+}
