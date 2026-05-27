@@ -47,27 +47,32 @@
         .header-nav a { color: #007bff; text-decoration: none; font-weight: bold; }
 
         .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 0 15px 30px;
-            display: block;
+            max-width: 1200px !important; 
+            margin: 0 auto !important; 
+            padding: 0 15px 30px !important;
+            display: block !important;
+            float: none !important;
+            position: static !important;
         }
 
         .quarto-bloco {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: relative;
-            top: auto;
-            left: auto;
-            transform: none;
-            display: block;
-            width: 100%;
-            clear: none;
-            float: none;
-            isolation: isolate;
+            background: white !important;
+            border-radius: 8px !important;
+            padding: 15px !important;
+            margin-bottom: 15px !important;
+            margin-top: 0 !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+            position: static !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+            display: block !important;
+            width: 100% !important;
+            clear: both !important;
+            float: none !important;
+            overflow: visible !important;
         }
         .quarto-header {
             display: flex;
@@ -81,12 +86,13 @@
         .btn-add { background: #2e7d32; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
         .grid-leitos {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 10px;
-            grid-auto-rows: 220px;
-            width: 100%;
-            align-items: start;
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+            gap: 10px !important;
+            grid-auto-rows: 220px !important;
+            width: 100% !important;
+            align-items: start !important;
+            position: static !important;
         }
         .card-leito {
             border: 2px solid #ddd;
@@ -151,9 +157,9 @@
 
         @media (max-width: 600px) {
             .grid-leitos {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 6px;
-                grid-auto-rows: 160px;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 6px !important;
+                grid-auto-rows: 160px !important;
             }
             .card-leito {
                 padding: 6px;
@@ -166,11 +172,11 @@
                 font-size: 9px;
             }
             .quarto-bloco {
-                padding: 10px;
-                margin-bottom: 12px;
+                padding: 10px !important;
+                margin-bottom: 12px !important;
             }
             .header-nav { margin: 10px; padding: 12px 15px; }
-            .container { padding: 0 8px 20px; }
+            .container { padding: 0 8px 20px !important; }
             .num-leito { font-size: 9px; padding: 1px 5px; }
         }
 
@@ -282,6 +288,7 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
         {% endfor %}
     </div>
 
