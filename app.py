@@ -122,7 +122,10 @@ def chamada():
         cur.close()
         conn.close()
         flash('Chamada salva com sucesso!')
-        return redirect(url_for('chamada', data=data_str))
+
+        # ALTERAÇÃO: REDIRECIONA PRO RELATÓRIO VISUAL
+        data_formatada = hoje.strftime('%d-%m-%Y')
+        return redirect(url_for('relatorio_chamada_visual', data=data_formatada))
 
     # PARTE DO GET - CORRIGIDA COM FUSO E NAVEGAÇÃO
     ordem = request.args.get('ordem', 'quarto')
@@ -417,6 +420,71 @@ def carometro():
     except Exception as e:
         print(f"ERRO NO CARÔMETRO: {e}")
         return render_template('carometro.html', conviventes=[], ordem=ordem, orientacao=orientacao, erro=str(e))
+
+# NOVA ROTA: RELATÓRIO VISUAL DA CHAMADA
+@app.route('/relatorio_chamada_visual/<data>')
+def relatorio_chamada_visual(data):
+    try:
+        data_obj = datetime.strptime(data, '%d-%m-%Y').date()
+    except ValueError:
+        flash('Data inválida')
+        return redirect(url_for('chamada'))
+
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Busca todos os conviventes ativos com quarto/leito
+    cur.execute('''
+        SELECT
+            c.id, c.nome,
+            q.numero as quarto_numero,
+            l.numero_leito,
+            ch.status
+        FROM conviventes c
+        LEFT JOIN leitos l ON c.leito_id = l.id
+        LEFT JOIN quartos q ON l.quarto_id = q.id
+        LEFT JOIN chamadas ch ON c.id = ch.convivente_id AND ch.data_chamada = %s
+        WHERE c.ativo = TRUE
+        ORDER BY c.nome ASC
+    ''', (data_obj,))
+
+    todos = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # Separa por status
+    faltaram = []
+    autorizados = []
+    hospitalizados = []
+    presentes = []
+    nao_verificados = []
+
+    for conv in todos:
+        item = {
+            'nome': conv['nome'],
+            'quarto': conv['quarto_numero'],
+            'leito': conv['numero_leito']
+        }
+
+        if conv['status'] == 'F':
+            faltaram.append(item)
+        elif conv['status'] == 'A':
+            autorizados.append(item)
+        elif conv['status'] == 'H':
+            hospitalizados.append(item)
+        elif conv['status'] == 'P':
+            presentes.append(item)
+        else:
+            nao_verificados.append(item)
+
+    return render_template('relatorio_chamada_visual.html',
+                         data=data,
+                         data_url=data_obj.strftime('%Y-%m-%d'),
+                         faltaram=faltaram,
+                         autorizados=autorizados,
+                         hospitalizados=hospitalizados,
+                         presentes=presentes,
+                         nao_verificados=nao_verificados)
 
 if __name__ == '__main__':
     app.run(debug=True)
