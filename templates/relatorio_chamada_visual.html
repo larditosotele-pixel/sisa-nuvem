@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Contagem - {{ data }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        
+       .navbar {
+            background: #2e7d32; color: white; padding: 15px 30px;
+            display: flex; align-items: center; gap: 15px; margin: -20px -20px 20px -20px;
+        }
+       .logo-img { width: 45px; height: 45px; background: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden; }
+       .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+       .navbar-info h2 { font-size: 22px; margin: 0; }
+       .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+
+       .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; }
+        h1 { font-size: 24px; color: #333; margin-bottom: 20px; }
+       .botoes { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+       .btn { padding: 8px 15px; border: none; background: #6c757d; color: white; 
+            border-radius: 4px; font-size: 14px; cursor: pointer; text-decoration: none; }
+       .btn-imprimir { background: #343a40; }
+        
+       .bloco { margin-bottom: 15px; border-radius: 6px; overflow: hidden; }
+       .bloco-header { padding: 10px 15px; font-weight: bold; font-size: 14px; color: white; }
+       .bloco-lista { padding: 10px 15px; background: #fff; }
+       .bloco-item { display: flex; justify-content: space-between; padding: 6px 0; 
+            border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+       .bloco-item:last-child { border-bottom: none; }
+       .qtd { font-size: 12px; color: #666; }
+
+        /* CORES IGUAL AO PRINT */
+       .faltaram .bloco-header { background: #dc3545; }
+       .faltaram .bloco-lista { background: #f8d7da; }
+       .faltaram { border-left: 4px solid #dc3545; }
+        
+       .autorizados .bloco-header { background: #ffc107; color: #000; }
+       .autorizados .bloco-lista { background: #fff3cd; }
+       .autorizados { border-left: 4px solid #ffc107; }
+        
+       .hospitalizados .bloco-header { background: #17a2b8; }
+       .hospitalizados .bloco-lista { background: #d1ecf1; }
+       .hospitalizados { border-left: 4px solid #17a2b8; }
+        
+       .presentes .bloco-header { background: #28a745; }
+       .presentes .bloco-lista { background: #d4edda; }
+       .presentes { border-left: 4px solid #28a745; }
+        
+       .nao-verificados .bloco-header { background: #6c757d; }
+       .nao-verificados .bloco-lista { background: #e9ecef; }
+       .nao-verificados { border-left: 4px solid #6c757d; }
+
+        @media print {
+           .navbar, .botoes { display: none; }
+            body { background: white; padding: 0; }
+           .container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo-img">
+            <img src="{{ url_for('static', filename='logo_ki.png') }}" alt="Logo Lar Ditoso">
+        </div>
+        <div class="navbar-info">
+            <h2>SISA</h2>
+            <p>CAE Idoso - Lar Ditoso</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>RELATÓRIO DE CONTAGEM - {{ data }}</h1>
+        
+        <div class="botoes">
+            <button onclick="window.print()" class="btn btn-imprimir">🖨️ IMPRIMIR ESTE RESUMO</button>
+            <a href="{{ url_for('index') }}" class="btn">← VOLTAR AO MAPA</a>
+        </div>
+
+        {% if faltaram %}
+        <div class="bloco faltaram">
+            <div class="bloco-header">FALTARAM (F) - Total: {{ faltaram|length }}</div>
+            <div class="bloco-lista">
+                {% for p in faltaram %}
+                <div class="bloco-item">
+                    <span>{{ p.nome }}</span>
+                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if autorizados %}
+        <div class="bloco autorizados">
+            <div class="bloco-header">AUTORIZADOS (A) - Total: {{ autorizados|length }}</div>
+            <div class="bloco-lista">
+                {% for p in autorizados %}
+                <div class="bloco-item">
+                    <span>{{ p.nome }}</span>
+                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if hospitalizados %}
+        <div class="bloco hospitalizados">
+            <div class="bloco-header">HOSPITALIZADOS (H) - Total: {{ hospitalizados|length }}</div>
+            <div class="bloco-lista">
+                {% for p in hospitalizados %}
+                <div class="bloco-item">
+                    <span>{{ p.nome }}</span>
+                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if presentes %}
+        <div class="bloco presentes">
+            <div class="bloco-header">PRESENTES (P) - Total: {{ presentes|length }}</div>
+            <div class="bloco-lista">
+                {% for p in presentes %}
+                <div class="bloco-item">
+                    <span>{{ p.nome }}</span>
+                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if nao_verificados %}
+        <div class="bloco nao-verificados">
+            <div class="bloco-header">NÃO VERIFICADOS - Total: {{ nao_verificados|length }}</div>
+            <div class="bloco-lista">
+                {% for p in nao_verificados %}
+                <div class="bloco-item">
+                    <span>{{ p.nome }}</span>
+                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
