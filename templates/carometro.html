@@ -182,7 +182,7 @@
     </div>
 
 <script>
-    function imprimir(orientacao) {
+    function imprimir() {
         let cards = Array.from(document.querySelectorAll('.grid.card'));
         if (cards.length === 0) cards = Array.from(document.querySelectorAll('.card'));
 
@@ -191,9 +191,6 @@
             return;
         }
 
-        // VOLTEI PRO QUE FUNCIONA: 4 COLUNAS X 10 LINHAS = 40 CARDS
-        const colunas = 4;
-        const linhas = 10;
         const cardsPorPagina = 40;
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
 
@@ -202,10 +199,10 @@
             <html>
             <head>
                 <meta charset="UTF-8">
-                <title>Carômetro - Impressão</title>
+                <title>Mapa de Leitos - SISA</title>
                 <style>
                     @page {
-                        size: A4 ${orientacao};
+                        size: A4 portrait;
                         margin: 0;
                     }
                     * {
@@ -216,58 +213,39 @@
                         padding: 0;
                     }
                     html, body {
-                        width: 100%;
-                        height: 100%;
+                        width: 210mm;
+                        height: 297mm;
                         background: white;
-                        overflow: hidden;
                     }
-                  .pagina {
-                        width: ${orientacao === 'retrato'? '210mm' : '297mm'};
-                        height: ${orientacao === 'retrato'? '297mm' : '210mm'};
-                        padding: 2mm;
+               .pagina {
+                        width: 210mm;
+                        height: 297mm;
+                        padding: 4mm;
                         page-break-after: always;
-                        position: relative;
                     }
-                  .pagina:last-child { page-break-after: auto; }
-                  
-                    /* GRID 4X10 FIXO - IGUAL AO PRINT */
-                  .grid-cards {
+               .pagina:last-child { page-break-after: auto; }
+
+                    /* 4 COLUNAS X 10 LINHAS - CRAVADO */
+               .grid-cards {
                         display: grid;
                         grid-template-columns: repeat(4, 1fr);
                         grid-template-rows: repeat(10, 1fr);
-                        gap: 2mm;
-                        width: 100%;
-                        height: calc(100% - 5mm);
-                        position: absolute;
-                        top: 2mm;
-                        left: 2mm;
-                        right: 2mm;
-                    }
-                  .card {
+                        gap: 3mm;
                         width: 100%;
                         height: 100%;
-                        border: 1.2pt solid #E67E22;
-                        border-radius: 1.5mm;
+                    }
+               .card {
+                        width: 100%;
+                        height: 100%;
+                        border: 1.5pt solid #E67E22;
+                        border-radius: 2mm;
                         display: flex;
                         flex-direction: column;
                         overflow: hidden;
-                        position: relative;
                         background: white;
                         page-break-inside: avoid;
                     }
-                 .leito {
-                        position: absolute;
-                        top: 0.5mm;
-                        left: 0.5mm;
-                        background: #3498DB!important;
-                        color: white!important;
-                        font-size: 7.5pt;
-                        font-weight: bold;
-                        padding: 0.3mm 1.5mm;
-                        border-radius: 0.8mm;
-                        z-index: 2;
-                    }
-                 .foto {
+              .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
@@ -275,50 +253,36 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 1mm;
+                        padding: 2mm;
                     }
-                 .foto img {
+              .foto img {
                         max-width: 100%;
                         max-height: 100%;
                         object-fit: contain;
-                        object-position: center 15%;
                     }
-                 .sem-foto {
+              .sem-foto {
                         width: 100%;
                         height: 100%;
-                        background: #ecf0f1;
+                        background: #f8f9fa;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        color: #7f8c8d;
-                        font-size: 7pt;
+                        color: #999;
+                        font-size: 8pt;
                     }
-                 .nome {
+              .nome {
                         background: white!important;
-                        font-size: 8.5pt;
-                        font-weight: bold;
+                        font-size: 9pt;
+                        font-weight: 500;
                         text-align: center;
-                        padding: 1mm;
-                        min-height: 9mm;
+                        padding: 2mm 1mm;
+                        min-height: 10mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        line-height: 1;
-                        flex-shrink: 0;
-                        word-break: break-word;
-                        color: #2c3e50;
-                        border-top: 0.8pt solid #E67E22;
-                    }
-                 .rodape-pagina {
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        text-align: center;
-                        font-size: 6.5pt;
-                        color: #666;
-                        height: 4mm;
-                        line-height: 4mm;
+                        line-height: 1.1;
+                        color: #333;
+                        border-top: 1pt solid #E67E22;
                     }
                 </style>
             </head>
@@ -326,34 +290,28 @@
         `;
 
         for (let p = 0; p < totalPaginas; p++) {
-            const inicio = p * cardsPorPagina + 1;
-            const fim = Math.min((p + 1) * cardsPorPagina, cards.length);
             const cardsPagina = cards.slice(p * cardsPorPagina, (p + 1) * cardsPorPagina);
 
             html += '<div class="pagina"><div class="grid-cards">';
 
-            // SEMPRE 40 POSIÇÕES - 10 LINHAS X 4 COLUNAS
             for (let i = 0; i < 40; i++) {
                 if (i < cardsPagina.length) {
                     const card = cardsPagina[i];
-                    const textoCompleto = card.querySelector('.card-header')?.textContent || '';
-                    const leito = textoCompleto.split('-')[1]?.trim() || textoCompleto;
                     const foto = card.querySelector('.card-foto')?.innerHTML || '<div class="sem-foto">Sem Foto</div>';
                     const nome = card.querySelector('.card-nome')?.textContent || '';
+
+                    // SEM.leito - SÓ FOTO E NOME
                     html += `
                         <div class="card">
-                            <div class="leito">${leito}</div>
                             <div class="foto">${foto}</div>
                             <div class="nome">${nome}</div>
                         </div>
                     `;
                 } else {
-                    html += '<div></div>'; // CÉLULA VAZIA PRA MANTER O GRID
+                    html += '<div></div>';
                 }
             }
-            html += `</div>
-                     <div class="rodape-pagina">Página ${p + 1} de ${totalPaginas} | Cards ${inicio} ao ${fim} | Total: ${cards.length}</div>
-                     </div>`;
+            html += `</div></div>`;
         }
         html += '</body></html>';
 
