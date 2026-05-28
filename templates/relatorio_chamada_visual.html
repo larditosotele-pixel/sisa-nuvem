@@ -7,57 +7,58 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-        
-       .navbar {
+
+      .navbar {
             background: #2e7d32; color: white; padding: 15px 30px;
             display: flex; align-items: center; gap: 15px; margin: -20px -20px 20px -20px;
         }
-       .logo-img { width: 45px; height: 45px; background: white; border-radius: 50%; 
+      .logo-img { width: 45px; height: 45px; background: white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; overflow: hidden; }
-       .logo-img img { width: 35px; height: 35px; object-fit: contain; }
-       .navbar-info h2 { font-size: 22px; margin: 0; }
-       .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+      .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+      .navbar-info h2 { font-size: 22px; margin: 0; }
+      .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
 
-       .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; }
+      .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; }
         h1 { font-size: 24px; color: #333; margin-bottom: 20px; }
-       .botoes { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
-       .btn { padding: 8px 15px; border: none; background: #6c757d; color: white; 
-            border-radius: 4px; font-size: 14px; cursor: pointer; text-decoration: none; }
-       .btn-imprimir { background: #343a40; }
-        
-       .bloco { margin-bottom: 15px; border-radius: 6px; overflow: hidden; }
-       .bloco-header { padding: 10px 15px; font-weight: bold; font-size: 14px; color: white; }
-       .bloco-lista { padding: 10px 15px; background: #fff; }
-       .bloco-item { display: flex; justify-content: space-between; padding: 6px 0; 
+      .botoes { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; flex-wrap: wrap; }
+      .btn { padding: 8px 15px; border: 1px solid #6c757d; background: white; color: #6c757d;
+            border-radius: 4px; font-size: 14px; cursor: pointer; text-decoration: none; font-weight: bold; }
+      .btn.active { background: #007bff; color: white; border-color: #007bff; }
+      .btn-imprimir { background: #343a40; color: white; border-color: #343a40; }
+
+      .bloco { margin-bottom: 15px; border-radius: 6px; overflow: hidden; }
+      .bloco-header { padding: 10px 15px; font-weight: bold; font-size: 14px; color: white; }
+      .bloco-lista { padding: 10px 15px; background: #fff; }
+      .bloco-item { display: flex; justify-content: space-between; padding: 6px 0;
             border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-       .bloco-item:last-child { border-bottom: none; }
-       .qtd { font-size: 12px; color: #666; }
+      .bloco-item:last-child { border-bottom: none; }
+      .qtd { font-size: 12px; color: #666; }
 
         /* CORES IGUAL AO PRINT */
-       .faltaram .bloco-header { background: #dc3545; }
-       .faltaram .bloco-lista { background: #f8d7da; }
-       .faltaram { border-left: 4px solid #dc3545; }
-        
-       .autorizados .bloco-header { background: #ffc107; color: #000; }
-       .autorizados .bloco-lista { background: #fff3cd; }
-       .autorizados { border-left: 4px solid #ffc107; }
-        
-       .hospitalizados .bloco-header { background: #17a2b8; }
-       .hospitalizados .bloco-lista { background: #d1ecf1; }
-       .hospitalizados { border-left: 4px solid #17a2b8; }
-        
-       .presentes .bloco-header { background: #28a745; }
-       .presentes .bloco-lista { background: #d4edda; }
-       .presentes { border-left: 4px solid #28a745; }
-        
-       .nao-verificados .bloco-header { background: #6c757d; }
-       .nao-verificados .bloco-lista { background: #e9ecef; }
-       .nao-verificados { border-left: 4px solid #6c757d; }
+      .faltaram.bloco-header { background: #dc3545; }
+      .faltaram.bloco-lista { background: #f8d7da; }
+      .faltaram { border-left: 4px solid #dc3545; }
+
+      .autorizados.bloco-header { background: #ffc107; color: #000; }
+      .autorizados.bloco-lista { background: #fff3cd; }
+      .autorizados { border-left: 4px solid #ffc107; }
+
+      .hospitalizados.bloco-header { background: #17a2b8; }
+      .hospitalizados.bloco-lista { background: #d1ecf1; }
+      .hospitalizados { border-left: 4px solid #17a2b8; }
+
+      .presentes.bloco-header { background: #28a745; }
+      .presentes.bloco-lista { background: #d4edda; }
+      .presentes { border-left: 4px solid #28a745; }
+
+      .nao-verificados.bloco-header { background: #6c757d; }
+      .nao-verificados.bloco-lista { background: #e9ecef; }
+      .nao-verificados { border-left: 4px solid #6c757d; }
 
         @media print {
-           .navbar, .botoes { display: none; }
+          .navbar,.botoes { display: none; }
             body { background: white; padding: 0; }
-           .container { box-shadow: none; }
+          .container { box-shadow: none; }
         }
     </style>
 </head>
@@ -74,10 +75,13 @@
 
     <div class="container">
         <h1>RELATÓRIO DE CONTAGEM - {{ data }}</h1>
-        
+
         <div class="botoes">
             <button onclick="window.print()" class="btn btn-imprimir">🖨️ IMPRIMIR ESTE RESUMO</button>
-            <a href="{{ url_for('index') }}" class="btn">← VOLTAR AO MAPA</a>
+            <a href="{{ url_for('relatorio_chamada_visual', data=data_url, ordem='status') }}" class="btn {% if ordem == 'status' %}active{% endif %}">Por Status</a>
+            <a href="{{ url_for('relatorio_chamada_visual', data=data_url, ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
+            <a href="{{ url_for('chamada', data=data_url|replace('-', '/')|replace('/', '-')|replace(data_url.split('-')[2] + '-' + data_url.split('-')[1] + '-' + data_url.split('-')[0], data_url.split('-')[2] + '-' + data_url.split('-')[1] + '-' + data_url.split('-')[0]) }}" class="btn">← VOLTAR PRA CHAMADA</a>
+            <a href="{{ url_for('index') }}" class="btn">🏠 MENU</a>
         </div>
 
         {% if faltaram %}
@@ -87,7 +91,7 @@
                 {% for p in faltaram %}
                 <div class="bloco-item">
                     <span>{{ p.nome }}</span>
-                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                    <span class="qtd">Q.{{ p.quarto or '---' }} / L.{{ p.leito or '---' }}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -101,7 +105,7 @@
                 {% for p in autorizados %}
                 <div class="bloco-item">
                     <span>{{ p.nome }}</span>
-                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                    <span class="qtd">Q.{{ p.quarto or '---' }} / L.{{ p.leito or '---' }}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -115,7 +119,7 @@
                 {% for p in hospitalizados %}
                 <div class="bloco-item">
                     <span>{{ p.nome }}</span>
-                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                    <span class="qtd">Q.{{ p.quarto or '---' }} / L.{{ p.leito or '---' }}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -129,11 +133,10 @@
                 {% for p in presentes %}
                 <div class="bloco-item">
                     <span>{{ p.nome }}</span>
-                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                    <span class="qtd">Q.{{ p.quarto or '---' }} / L.{{ p.leito or '---' }}</span>
                 </div>
                 {% endfor %}
             </div>
-        </div>
         {% endif %}
 
         {% if nao_verificados %}
@@ -143,7 +146,7 @@
                 {% for p in nao_verificados %}
                 <div class="bloco-item">
                     <span>{{ p.nome }}</span>
-                    <span class="qtd">Q.{{ p.quarto }} / L.{{ p.leito }}</span>
+                    <span class="qtd">Q.{{ p.quarto or '---' }} / L.{{ p.leito or '---' }}</span>
                 </div>
                 {% endfor %}
             </div>
