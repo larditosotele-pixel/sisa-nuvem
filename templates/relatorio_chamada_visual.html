@@ -56,9 +56,9 @@
       .nao-verificados { border-left: 4px solid #6c757d; }
 
         @media print {
-          .navbar,.botoes { display: none; }
+         .navbar,.botoes { display: none; }
             body { background: white; padding: 0; }
-          .container { box-shadow: none; }
+         .container { box-shadow: none; }
         }
     </style>
 </head>
@@ -80,7 +80,7 @@
             <button onclick="window.print()" class="btn btn-imprimir">🖨️ IMPRIMIR ESTE RESUMO</button>
             <a href="{{ url_for('relatorio_chamada_visual', data=data_url, ordem='status') }}" class="btn {% if ordem == 'status' %}active{% endif %}">Por Status</a>
             <a href="{{ url_for('relatorio_chamada_visual', data=data_url, ordem='quarto') }}" class="btn {% if ordem == 'quarto' %}active{% endif %}">Por Quarto</a>
-            <a href="{{ url_for('chamada', data=data_url|replace('-', '/')|replace('/', '-')|replace(data_url.split('-')[2] + '-' + data_url.split('-')[1] + '-' + data_url.split('-')[0], data_url.split('-')[2] + '-' + data_url.split('-')[1] + '-' + data_url.split('-')[0]) }}" class="btn">← VOLTAR PRA CHAMADA</a>
+            <a href="{{ url_for('chamada', data=data_iso) }}" class="btn">← VOLTAR PRA CHAMADA</a>
             <a href="{{ url_for('index') }}" class="btn">🏠 MENU</a>
         </div>
 
@@ -137,6 +137,7 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
         {% endif %}
 
         {% if nao_verificados %}
