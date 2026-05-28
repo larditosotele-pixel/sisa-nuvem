@@ -421,7 +421,7 @@ def carometro():
         print(f"ERRO NO CARÔMETRO: {e}")
         return render_template('carometro.html', conviventes=[], ordem=ordem, orientacao=orientacao, erro=str(e))
 
-# NOVA ROTA: RELATÓRIO VISUAL DA CHAMADA - ATUALIZADA COM ORDENAÇÃO
+# ROTA: RELATÓRIO VISUAL DA CHAMADA - CORRIGIDA COM ORDENAÇÃO
 @app.route('/relatorio_chamada_visual/<data>')
 def relatorio_chamada_visual(data):
     try:
@@ -471,9 +471,16 @@ def relatorio_chamada_visual(data):
         else:
             nao_verificados.append(item)
 
-    # Função pra ordenar por quarto e depois leito
+    # Função pra ordenar por quarto e depois leito - SEGURA PRA TEXTO
     def ordenar_por_quarto(lista):
-        return sorted(lista, key=lambda x: (x['quarto'] or 999, int(x['leito']) if x['leito'] and str(x['leito']).isdigit() else 999))
+        def get_leito_num(leito):
+            if leito is None:
+                return 999
+            try:
+                return int(str(leito))
+            except (ValueError, TypeError):
+                return 999
+        return sorted(lista, key=lambda x: (x['quarto'] or 999, get_leito_num(x['leito'])))
 
     # Se pediu ordem por quarto, ordena todas as listas
     if ordem == 'quarto':
@@ -483,7 +490,8 @@ def relatorio_chamada_visual(data):
 
     return render_template('relatorio_chamada_visual.html',
                          data=data_obj.strftime('%d/%m/%Y'),
-                         data_url=data, # Passa a data original pra URL
+                         data_url=data, # Pra URL: 27-05-2026
+                         data_iso=data_obj.strftime('%Y-%m-%d'), # Pra voltar pra chamada: 2026-05-27
                          faltaram=status_map['F'],
                          autorizados=status_map['A'],
                          hospitalizados=status_map['H'],
