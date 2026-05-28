@@ -182,7 +182,7 @@
     </div>
 
 <script>
-    function imprimir() {
+    function imprimir(orientacao) {
         let cards = Array.from(document.querySelectorAll('.grid.card'));
         if (cards.length === 0) cards = Array.from(document.querySelectorAll('.card'));
 
@@ -191,7 +191,26 @@
             return;
         }
 
-        const cardsPorPagina = 32;
+        // AJUSTA GRID E QUANTIDADE POR ORIENTAÇÃO
+        let colunas, linhas, cardsPorPagina;
+        let larguraMM, alturaMM;
+
+        if (orientacao === 'paisagem') {
+            // PAISAGEM: 6 colunas x 5 linhas = 30 cards - CARD MAIS QUADRADO/VERTICAL
+            colunas = 6;
+            linhas = 5;
+            cardsPorPagina = 30;
+            larguraMM = 297;
+            alturaMM = 210;
+        } else {
+            // RETRATO: 4 colunas x 8 linhas = 32 cards - CARD VERTICAL QUE VOCÊ GOSTOU
+            colunas = 4;
+            linhas = 8;
+            cardsPorPagina = 32;
+            larguraMM = 210;
+            alturaMM = 297;
+        }
+
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
 
         let html = `
@@ -202,7 +221,7 @@
                 <title>Mapa de Leitos - SISA</title>
                 <style>
                     @page {
-                        size: A4 portrait;
+                        size: A4 ${orientacao};
                         margin: 0;
                     }
                     * {
@@ -213,28 +232,27 @@
                         padding: 0;
                     }
                     html, body {
-                        width: 210mm;
-                        height: 297mm;
+                        width: ${larguraMM}mm;
+                        height: ${alturaMM}mm;
                         background: white;
                     }
-          .pagina {
-                        width: 210mm;
-                        height: 297mm;
+       .pagina {
+                        width: ${larguraMM}mm;
+                        height: ${alturaMM}mm;
                         padding: 4mm;
                         page-break-after: always;
                     }
-          .pagina:last-child { page-break-after: auto; }
+       .pagina:last-child { page-break-after: auto; }
 
-                    /* 4X8 - CARD VERTICAL */
-          .grid-cards {
+       .grid-cards {
                         display: grid;
-                        grid-template-columns: repeat(4, 1fr);
-                        grid-template-rows: repeat(8, 1fr);
+                        grid-template-columns: repeat(${colunas}, 1fr);
+                        grid-template-rows: repeat(${linhas}, 1fr);
                         gap: 3mm;
                         width: 100%;
                         height: 100%;
                     }
-          .card {
+       .card {
                         width: 100%;
                         height: 100%;
                         border: 1.5pt solid #E67E22;
@@ -246,8 +264,7 @@
                         page-break-inside: avoid;
                         position: relative;
                     }
-          /* ETIQUETA AZUL COM QUARTO + LEITO */
-         .etiqueta {
+      .etiqueta {
                         position: absolute;
                         top: 1mm;
                         left: 1mm;
@@ -262,16 +279,16 @@
                         text-align: center;
                         min-width: 8mm;
                     }
-         .quarto {
+      .quarto {
                         display: block;
                         font-size: 8pt;
                     }
-         .leito {
+      .leito {
                         display: block;
                         font-size: 7pt;
                         opacity: 0.9;
                     }
-         .foto {
+      .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
@@ -279,15 +296,15 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 4mm 2mm 2mm 2mm; /* TOPO MAIOR PRA ETIQUETA */
+                        padding: 4mm 2mm 2mm 2mm;
                     }
-         .foto img {
+      .foto img {
                         max-width: 100%;
                         max-height: 100%;
                         object-fit: cover;
                         object-position: center 25%;
                     }
-         .sem-foto {
+      .sem-foto {
                         width: 100%;
                         height: 100%;
                         background: #f8f9fa;
@@ -297,13 +314,13 @@
                         color: #999;
                         font-size: 8pt;
                     }
-         .nome {
+      .nome {
                         background: white!important;
-                        font-size: 8.5pt;
+                        font-size: ${orientacao === 'paisagem'? '8pt' : '8.5pt'};
                         font-weight: 500;
                         text-align: center;
                         padding: 1.5mm 1mm;
-                        min-height: 8mm;
+                        min-height: ${orientacao === 'paisagem'? '7mm' : '8mm'};
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -322,26 +339,20 @@
 
             html += '<div class="pagina"><div class="grid-cards">';
 
-            for (let i = 0; i < 32; i++) {
+            for (let i = 0; i < cardsPorPagina; i++) {
                 if (i < cardsPagina.length) {
                     const card = cardsPagina[i];
 
-                    // AQUI QUEBRA O TEXTO: "Quarto 17 - L1" vira Q17 e L1
                     const textoCompleto = card.querySelector('.card-header')?.textContent || '';
                     let quarto = '';
                     let leito = '';
 
-                    // Tenta extrair "Quarto 17 - L1" ou "Q17 - L1"
                     const partes = textoCompleto.split('-');
                     if (partes.length >= 2) {
-                        // Pega número do quarto: "Quarto 17" vira "Q17"
                         const numQuarto = partes[0].replace(/[^0-9]/g, '');
                         quarto = numQuarto? `Q${numQuarto}` : '';
-
-                        // Pega leito: "L1"
                         leito = partes[1].trim();
                     } else {
-                        // Se não achar o formato, usa o texto todo como leito
                         leito = textoCompleto;
                     }
 
