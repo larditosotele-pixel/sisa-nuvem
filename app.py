@@ -421,7 +421,7 @@ def carometro():
         print(f"ERRO NO CARÔMETRO: {e}")
         return render_template('carometro.html', conviventes=[], ordem=ordem, orientacao=orientacao, erro=str(e))
 
-# NOVA ROTA: RELATÓRIO VISUAL DA CHAMADA
+# NOVA ROTA: RELATÓRIO VISUAL DA CHAMADA - ATUALIZADA COM ORDENAÇÃO
 @app.route('/relatorio_chamada_visual/<data>')
 def relatorio_chamada_visual(data):
     try:
@@ -429,6 +429,9 @@ def relatorio_chamada_visual(data):
     except ValueError:
         flash('Data inválida')
         return redirect(url_for('chamada'))
+
+    # PEGA A ORDEM DA URL:?ordem=quarto ou?ordem=status
+    ordem = request.args.get('ordem', 'status') # 'status' é o padrão
 
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -453,10 +456,7 @@ def relatorio_chamada_visual(data):
     conn.close()
 
     # Separa por status
-    faltaram = []
-    autorizados = []
-    hospitalizados = []
-    presentes = []
+    status_map = {'F': [], 'A': [], 'H': [], 'P': []}
     nao_verificados = []
 
     for conv in todos:
@@ -466,25 +466,30 @@ def relatorio_chamada_visual(data):
             'leito': conv['numero_leito']
         }
 
-        if conv['status'] == 'F':
-            faltaram.append(item)
-        elif conv['status'] == 'A':
-            autorizados.append(item)
-        elif conv['status'] == 'H':
-            hospitalizados.append(item)
-        elif conv['status'] == 'P':
-            presentes.append(item)
+        if conv['status'] in status_map:
+            status_map[conv['status']].append(item)
         else:
             nao_verificados.append(item)
 
+    # Função pra ordenar por quarto e depois leito
+    def ordenar_por_quarto(lista):
+        return sorted(lista, key=lambda x: (x['quarto'] or 999, int(x['leito']) if x['leito'] and str(x['leito']).isdigit() else 999))
+
+    # Se pediu ordem por quarto, ordena todas as listas
+    if ordem == 'quarto':
+        for status in status_map:
+            status_map[status] = ordenar_por_quarto(status_map[status])
+        nao_verificados = ordenar_por_quarto(nao_verificados)
+
     return render_template('relatorio_chamada_visual.html',
-                         data=data,
-                         data_url=data_obj.strftime('%Y-%m-%d'),
-                         faltaram=faltaram,
-                         autorizados=autorizados,
-                         hospitalizados=hospitalizados,
-                         presentes=presentes,
-                         nao_verificados=nao_verificados)
+                         data=data_obj.strftime('%d/%m/%Y'),
+                         data_url=data, # Passa a data original pra URL
+                         faltaram=status_map['F'],
+                         autorizados=status_map['A'],
+                         hospitalizados=status_map['H'],
+                         presentes=status_map['P'],
+                         nao_verificados=nao_verificados,
+                         ordem=ordem)
 
 if __name__ == '__main__':
     app.run(debug=True)
