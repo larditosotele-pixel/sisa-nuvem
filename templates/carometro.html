@@ -191,7 +191,6 @@
             return;
         }
 
-        // 4 COLUNAS X 8 LINHAS = 32 CARDS - CARD VERTICAL
         const cardsPorPagina = 32;
         const totalPaginas = Math.ceil(cards.length / cardsPorPagina);
 
@@ -218,16 +217,16 @@
                         height: 297mm;
                         background: white;
                     }
-            .pagina {
+          .pagina {
                         width: 210mm;
                         height: 297mm;
                         padding: 4mm;
                         page-break-after: always;
                     }
-            .pagina:last-child { page-break-after: auto; }
+          .pagina:last-child { page-break-after: auto; }
 
                     /* 4X8 - CARD VERTICAL */
-            .grid-cards {
+          .grid-cards {
                         display: grid;
                         grid-template-columns: repeat(4, 1fr);
                         grid-template-rows: repeat(8, 1fr);
@@ -235,7 +234,7 @@
                         width: 100%;
                         height: 100%;
                     }
-            .card {
+          .card {
                         width: 100%;
                         height: 100%;
                         border: 1.5pt solid #E67E22;
@@ -247,20 +246,32 @@
                         page-break-inside: avoid;
                         position: relative;
                     }
-           .leito {
+          /* ETIQUETA AZUL COM QUARTO + LEITO */
+         .etiqueta {
                         position: absolute;
                         top: 1mm;
                         left: 1mm;
                         background: #3498DB!important;
                         color: white!important;
-                        font-size: 8pt;
+                        font-size: 7.5pt;
                         font-weight: bold;
-                        padding: 0.5mm 2mm;
+                        padding: 0.8mm 1.5mm;
                         border-radius: 1mm;
                         z-index: 2;
-                        line-height: 1;
+                        line-height: 1.1;
+                        text-align: center;
+                        min-width: 8mm;
                     }
-           .foto {
+         .quarto {
+                        display: block;
+                        font-size: 8pt;
+                    }
+         .leito {
+                        display: block;
+                        font-size: 7pt;
+                        opacity: 0.9;
+                    }
+         .foto {
                         flex: 1;
                         overflow: hidden;
                         min-height: 0;
@@ -268,15 +279,15 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 3mm 2mm 2mm 2mm; /* TOPO MAIOR PRA NÃO PEGAR NA ETIQUETA */
+                        padding: 4mm 2mm 2mm 2mm; /* TOPO MAIOR PRA ETIQUETA */
                     }
-           .foto img {
+         .foto img {
                         max-width: 100%;
                         max-height: 100%;
                         object-fit: cover;
                         object-position: center 25%;
                     }
-           .sem-foto {
+         .sem-foto {
                         width: 100%;
                         height: 100%;
                         background: #f8f9fa;
@@ -286,7 +297,7 @@
                         color: #999;
                         font-size: 8pt;
                     }
-           .nome {
+         .nome {
                         background: white!important;
                         font-size: 8.5pt;
                         font-weight: 500;
@@ -314,13 +325,35 @@
             for (let i = 0; i < 32; i++) {
                 if (i < cardsPagina.length) {
                     const card = cardsPagina[i];
+
+                    // AQUI QUEBRA O TEXTO: "Quarto 17 - L1" vira Q17 e L1
                     const textoCompleto = card.querySelector('.card-header')?.textContent || '';
-                    const leito = textoCompleto.split('-')[1]?.trim() || textoCompleto; // PEGA L1, L2, ETC
+                    let quarto = '';
+                    let leito = '';
+
+                    // Tenta extrair "Quarto 17 - L1" ou "Q17 - L1"
+                    const partes = textoCompleto.split('-');
+                    if (partes.length >= 2) {
+                        // Pega número do quarto: "Quarto 17" vira "Q17"
+                        const numQuarto = partes[0].replace(/[^0-9]/g, '');
+                        quarto = numQuarto? `Q${numQuarto}` : '';
+
+                        // Pega leito: "L1"
+                        leito = partes[1].trim();
+                    } else {
+                        // Se não achar o formato, usa o texto todo como leito
+                        leito = textoCompleto;
+                    }
+
                     const foto = card.querySelector('.card-foto')?.innerHTML || '<div class="sem-foto">Sem Foto</div>';
                     const nome = card.querySelector('.card-nome')?.textContent || '';
+
                     html += `
                         <div class="card">
-                            <div class="leito">${leito}</div>
+                            <div class="etiqueta">
+                                ${quarto? `<span class="quarto">${quarto}</span>` : ''}
+                                <span class="leito">${leito}</span>
+                            </div>
                             <div class="foto">${foto}</div>
                             <div class="nome">${nome}</div>
                         </div>
