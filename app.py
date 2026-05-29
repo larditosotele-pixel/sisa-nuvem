@@ -75,21 +75,67 @@ def adicionar_quarto_mapa():
     flash(f'Quarto {novo_num} criado com sucesso!')
     return redirect(url_for('mapa_leitos') + f'#quarto-{novo_num}')
 
+# ROTA ADICIONAR LEITO - ATUALIZADA PRA PREENCHER BURACOS
 @app.route('/adicionar_leito_mapa/<int:quarto_id>', methods=['POST'])
 def adicionar_leito_mapa(quarto_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT MAX(CAST(numero_leito AS INTEGER)) FROM leitos WHERE quarto_id = %s AND numero_leito ~ \'^[0-9]+$\'', (quarto_id,))
-    max_num = cur.fetchone()[0]
-    novo_num = (max_num or 0) + 1
+
+    # PEGA TODOS OS NÚMEROS DE LEITO DO QUARTO
+    cur.execute("SELECT numero_leito FROM leitos WHERE quarto_id = %s AND numero_leito ~ '^[0-9]+$'", (quarto_id,))
+    leitos_existentes = [int(row[0]) for row in cur.fetchall()]
+
+    # ACHA O PRIMEIRO NÚMERO LIVRE NA SEQUÊNCIA 1,2,3,4...
+    novo_num = 1
+    while novo_num in leitos_existentes:
+        novo_num += 1
+
     cur.execute('INSERT INTO leitos (quarto_id, numero_leito) VALUES (%s, %s)', (quarto_id, str(novo_num)))
     conn.commit()
+
     cur.execute('SELECT numero FROM quartos WHERE id = %s', (quarto_id,))
     quarto_num = cur.fetchone()[0]
     cur.close()
     conn.close()
     flash(f'Leito {novo_num} adicionado ao Quarto {quarto_num}!')
     return redirect(url_for('mapa_leitos') + f'#quarto-{quarto_num}')
+
+# NOVA ROTA: EXCLUIR LEITO
+@app.route('/excluir_leito/<int:leito_id>', methods=['POST'])
+def excluir_leito(leito_id):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # PEGA INFO DO LEITO PRA SABER PRA ONDE VOLTAR
+    cur.execute('''
+        SELECT l.numero_leito, q.numero as quarto_numero, l.quarto_id, l.ocupado
+        FROM leitos l
+        JOIN quartos q ON l.quarto_id = q.id
+        WHERE l.id = %s
+    ''', (leito_id,))
+    leito = cur.fetchone()
+
+    if not leito:
+        flash('Leito não encontrado!')
+        cur.close()
+        conn.close()
+        return redirect(url_for('mapa_leitos'))
+
+    # SEGURANÇA: SÓ DELETA SE TIVER VAGO
+    if leito['ocupado']:
+        flash(f'Não é possível excluir o Leito {leito["numero_leito"]}. Desocupe o convivente primeiro!')
+        cur.close()
+        conn.close()
+        return redirect(url_for('mapa_leitos') + f'#quarto-{leito["quarto_numero"]}')
+
+    # DELETA O LEITO
+    cur.execute('DELETE FROM leitos WHERE id = %s', (leito_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    flash(f'Leito {leito["numero_leito"]} do Quarto {leito["quarto_numero"]} excluído com sucesso!')
+    return redirect(url_for('mapa_leitos') + f'#quarto-{leito["quarto_numero"]}')
 
 @app.route('/chamada', methods=['GET', 'POST'])
 def chamada():
@@ -421,7 +467,7 @@ def carometro():
         print(f"ERRO NO CARÔMETRO: {e}")
         return render_template('carometro.html', conviventes=[], ordem=ordem, orientacao=orientacao, erro=str(e))
 
-# ROTA: RELATÓRIO VISUAL DA CHAMADA - CORRIGIDA COM ORDENAÇÃO
+# ROTA: RELATÓRIO VISUAL DA CHAMADA - COM ORDENAÇÃO
 @app.route('/relatorio_chamada_visual/<data>')
 def relatorio_chamada_visual(data):
     try:
