@@ -5,7 +5,10 @@ import psycopg2
 import psycopg2.extras
 import base64
 from datetime import date
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file
+import io
+import pandas as pd
+from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'uma_chave_secreta_muito_segura_e_dificil')
@@ -13,7 +16,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'uma_chave_secreta_muito_segura_e_
 # TRAVA: LIMITE DE QUARTOS DO LAR DITOSO
 MAX_QUARTOS = 17
 
-# FUSO HORÁRIO DE SÃO PAULO - CORRIGE O BUG DAS 21H
+# FUSO HORÁRIO DE SÃO PAULO
 fuso_sp = pytz.timezone('America/Sao_Paulo')
 
 def get_db_connection():
@@ -64,7 +67,6 @@ def mapa_leitos():
     conn.close()
     return render_template('mapa_leitos.html', quartos=quartos, max_quartos=MAX_QUARTOS)
 
-# ROTA ATUALIZADA: COM TRAVA DE 17 QUARTOS
 @app.route('/adicionar_quarto_mapa', methods=['POST'])
 def adicionar_quarto_mapa():
     conn = get_db_connection()
@@ -88,7 +90,6 @@ def adicionar_quarto_mapa():
     flash(f'Quarto {novo_num} criado com sucesso!')
     return redirect(url_for('mapa_leitos') + f'#quarto-{novo_num}')
 
-# NOVA ROTA: EXCLUIR QUARTO
 @app.route('/excluir_quarto/<int:quarto_id>', methods=['POST'])
 def excluir_quarto(quarto_id):
     conn = get_db_connection()
@@ -168,7 +169,6 @@ def excluir_leito(leito_id):
     flash(f'Leito {leito["numero_leito"]} do Quarto {leito["quarto_numero"]} excluído com sucesso!')
     return redirect(url_for('mapa_leitos') + f'#quarto-{leito["quarto_numero"]}')
 
-# ROTA CORRIGIDA: VAGO NÃO BAGUNÇA MAIS A ORDEM
 @app.route('/editar_convivente/<int:id>', methods=['POST'])
 def editar_convivente(id):
     acao = request.form['acao']
@@ -199,6 +199,176 @@ def editar_convivente(id):
     cur.close()
     conn.close()
     return redirect(url_for('mapa_leitos'))
+
+# ROTA: EXPORTAR MAPEAMENTO EXCEL - LAYOUT IDÊNTICO À FOTO
+@app.route('/exportar_mapeamento')
+def exportar_mapeamento():
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # PEGA TODOS OS QUARTOS E LEITOS
+    cur.execute('''
+        SELECT
+            q.numero as quarto_numero,
+            l.numero_leito,
+            c.nome as convivente_nome,
+            CASE
+                WHEN q.numero IN (1,2,3) THEN 'AMB1'
+                WHEN q.numero IN (4,5,6,7) THEN 'AMB2_H'
+                WHEN q.numero IN (8,9,10,11) THEN 'AMB2_M'
+                WHEN q.numero IN (12,13,14,15) THEN 'AMB3_H'
+                WHEN q.numero IN (16,17) THEN 'AMB3_M'
+                ELSE 'OUTRO'
+            END as ambiente_tipo
+        FROM quartos q
+        LEFT JOIN leitos l ON q.id = l.quarto_id
+        LEFT JOIN conviventes c ON l.id = c.leito_id AND c.ativo = TRUE
+        ORDER BY q.numero, CASE WHEN l.numero_leito ~ '^[0-9]+$' THEN CAST(l.numero_leito AS INTEGER) ELSE 999 END
+    ''')
+
+    dados_raw = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # ORGANIZA POR QUARTO
+    quartos_dict = {}
+    for row in dados_raw:
+        q_num = row['quarto_numero']
+        if q_num not in quartos_dict:
+            quartos_dict[q_num] = {
+                'ambiente': row['ambiente_tipo'],
+                'leitos': []
+            }
+        quartos_dict[q_num]['leitos'].append({
+            'num': row['numero_leito'],
+            'nome': row['convivente_nome'] or 'VAGO'
+        })
+
+    # CRIA EXCEL COM LAYOUT DE 4 COLUNAS
+    output = io.BytesIO()
+    writer = pd.ExcelWriter(output, engine='openpyxl')
+
+    # CORES IGUAIS À SUA PLANILHA
+    cor_amb1 = PatternFill(start_color='C6E0B4', end_color='C6E0B4', fill_type='solid') # Verde claro
+    cor_amb2_h = PatternFill(start_color='BDD7EE', end_color='BDD7EE', fill_type='solid') # Azul claro homens
+    cor_amb2_m = PatternFill(start_color='F8CBAD', end_color='F8CBAD', fill_type='solid') # Laranja mulheres
+    cor_amb3_h = PatternFill(start_color='BDD7EE', end_color='BDD7EE', fill_type='solid') # Azul claro
+    cor_amb3_m = PatternFill(start_color='A9D08E', end_color='A9D08E', fill_type='solid') # Verde
+    cor_cabecalho = PatternFill(start_color='4472C4', end_color='4472C4', fill_type='solid')
+    cor_vago = PatternFill(start_color='F2F2F2', end_color='F2F2F2', fill_type='solid')
+    borda = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+    fonte_branca = Font(color='FFFFFF', bold=True)
+    fonte_preta = Font(bold=True)
+    centro = Alignment(horizontal='center', vertical='center')
+
+    # MONTA LINHAS DO EXCEL
+    linhas = []
+    max_leitos = max([len(q['leitos']) for q in quartos_dict.values()]) if quartos_dict else 8
+
+    # CABEÇALHOS AMB1
+    linhas.append(['AMB 1', 'QUARTO 1 (ACESSIVEL)', 'QUARTO 2 (ACESSIVEL)', 'QUARTO 3 (ACESSIVEL)'])
+    for i in range(max_leitos):
+        linha = [f'LEITO {i+1}']
+        for q in [1,2,3]:
+            if q in quartos_dict and i < len(quartos_dict[q]['leitos']):
+                linha.append(quartos_dict[q]['leitos'][i]['nome'])
+            else:
+                linha.append('')
+        linhas.append(linha)
+
+    # CABEÇALHOS AMB2 HOMENS
+    linhas.append(['AMB 2', 'QUARTO 4', 'QUARTO 5', 'QUARTO 6', 'QUARTO 7'])
+    for i in range(max_leitos):
+        linha = [f'LEITO {i+1}']
+        for q in [4,5,6,7]:
+            if q in quartos_dict and i < len(quartos_dict[q]['leitos']):
+                linha.append(quartos_dict[q]['leitos'][i]['nome'])
+            else:
+                linha.append('')
+        linhas.append(linha)
+
+    # CABEÇALHOS AMB2 MULHERES
+    linhas.append(['AMB 2', 'QUARTO 8', 'QUARTO 9', 'QUARTO 10', 'QUARTO 11'])
+    for i in range(max_leitos):
+        linha = [f'LEITO {i+1}']
+        for q in [8,9,10,11]:
+            if q in quartos_dict and i < len(quartos_dict[q]['leitos']):
+                linha.append(quartos_dict[q]['leitos'][i]['nome'])
+            else:
+                linha.append('')
+        linhas.append(linha)
+
+    # CABEÇALHOS AMB3
+    linhas.append(['AMB 3', 'QUARTO 12', 'QUARTO 13', 'QUARTO 14', 'QUARTO 15'])
+    for i in range(max_leitos):
+        linha = [f'LEITO {i+1}']
+        for q in [12,13,14,15]:
+            if q in quartos_dict and i < len(quartos_dict[q]['leitos']):
+                linha.append(quartos_dict[q]['leitos'][i]['nome'])
+            else:
+                linha.append('')
+        linhas.append(linha)
+
+    # CABEÇALHOS AMB3 FINAL
+    linhas.append(['AMB 3', 'QUARTO 16', 'QUARTO 17'])
+    for i in range(max_leitos):
+        linha = [f'LEITO {i+1}']
+        for q in [16,17]:
+            if q in quartos_dict and i < len(quartos_dict[q]['leitos']):
+                linha.append(quartos_dict[q]['leitos'][i]['nome'])
+            else:
+                linha.append('')
+        linha.extend(['', '']) # Completa 5 colunas
+        linhas.append(linha)
+
+    df = pd.DataFrame(linhas)
+    df.to_excel(writer, index=False, header=False, sheet_name='MAPEAMENTO')
+
+    worksheet = writer.sheets['MAPEAMENTO']
+
+    # APLICA CORES E FORMATAÇÃO
+    row_idx = 1
+    for linha in linhas:
+        if linha[0].startswith('AMB'):
+            # Linha de cabeçalho de ambiente
+            for col in range(1, len(linha) + 1):
+                cell = worksheet.cell(row=row_idx, column=col)
+                cell.fill = cor_cabecalho
+                cell.font = fonte_branca
+                cell.alignment = centro
+                cell.border = borda
+        else:
+            # Linha de leito
+            for col in range(1, len(linha) + 1):
+                cell = worksheet.cell(row=row_idx, column=col)
+                cell.border = borda
+                cell.alignment = centro
+                if linha[0].startswith('LEITO'):
+                    if 'VAGO' in str(cell.value):
+                        cell.fill = cor_vago
+                    elif row_idx <= 7: # AMB1
+                        cell.fill = cor_amb1
+                    elif row_idx <= 16: # AMB2_H
+                        cell.fill = cor_amb2_h
+                    elif row_idx <= 25: # AMB2_M
+                        cell.fill = cor_amb2_m
+                    elif row_idx <= 33: # AMB3_H
+                        cell.fill = cor_amb3_h
+                    else: # AMB3_M
+                        cell.fill = cor_amb3_m
+        row_idx += 1
+
+    # LARGURA COLUNAS
+    for col in ['A', 'B', 'C', 'D', 'E']:
+        worksheet.column_dimensions[col].width = 25
+
+    writer.close()
+    output.seek(0)
+
+    data_hoje = datetime.now(fuso_sp).strftime('%d_%m_%Y')
+    nome_arquivo = f'MAPEAMENTO_DE_LEITOS_CAE_IDOSOS_{data_hoje}.xlsx'
+
+    return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name=nome_arquivo)
 
 # RESTO DAS ROTAS CONTINUA IGUAL...
 @app.route('/chamada', methods=['GET', 'POST'])
