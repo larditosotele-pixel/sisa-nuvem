@@ -15,11 +15,11 @@
       .navbar {
             background: #2e7d32;
             color: white;
-            padding: 15px 30px;
+            padding: 15px 20px !important;
             display: flex;
             align-items: center;
-            gap: 15px;
-            min-height: 75px; /* FORÇA ALTURA PRA CABER 3 LINHAS */
+            gap: 12px !important;
+            min-height: 75px;
         }
       .logo-img {
             width: 45px !important;
@@ -32,7 +32,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            flex-shrink: 0 !important; /* NÃO DEIXA ESPREMER */
+            flex-shrink: 0 !important;
             aspect-ratio: 1 / 1 !important;
         }
        .logo-img img { 
@@ -41,10 +41,16 @@
             object-fit: contain; 
         }
        .navbar-info {
-            flex: 1; /* OCUPA O ESPAÇO RESTANTE */
+            flex: 1;
         }
        .navbar-info h2 { font-size: 22px; margin: 0; }
-       .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; line-height: 1.3; }
+       .navbar-info p { 
+            font-size: 11px; 
+            margin: 0; 
+            opacity: 0.9; 
+            line-height: 1.2;
+            max-width: 220px;
+       }
 
        .header-nav {
             background: white;
@@ -199,8 +205,9 @@
 
         @media (max-width: 600px) {
            .navbar {
-                padding: 12px 15px;
+                padding: 12px 15px !important;
                 min-height: 70px;
+                gap: 10px !important;
            }
            .logo-img {
                 width: 40px !important;
@@ -213,7 +220,10 @@
                 height: 30px; 
            }
            .navbar-info h2 { font-size: 20px; }
-           .navbar-info p { font-size: 10px; }
+           .navbar-info p { 
+                font-size: 10px;
+                max-width: 180px;
+           }
            .grid-leitos {
                 grid-template-columns: repeat(2, 1fr)!important;
                 gap: 6px!important;
@@ -360,7 +370,6 @@
                 </div>
                 {% endfor %}
             </div>
-        </div>
         {% endfor %}
     </div>
 
