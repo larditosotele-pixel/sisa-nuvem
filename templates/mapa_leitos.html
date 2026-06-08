@@ -19,20 +19,32 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            min-height: 75px; /* FORÇA ALTURA PRA CABER 3 LINHAS */
         }
       .logo-img {
-            width: 45px;
-            height: 45px;
+            width: 45px !important;
+            height: 45px !important;
+            min-width: 45px !important;
+            min-height: 45px !important;
             background: white;
-            border-radius: 50%;
+            border-radius: 50% !important;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            flex-shrink: 0 !important; /* NÃO DEIXA ESPREMER */
+            aspect-ratio: 1 / 1 !important;
         }
-       .logo-img img { width: 35px; height: 35px; object-fit: contain; }
+       .logo-img img { 
+            width: 35px; 
+            height: 35px; 
+            object-fit: contain; 
+        }
+       .navbar-info {
+            flex: 1; /* OCUPA O ESPAÇO RESTANTE */
+        }
        .navbar-info h2 { font-size: 22px; margin: 0; }
-       .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; }
+       .navbar-info p { font-size: 11px; margin: 0; opacity: 0.9; line-height: 1.3; }
 
        .header-nav {
             background: white;
@@ -143,7 +155,6 @@
             font-weight: bold;
             z-index: 1;
         }
-        /* BOTÃO EXCLUIR LEITO */
        .btn-excluir-leito {
             position: absolute;
             top: 4px;
@@ -187,6 +198,22 @@
         }
 
         @media (max-width: 600px) {
+           .navbar {
+                padding: 12px 15px;
+                min-height: 70px;
+           }
+           .logo-img {
+                width: 40px !important;
+                height: 40px !important;
+                min-width: 40px !important;
+                min-height: 40px !important;
+           }
+           .logo-img img { 
+                width: 30px; 
+                height: 30px; 
+           }
+           .navbar-info h2 { font-size: 20px; }
+           .navbar-info p { font-size: 10px; }
            .grid-leitos {
                 grid-template-columns: repeat(2, 1fr)!important;
                 gap: 6px!important;
@@ -213,7 +240,6 @@
            .btn-add, .btn-excluir-quarto { padding: 6px 10px; font-size: 12px; }
         }
 
-        /* MODAL */
        .modal {
             display: none;
             position: fixed;
@@ -307,7 +333,6 @@
                     <div class="num-leito">L{{ leito.numero_leito }}</div>
 
                     {% if leito.ocupado %}
-                        <!-- LEITO OCUPADO -->
                         <div onclick="abrirModalEditar({{ leito.convivente_id }}, '{{ leito.convivente_nome }}')" style="height: 100%; display: flex; flex-direction: column;">
                             {% if leito.foto_base64 %}
                             <img src="{{ leito.foto_base64 }}" alt="{{ leito.convivente_nome }}">
@@ -317,7 +342,6 @@
                             <div class="nome">{{ leito.convivente_nome }}</div>
                         </div>
                     {% else %}
-                        <!-- LEITO VAGO - COM BOTÃO EXCLUIR -->
                         <form action="{{ url_for('excluir_leito', leito_id=leito.leito_id) }}" method="POST"
                               onsubmit="return confirm('Tem certeza que deseja excluir o Leito L{{ leito.numero_leito }}?');">
                             <button type="submit" class="btn-excluir-leito" title="Excluir Leito">×</button>
@@ -340,7 +364,6 @@
         {% endfor %}
     </div>
 
-    <!-- MODAL DE EDIÇÃO -->
     <div class="modal" id="modalEditar">
         <div class="modal-content">
             <h2>Editar Convivente</h2>
