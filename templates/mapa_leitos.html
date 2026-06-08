@@ -15,10 +15,11 @@
       .navbar {
             background: #2e7d32;
             color: white;
-            padding: 15px 30px;
+            padding: 15px 30px !important;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 15px !important;
+            min-height: 75px;
         }
       .logo-img {
             width: 45px !important;
@@ -48,7 +49,6 @@
             margin: 0; 
             opacity: 0.9; 
             line-height: 1.2;
-            max-width: 220px;
        }
 
        .header-nav {
@@ -202,27 +202,13 @@
             overflow: hidden;
         }
 
-        @media (max-width: 600px) {
-           .navbar {
-                padding: 12px 15px !important;
-                min-height: 70px;
-                gap: 10px !important;
+        @media (max-width: 768px) {
+           .navbar { 
+                padding: 12px 15px !important; 
+                gap: 15px !important;
            }
-           .logo-img {
-                width: 40px !important;
-                height: 40px !important;
-                min-width: 40px !important;
-                min-height: 40px !important;
-           }
-           .logo-img img { 
-                width: 30px; 
-                height: 30px; 
-           }
-           .navbar-info h2 { font-size: 20px; }
-           .navbar-info p { 
-                font-size: 10px;
-                max-width: 180px;
-           }
+           .navbar-info h2 { font-size: 18px; }
+           .navbar-info p { font-size: 10px; }
            .grid-leitos {
                 grid-template-columns: repeat(2, 1fr)!important;
                 gap: 6px!important;
@@ -369,6 +355,7 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
         {% endfor %}
     </div>
 
