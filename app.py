@@ -1,6 +1,8 @@
 import pytz
 from datetime import datetime, timedelta
 import os
+from dotenv import load_dotenv
+load_dotenv()
 import psycopg2
 import psycopg2.extras
 import base64
@@ -168,7 +170,7 @@ def excluir_leito(leito_id):
     flash(f'Leito {leito["numero_leito"]} do Quarto {leito["quarto_numero"]} excluído com sucesso!')
     return redirect(url_for('mapa_leitos') + f'#quarto-{leito["quarto_numero"]}')
 
-# ROTA CORRIGIDA: VAGO NÃO BAGUNÇA MAIS A ORDEM
+# ROTA CORRIGIDA: DESOCUPAR AGORA APAGA O CONVIVENTE PRA NAO ESTOURAR
 @app.route('/editar_convivente/<int:id>', methods=['POST'])
 def editar_convivente(id):
     acao = request.form['acao']
@@ -178,26 +180,34 @@ def editar_convivente(id):
         nome = request.form['nome']
         cur.execute('UPDATE conviventes SET nome = %s WHERE id = %s', (nome, id))
         flash('Convivente atualizado!')
+        conn.commit()
+        cur.close()
+        conn.close()
     elif acao == 'desocupar':
         cur.execute('''
-            SELECT c.leito_id, l.quarto_id, q.numero as quarto_numero
+            SELECT c.leito_id, q.numero as quarto_numero
             FROM conviventes c
             JOIN leitos l ON c.leito_id = l.id
             JOIN quartos q ON l.quarto_id = q.id
             WHERE c.id = %s
         ''', (id,))
         info = cur.fetchone()
-        cur.execute('UPDATE conviventes SET ativo = FALSE, leito_id = NULL WHERE id = %s', (id,))
-        if info and info['leito_id']:
-            cur.execute('UPDATE leitos SET ocupado = FALSE WHERE id = %s', (info['leito_id'],))
-        flash('Leito desocupado com sucesso!')
+        if info:
+            leito_id = info['leito_id']
+            quarto_numero = info['quarto_numero']
+            # 1. Apaga as chamadas do convivente
+            cur.execute('DELETE FROM chamadas WHERE convivente_id = %s', (id,))
+            # 2. Apaga o convivente
+            cur.execute('DELETE FROM conviventes WHERE id = %s', (id,))
+            # 3. Libera o leito
+            cur.execute('UPDATE leitos SET ocupado = FALSE WHERE id = %s', (leito_id,))
+            flash('Convivente removido e leito desocupado com sucesso!')
+
         conn.commit()
         cur.close()
         conn.close()
         return redirect(url_for('mapa_leitos') + f'#quarto-{info["quarto_numero"]}')
-    conn.commit()
-    cur.close()
-    conn.close()
+
     return redirect(url_for('mapa_leitos'))
 
 # RESTO DAS ROTAS CONTINUA IGUAL...
